@@ -60,19 +60,12 @@
 
 </template>
   
-<script setup>
+<script lang="ts" setup>
   import TodoItem from './Item.vue'
-  import { NForm } from 'naive-ui'
-
-  const props = defineProps({
-    todoData: {
-      type: Array,
-      default: () => []
-    }
-  })
+  import { FormInst } from 'naive-ui'
   import { useStore } from '../../store'
   const store = useStore()
-  const formRef = ref()
+  const formRef = ref<FormInst>()
 
   const rules = ref({
     content: {
@@ -81,6 +74,10 @@
       trigger: 'blur'
     }
   })
+
+  const props = defineProps<{
+    todoData: Record<string, any>
+  }>()
 
   const levelOptions = ref([
     { label: '重要或紧急', value: '1'},
@@ -103,7 +100,7 @@
     type: ''
   })
 
-  const handleAddTodoConfirm = (e) => {
+  const handleAddTodoConfirm = (e: MouseEvent) => {
     e.preventDefault()
     formRef.value?.validate(err => {
       if (err) return

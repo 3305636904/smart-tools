@@ -107,7 +107,7 @@
             <n-p class="w-20vw">
               <n-input v-model:value="searchTodoKey" placeholder="输入待办内容关键字" />
             </n-p>
-            <Todo ref="todoRef" :todoData="showTodoList"/>
+            <TodoList ref="todoRef" :todoData="showTodoList"/>
           </n-collapse-item>
         </n-collapse>
       </n-layout-content>
@@ -126,14 +126,14 @@ import CategoryCard from './CategoryCard.vue'
 import CateModal from './CateModal.vue'
 import ItemModal from './ItemModal.vue'
 import FloatBtn from './FloatBtn.vue'
-import Todo from './Todo/index.vue'
+import TodoList from './Todo/index.vue'
 import type { CollapseProps } from 'naive-ui'
 
 import { writeTextFile, readTextFile } from '@tauri-apps/api/fs'
 import { open, save } from '@tauri-apps/api/dialog'
 
 const store = useStore()
-const todoRef = ref<Todo>()
+const todoRef = ref<typeof TodoList>()
 
 const searchWebKey = ref('')
 const showWebList = computed(() => {
