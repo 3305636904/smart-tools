@@ -1,15 +1,17 @@
 <template>
   <n-card
-    :title="cate.label"
     class="max-w-400px min-w-200px"
     :segmented="{
       content: 'soft',
     }"
     hoverable
   >
+    <template #header>
+      <n-tag class="cursor-pointer" type="success" @dblclick="handleSelect('edit')">{{ cate.label }}</n-tag>
+    </template>
     <template #header-extra>
       <n-dropdown :options="cateOptions" @select="handleSelect">
-        <n-button quaternary circle style="margin-left: 16px">
+        <n-button quaternary circle class="ml-1">
           <template #icon>
             <n-icon>
               <i-material-symbols-expand-circle-down-outline-rounded />
@@ -17,11 +19,19 @@
           </template>
         </n-button>
       </n-dropdown>
+      <n-button quaternary circle @click="handleSelect('add')">
+        <template #icon>
+          <n-icon>
+            <IGridiconsAddOutline/>
+          </n-icon>
+        </template>
+      </n-button>
     </template>
     <n-space class="min-h-20px" vertical>
       <item-card
         class="w-full"
         v-for="item in cate.list"
+        :key="cate.label"
         :item="item"
         :cate="cate.label"
       ></item-card>
@@ -59,6 +69,7 @@ const cateOptions = [
     icon: () => h(NIcon, null, { default: () => h(DeleteCate) }),
   },
 ]
+
 const handleSelect = (key: string) => {
   if (key === 'add') {
     store.itemModal.title = '添加快捷方式'

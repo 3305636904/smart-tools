@@ -7,7 +7,7 @@
       @contextmenu="handleContextMenu"
       @click="handleOpen(item.value)"
     >
-      <div class="w-full h-full flex-1 flex items-center justify-center">
+      <div :title="item.value" class="w-full h-full flex-1 flex items-center justify-center">
         <n-h4 class="m-0">{{ item.label }}</n-h4>
       </div>
     </n-card>
@@ -24,7 +24,7 @@
   </div>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup name="ItemCard">
 import { useStore } from '../store'
 import { NIcon } from 'naive-ui'
 import editIcon from '~icons/line-md/edit'

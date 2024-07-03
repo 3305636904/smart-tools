@@ -7,14 +7,7 @@
     >
       <lock-screen v-if="store.screenLocked" />
       <div class="h-100vh" v-else>
-        <n-collapse>
-          <n-collapse-item title="一个简单的快捷工具" name="1">
-            <category-list />
-          </n-collapse-item>
-          <n-collapse-item title="白银" name="2">
-            <div>很好</div>
-          </n-collapse-item>
-        </n-collapse>
+        <category-list/>
         <div
           v-if="store.data.length === 0"
           class="w-full h-80vh flex justify-center items-center"
