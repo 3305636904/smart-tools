@@ -53,9 +53,9 @@
 
 <script lang="ts" setup>
 import { useStore } from '../store'
-import { NForm } from 'naive-ui'
+import { FormInst } from 'naive-ui'
 const store = useStore()
-const formRef = ref<InstanceType<typeof NForm>>()
+const formRef = ref<FormInst>()
 const rules = ref({
   label: {
     required: true,
@@ -68,7 +68,8 @@ const rules = ref({
     message: '请输入 路径',
   },
 })
-const handleConfirm = () => {
+const handleConfirm = (e: MouseEvent) => {
+  e.preventDefault()
   formRef.value?.validate(async (errors) => {
     if (errors) {
       window.$message.error('请检查快捷方式名称和路径')

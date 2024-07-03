@@ -13,9 +13,10 @@
         <n-collapse class="w-100vw overflow-hidden" :default-expanded-names="store.activeVal" @item-header-click="handleItemHeaderClick" accordion>
           <n-collapse-item title="快捷网站" :name="1">
             <template #header-extra>
-              <n-tooltip placement="left" trigger="hover">
+              <span class="mr-20">
+                <n-tooltip placement="left" trigger="hover">
                 <template #trigger>
-                  <n-icon class="mr-5" @click.stop="clearAll1">
+                  <n-icon class="mr-5" @click.stop="clearAllData">
                     <i-carbon-clean v-if="store.activeVal === 1" class="text-20px" />
                   </n-icon>
                 </template>
@@ -47,16 +48,20 @@
               </n-popover>
               <n-popover placement="left" trigger="hover">
                 <template #trigger>
-                  <n-icon class="mr-20">
+                  <n-icon>
                     <i-ri-question-line v-show="store.activeVal === 1" class="text-20px" />
                   </n-icon>
                 </template>
                 <n-p>左键跳转，右键卡片编辑和删除</n-p>
               </n-popover>
+              </span>
             </template>
+            <n-p class="w-20vw">
+              <n-input v-model:value="searchWebKey" placeholder="输入快捷网站或分类名称" />
+            </n-p>
             <n-space>
               <category-card
-                v-for="item in store.data"
+                v-for="item in showWebList"
                 :key="item.label"
                 :cate="item"
               />
@@ -64,17 +69,45 @@
           </n-collapse-item>
           <n-collapse-item title="待办纪要" :name="2">
             <template #header-extra>
-              <n-popover placement="left" trigger="hover">
-                <template #trigger>
-                  <n-icon class="mr-20">
-                    <IZondiconsAddOutline v-show="store.activeVal === 2" class="text-16px" @click.stop="handleAddTodo"/>
-                    <!-- <i-carbon-category-new v-show="store.activeVal === 2" class="text-20px" @click.stop="handleAddCate"/> -->
-                  </n-icon>
-                </template>
-                <n-p>添加待办纪要</n-p>
-              </n-popover>
+              <span class="mr-20">
+                <n-tooltip placement="left" trigger="hover">
+                  <template #trigger>
+                    <n-icon class="mr-5" @click.stop="clearAllData">
+                      <i-carbon-clean v-if="store.activeVal === 2" class="text-18px" />
+                    </n-icon>
+                  </template>
+                  <n-p>清除所有待办事项</n-p>
+                </n-tooltip>
+                <n-tooltip placement="left" trigger="hover">
+                  <template #trigger>
+                    <n-icon class="mr-5">
+                      <i-line-md-upload-outline-loop v-show="store.activeVal === 2" class="text-18px" @click.stop="handleExport" />
+                    </n-icon>
+                  </template>
+                  <n-p>导出快捷网站</n-p>
+                </n-tooltip>
+                <n-tooltip placement="left" trigger="hover">
+                  <template #trigger>
+                    <n-icon class="mr-5">
+                      <i-line-md-download-outline-loop v-show="store.activeVal === 2" class="text-18px" @click.stop="handleImport"/>
+                    </n-icon>
+                  </template>
+                  <n-p>导入快捷网站</n-p>
+                </n-tooltip>
+                <n-popover placement="left" trigger="hover">
+                  <template #trigger>
+                    <n-icon>
+                      <IZondiconsAddOutline v-show="store.activeVal === 2" class="text-16px" @click.stop="handleAddTodo"/>
+                    </n-icon>
+                  </template>
+                  <n-p>添加待办纪要</n-p>
+                </n-popover>
+              </span>
             </template>
-            <Todo ref="todoRef"/>
+            <n-p class="w-20vw">
+              <n-input v-model:value="searchTodoKey" placeholder="输入待办内容关键字" />
+            </n-p>
+            <Todo ref="todoRef" :todoData="showTodoList"/>
           </n-collapse-item>
         </n-collapse>
       </n-layout-content>
@@ -100,12 +133,23 @@ import { writeTextFile, readTextFile } from '@tauri-apps/api/fs'
 import { open, save } from '@tauri-apps/api/dialog'
 
 const store = useStore()
+const todoRef = ref<Todo>()
 
-const todoRef = ref(null)
+const searchWebKey = ref('')
+const showWebList = computed(() => {
+  if (!searchWebKey.value.trim()) return store.data;
+
+  return store.data.filter(v => v.label.indexOf(searchWebKey.value) !== -1 || v.list.some(v => v.label.indexOf(searchWebKey.value)!== -1))
+})
+
+const searchTodoKey = ref('')
+const showTodoList = computed(() => {
+  if (!searchTodoKey.value.trim()) return store.todoData;
+  return store.todoData.filter(v => v.content.indexOf(searchTodoKey.value)!== -1)
+})
 
 const activeTitle = computed(() => {
-  // const store.cateToolList: Record<number, string> = { 1: `快捷网站`, 2: `待办纪要`, 3: `驼峰下划线相互转换` }
-  return store.activeVal ? store.cateToolList[store.activeVal] : `快捷网站`
+  return store.activeVal ? store.cateToolList[store.activeVal as number] : `快捷网站`
 })
 
 const handleItemHeaderClick: CollapseProps['onItemHeaderClick'] = ({ name, expanded }) => {
@@ -117,21 +161,25 @@ const handleItemHeaderClick: CollapseProps['onItemHeaderClick'] = ({ name, expan
 }
 
 function handleAddTodo() {
-  todoRef.value.handleShowModal()
+  todoRef.value?.handleShowModal()
 }
 
-const clearAll1 = () => {
+const clearAllData = () => {
   window.$dialog.warning({
     title: '警告',
     content: '确定删除所有数据？建议先点击上方按钮导出备份',
     positiveText: '确定',
     negativeText: '不确定',
     onPositiveClick: () => {
-      // store.data = []
-      // window.$notification.success({
-      //   title: '清空成功',
-      //   duration: 3000,
-      // })
+      if (store.activeVal === 1) {
+        store.data = []
+      } else if (store.activeVal === 2) {
+        store.todoData = []
+      }
+      window.$notification.success({
+        title: '清空成功',
+        duration: 3000,
+      })
     },
   })
 }
@@ -145,8 +193,9 @@ const handleExport = async (data: string) => {
       },
     ],
   })
+  const exportData = store.activeVal === 1 ? store.data : store.todoData
   if (selete) {
-    await writeTextFile(selete, JSON.stringify(store.data))
+    await writeTextFile(selete, JSON.stringify(exportData))
     window.$notification.success({
       title: '导出成功',
       duration: 3000,
@@ -171,7 +220,11 @@ const handleImport = async () => {
     try {
       const data = await readTextFile(selete as string)
       console.log('import: ', data)
-      store.data = JSON.parse(data)
+      if (store.activeVal === 1) {
+        store.data = JSON.parse(data)
+      } else if (store.activeVal === 2) {
+        store.todoData = JSON.parse(data)
+      }
       window.$notification.success({
         title: '导入成功',
         duration: 3000,

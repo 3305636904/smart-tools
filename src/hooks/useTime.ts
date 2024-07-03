@@ -46,3 +46,52 @@ export function useTime() {
 
   return { month, day, hour, minute, second, week }
 }
+
+type NumStr = number | string 
+export function formatTime(date: Date) {
+  let year: NumStr = date.getFullYear();
+  let month: NumStr = date.getMonth() + 1; // getMonth() 返回的月份是从0开始的，所以需要+1
+  let day: NumStr = date.getDate();
+  let hour: NumStr = date.getHours();
+  let minute: NumStr = date.getMinutes();
+  let second: NumStr = date.getSeconds();
+
+  // 为个位数的月、日、时、分、秒前面补0
+  month = month < 10 ? '0' + month : month;
+  day = day < 10 ? '0' + day : day;
+  hour = hour < 10 ? '0' + hour : hour;
+  minute = minute < 10 ? '0' + minute : minute;
+  second = second < 10 ? '0' + second : second;
+
+  return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
+}
+
+export function getTimeDifference(date1: Date, date2: Date) {
+  return Math.abs(date2.getTime() - date1.getTime());
+}
+
+export function formatTimeDifference(diffMilliseconds: number) {
+  let seconds = Math.floor(diffMilliseconds / 1000);
+  let minutes = Math.floor(seconds / 60);
+  let hours = Math.floor(minutes / 60);
+  let days = Math.floor(hours / 24);
+
+  hours %= 24;
+  minutes %= 60;
+  seconds %= 60;
+
+  return {
+    days: days,
+    hours: hours,
+    minutes: minutes,
+    seconds: seconds
+  };
+}
+
+export function getTimeDuration(date1: Date, date2: Date){
+  return formatTimeDifference(getTimeDifference(date1, date2))
+}
+
+// 使用示例
+// const formattedDiff = formatTimeDifference(difference);
+// console.log(`格式化的时间间隔：${formattedDiff.days}天 ${formattedDiff.hours}小时 ${formattedDiff.minutes}分钟 ${formattedDiff.seconds}秒`);

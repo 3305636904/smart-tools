@@ -50,7 +50,6 @@ export const useStore = defineStore('global', () => {
   const getData = async () => {
     try {
       let storageData
-      // console.log('in window: ', 'tauri' in window)
       const isWindow = 'tauri' in window
       if (isWindow) {
         storageData = JSON.stringify(jsonData)
@@ -59,13 +58,9 @@ export const useStore = defineStore('global', () => {
       } else {
         data.value = JSON.parse(window.localStorage.getItem('data') as string)
         todoData.value = JSON.parse(window.localStorage.getItem('todoData') as string)
-      }
-      if (!storageData) {
-        data.value = []
-        return
+        activeVal.value = JSON.parse(window.localStorage.getItem('activeVal') as string)
       }
     } catch (e) {}
-    console.log('获取到的列表：', data.value, todoData.value)
 
   }
   const getDarkTheme = () => {
@@ -75,9 +70,7 @@ export const useStore = defineStore('global', () => {
   getData()
   getDarkTheme()
   watchEffect(() => {
-    console.log('effect. ', data)
     window.localStorage.setItem('data', JSON.stringify(data.value))
-    window.localStorage.setItem('todoData', JSON.stringify(todoData.value)) // 如果以后数据结构发生改变可以用这个进行自动化升级
     window.localStorage.setItem('dataVersion', 'v1') // 如果以后数据结构发生改变可以用这个进行自动化升级
     window.localStorage.setItem('darkTheme', darkTheme.value ? 'true' : 'false')
     // darkTheme.value ? WindowSetDarkTheme() : WindowSetLightTheme()
@@ -86,6 +79,13 @@ export const useStore = defineStore('global', () => {
     //   : WindowSetBackgroundColour(255, 255, 255, 1)
     appWindow.setFullscreen(fullscreen.value)
     // fullscreen.value ? WindowFullscreen() : WindowUnfullscreen()
+  })
+
+  watchEffect(() => {
+    window.localStorage.setItem('todoData', JSON.stringify(todoData.value)) // 如果以后数据结构发生改变可以用这个进行自动化升级
+  })
+  watchEffect(() => {
+    window.localStorage.setItem('activeVal', JSON.stringify(activeVal.value)) // 如果以后数据结构发生改变可以用这个进行自动化升级
   })
   return {
     darkTheme,

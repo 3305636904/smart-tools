@@ -1,10 +1,7 @@
 <template>
   <n-layout class="h-75vh w-100vw">
     <n-space>
-      <TodoItem  v-for="(v, i) of store.todoData" :key="i" :item="v"/>
-      <!-- <n-card class="w-20vw max-h-35vh flex justify-center items-center p-0" hoverable>
-        <IZondiconsAddOutline class="text-40px text-gray-800 hover:text-white transition cursor-pointer"/>
-      </n-card> -->
+      <TodoItem v-for="(v, i) of props.todoData" :key="i" :item="v"/>
     </n-space>
   </n-layout>
   <n-modal
@@ -43,8 +40,8 @@
             />
           </n-radio-group>
       </n-form-item>
-      <n-form-item label="事项分类" path="level">
-        <n-select v-model:value="todoInfo.level" multiple :options="typeOptions" />
+      <n-form-item label="事项分类" path="type">
+        <n-select v-model:value="todoInfo.type" multiple :options="typeOptions" />
       </n-form-item>
     </n-form>
     <template #footer>
@@ -65,12 +62,17 @@
   
 <script setup>
   import TodoItem from './Item.vue'
+  import { NForm } from 'naive-ui'
 
+  const props = defineProps({
+    todoData: {
+      type: Array,
+      default: () => []
+    }
+  })
   import { useStore } from '../../store'
-
-  const store = useStore()  
-
-  const formRef = ref(null)
+  const store = useStore()
+  const formRef = ref()
 
   const rules = ref({
     content: {
@@ -79,8 +81,9 @@
       trigger: 'blur'
     }
   })
+
   const levelOptions = ref([
-    { label: '重要', value: '1'},
+    { label: '重要或紧急', value: '1'},
     { label: '重要不紧急', value: '2'},
     { label: '紧急不重要', value: '3'},
     { label: '一般', value: '4'},
@@ -92,6 +95,7 @@
     { label: '��假', value: '3'},
     { label: '其他', value: '4'},
   ])
+
   const todoInfo = reactive({
     isShow: false,
     content: '',
@@ -117,7 +121,6 @@
       todoInfo.content = ''
     })
   }
-
 
   const handleShowModal = () => {
     todoInfo.isShow = true

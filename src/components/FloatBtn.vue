@@ -36,7 +36,7 @@
       </template>
       清除所有数据
     </n-tooltip> -->
-    <n-tooltip placement="top-end" trigger="hover">
+    <!-- <n-tooltip placement="top-end" trigger="hover">
       <template #trigger>
         <n-button class="mb-2" circle size="large" @click="handleAddCate">
           <template #icon>
@@ -47,7 +47,7 @@
         </n-button>
       </template>
       添加一个分类
-    </n-tooltip>
+    </n-tooltip> -->
     <n-tooltip placement="top-end" trigger="hover">
       <template #trigger>
         <n-button class="mb-2" circle size="large" @click="themeSwitch">
