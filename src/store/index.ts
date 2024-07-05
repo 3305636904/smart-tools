@@ -16,9 +16,11 @@ export const store = createPinia()
 export const useStore = defineStore('global', () => {
   const darkTheme = ref(false)
   const data = ref<Category[]>([])
-  const todoData = ref<Record<string, any>[]>([])
   const cateToolList = ref<Record<string, any>>({ 1: `快捷网站`, 2: `待办纪要`, 3: `驼峰下划线相互转换` })
   const activeVal = ref(<Number | null>1)
+
+  const todoData = ref<Record<string, any>[]>([])
+  const isTodoList = ref(<Boolean>false)
 
   const itemModal = ref({
     isShow: false,
@@ -59,6 +61,7 @@ export const useStore = defineStore('global', () => {
         data.value = JSON.parse(window.localStorage.getItem('data') as string)
         todoData.value = JSON.parse(window.localStorage.getItem('todoData') as string)
         activeVal.value = JSON.parse(window.localStorage.getItem('activeVal') as string)
+        isTodoList.value = JSON.parse(window.localStorage.getItem('isTodoList') as string)
       }
     } catch (e) {}
 
@@ -87,6 +90,9 @@ export const useStore = defineStore('global', () => {
   watchEffect(() => {
     window.localStorage.setItem('activeVal', JSON.stringify(activeVal.value)) // 如果以后数据结构发生改变可以用这个进行自动化升级
   })
+  watchEffect(() => {
+    window.localStorage.setItem('isTodoList', JSON.stringify(isTodoList.value)) // 如果以后数据结构发生改变可以用这个进行自动化升级
+  })
   return {
     darkTheme,
     itemModal,
@@ -99,6 +105,7 @@ export const useStore = defineStore('global', () => {
     getData,
 
     cateToolList,
-    activeVal
+    activeVal,
+    isTodoList
   }
 })

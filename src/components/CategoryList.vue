@@ -57,7 +57,7 @@
               </span>
             </template>
             <n-p class="w-20vw">
-              <n-input v-model:value="searchWebKey" placeholder="输入快捷网站或分类名称" />
+              <n-input class="text-left" v-model:value="searchWebKey" placeholder="输入快捷网站或分类名称" clearable />
             </n-p>
             <n-space>
               <category-card
@@ -69,11 +69,20 @@
           </n-collapse-item>
           <n-collapse-item title="待办纪要" :name="2">
             <template #header-extra>
-              <span class="mr-20">
+              <span class="mr-20" v-if="store.activeVal === 2">
+                <n-tooltip placement="left" trigger="hover">
+                  <template #trigger>
+                    <n-icon class="mr-5" @click.stop="switchListType">
+                      <IMaterialSymbolsMenu v-if="store.isTodoList" class="text-18px" />
+                      <IGgMenuGridR v-else class="text-18px" />
+                    </n-icon>
+                  </template>
+                  <n-p>切换为{{ store.isTodoList ? '方块' : '列表' }}</n-p>
+                </n-tooltip>
                 <n-tooltip placement="left" trigger="hover">
                   <template #trigger>
                     <n-icon class="mr-5" @click.stop="clearAllData">
-                      <i-carbon-clean v-if="store.activeVal === 2" class="text-18px" />
+                      <i-carbon-clean class="text-18px" />
                     </n-icon>
                   </template>
                   <n-p>清除所有待办事项</n-p>
@@ -81,7 +90,7 @@
                 <n-tooltip placement="left" trigger="hover">
                   <template #trigger>
                     <n-icon class="mr-5">
-                      <i-line-md-upload-outline-loop v-show="store.activeVal === 2" class="text-18px" @click.stop="handleExport" />
+                      <i-line-md-upload-outline-loop class="text-18px" @click.stop="handleExport" />
                     </n-icon>
                   </template>
                   <n-p>导出快捷网站</n-p>
@@ -89,7 +98,7 @@
                 <n-tooltip placement="left" trigger="hover">
                   <template #trigger>
                     <n-icon class="mr-5">
-                      <i-line-md-download-outline-loop v-show="store.activeVal === 2" class="text-18px" @click.stop="handleImport"/>
+                      <i-line-md-download-outline-loop class="text-18px" @click.stop="handleImport"/>
                     </n-icon>
                   </template>
                   <n-p>导入快捷网站</n-p>
@@ -97,17 +106,14 @@
                 <n-popover placement="left" trigger="hover">
                   <template #trigger>
                     <n-icon>
-                      <IZondiconsAddOutline v-show="store.activeVal === 2" class="text-16px" @click.stop="handleAddTodo"/>
+                      <IZondiconsAddOutline class="text-16px" @click.stop="handleAddTodo"/>
                     </n-icon>
                   </template>
                   <n-p>添加待办纪要</n-p>
                 </n-popover>
               </span>
             </template>
-            <n-p class="w-20vw">
-              <n-input v-model:value="searchTodoKey" placeholder="输入待办内容关键字" />
-            </n-p>
-            <TodoList ref="todoRef" :todoData="showTodoList"/>
+            <TodoList ref="todoRef" />
           </n-collapse-item>
         </n-collapse>
       </n-layout-content>
@@ -142,12 +148,6 @@ const showWebList = computed(() => {
   return store.data.filter(v => v.label.indexOf(searchWebKey.value) !== -1 || v.list.some(v => v.label.indexOf(searchWebKey.value)!== -1))
 })
 
-const searchTodoKey = ref('')
-const showTodoList = computed(() => {
-  if (!searchTodoKey.value.trim()) return store.todoData;
-  return store.todoData.filter(v => v.content.indexOf(searchTodoKey.value)!== -1)
-})
-
 const activeTitle = computed(() => {
   return store.activeVal ? store.cateToolList[store.activeVal as number] : `快捷网站`
 })
@@ -158,6 +158,10 @@ const handleItemHeaderClick: CollapseProps['onItemHeaderClick'] = ({ name, expan
     return
   }
   store.activeVal = name
+}
+
+function switchListType() {
+  store.isTodoList = !store.isTodoList
 }
 
 function handleAddTodo() {

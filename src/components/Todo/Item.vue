@@ -1,6 +1,16 @@
 <template>
-  <n-card :class="['w-20vw', 'text-left', 'p-0', 'pos-relative', 'overflow-hidden', {'color-gray-500': props.item.isCompleted }]" :bordered="!props.item.isCompleted" :content-style="isEdit ? `padding: 0;` : ''" hoverable>
-    <span class="pos-absolute top-1 right-1">
+  <n-card v-if="!props.isList" :class="['w-20vw', 'text-left', 'p-0', 'pos-relative', 'overflow-hidden', {'color-gray-500': props.item.isCompleted }]"
+  @mouseenter="() => (isEnter = true)" @mouseleave="() => (isEnter = false)"
+  :bordered="!props.item.isCompleted" :content-style="isEdit ? `padding: 0;` : ''" hoverable>
+    <span v-show="!props.item.isCompleted && !isEdit">
+      <n-popover trigger="hover" raw>
+        <template #trigger>
+          <span class="pos-absolute top-1 left-5 text-size-8px color-red">{{ spendDuration }}</span>
+        </template>
+        <span :class="['text-size-12px', 'color-red', 'p-1', {'bg-gray-700': store.darkTheme, 'bg-gray-400': !store.darkTheme}]">{{ spendDuration }}</span>
+      </n-popover>
+    </span>
+    <span :class="['pos-absolute', 'top-1', 'right-1', 'transition-all', 'transition-duration-800', { 'hidden' : !isEnter }]">
       <n-icon class="m-r-2" @click.stop="editItem">
         <IMaterialSymbolsEditSquareOutlineRounded v-show="!isEdit" class="text-15px cursor-pointer hover:color-blue-400" />
       </n-icon>
@@ -9,12 +19,29 @@
       </n-icon>
     </span>
     <section @dblclick="dbEditItem" @blur="isEdit = false">
-      <n-input ref="inputRef" type="textarea" class="w-full h-full" v-if="isEdit" @blur="isEdit = false" @keydown.enter="keyDown" v-model:value="item.content" ></n-input>
+      <n-input ref="inputRef" type="textarea" :autosize="{ minRows: 1 }" v-if="isEdit" @blur="isEdit = false" @keydown.enter="keyDown" v-model:value="item.content" ></n-input>
       <n-ellipsis v-else expand-trigger="click" line-clamp="3" :tooltip="false">
-        {{item.content}}
+        {{props.item.content}}
       </n-ellipsis>
     </section>
   </n-card>
+  <n-p v-else :class="['w-93vw', 'text-left', 'p-1', 'pt-2', 'pos-relative', 'overflow-hidden', 'border-b-emerald', {'hover:bg-dark': store.darkTheme, 'hover:bg-gray-200': !store.darkTheme}, {'color-gray-500': props.item.isCompleted }]"
+    @mouseenter="() => (isEnter = true)" @mouseleave="() => (isEnter = false)">
+    <span class="block w-85vw" @dblclick="dbEditItem" @blur="isEdit = false">
+      <n-input ref="inputRef" type="textarea" :autosize="{ minRows: 1 }" v-if="isEdit" @blur="isEdit = false" @keydown.enter="keyDown" v-model:value="item.content" ></n-input>
+      <n-ellipsis class="w-full" v-else expand-trigger="click" line-clamp="1" :tooltip="false">
+        {{props.item.content}}
+      </n-ellipsis>
+    </span>
+    <span :class="['pos-absolute', 'top-25%', 'right-2', 'transition-all', 'transition-duration-800', { 'hidden' : !isEnter }]">
+      <n-icon class="m-r-2" @click.stop="editItem">
+        <IMaterialSymbolsEditSquareOutlineRounded v-show="!isEdit" class="text-15px cursor-pointer hover:color-blue-400" />
+      </n-icon>
+      <n-icon class="m-r-1" @click.stop="removeItem">
+        <IMdiCloseCircleOutline v-show="!isEdit" class="text-15px cursor-pointer hover:color-red-500" />
+      </n-icon>
+    </span>
+  </n-p >
 
   <n-modal
     v-model:show="todoInfo.isShow"
@@ -32,6 +59,7 @@
       label-width="auto"
       size="small"
       ref="formRef"
+      class="text-left"
       require-mark-placement="right-hanging"
       :model="todoInfo"
       :rules="rules"
@@ -40,6 +68,7 @@
         <n-input
           v-model:value="todoInfo.content"
           type="textarea"
+          :autosize="{ minRows: 1 }"
           placeholder="待办事项内容"
         />
       </n-form-item>
@@ -60,14 +89,13 @@
         <n-p>{{ formatTime(new Date(todoInfo.createdAt))  }}</n-p>
       </n-form-item>
       <n-form-item label="上次修改时间" path="updatedAt">
-        <n-p>{{ formatTime(todoInfo.updatedAt)  }}</n-p>
+        <n-p>{{ formatTime(new Date(todoInfo.updatedAt))  }}</n-p>
       </n-form-item>
       <n-form-item label="是否完成" path="isCompleted">
         <n-switch v-model:value="todoInfo.isCompleted" />
       </n-form-item>
       <n-form-item label="已花费时间" >
-        <n-p>{{ getTimeDuration(new Date(todoInfo.createdAt), todoInfo.isCompleted ? todoInfo.updatedAt : new Date()).minutes }} 分钟</n-p>
-        <!-- <n-switch v-model:value="todoInfo.isCompleted" /> -->
+        <n-p class="color-red">{{ spendDuration }}</n-p>
       </n-form-item>
     </n-form>
     <template #footer>
@@ -88,7 +116,7 @@
 <script lang="ts" setup>
   const isEdit = ref(false)
   const inputRef = ref<InputInst | null>()
-  import { formatTime, getTimeDuration } from '../../hooks/useTime'
+  import { formatTime, formatTimeDifference } from '../../hooks/useTime'
   import { FormInst, InputInst } from 'naive-ui'
 
   import { useStore } from '../../store'
@@ -102,7 +130,7 @@
     id: '', // 随机生成的 id
     isCompleted: false, // 初始状态为 false，即未完成
     createdAt: '', // 创建时间
-    updatedAt: new Date() // 更新时间
+    updatedAt: '' // 更新时间
   })
 
   const formRef = ref<FormInst>()
@@ -119,6 +147,17 @@
       trigger: 'blur'
     }
   })
+
+  const isEnter = ref(false)
+
+  const spendDuration = computed(() => {
+    const {days, hours, minutes, seconds} = formatTimeDifference((props.item.isCompleted ? new Date(props.item.updatedAt).getTime() : new Date().getTime()) - new Date(props.item.createdAt).getTime())
+    const day = days ? days + '天' : ''
+    const hour = hours ? hours + '小时' : ''
+    const minute = minutes ? minutes + '分' : ''
+    const second = seconds ? seconds + '秒' : ''
+    return `${day}${hour}${minute}${second}`
+  })
   
   const levelOptions = ref([
     { label: '重要或紧急', value: '1'},
@@ -134,14 +173,16 @@
     { label: '其他', value: '4'},
   ])
 
+
   function editItem() {
     todoInfo.isShow = true
-    todoInfo.content = item.content
-    todoInfo.level = item.level
-    todoInfo.type = item.type
-    todoInfo.id = item.id
-    todoInfo.isCompleted = item.isCompleted
-    todoInfo.createdAt = item.createdAt
+    todoInfo.content = props.item.content
+    todoInfo.level = props.item.level
+    todoInfo.type = props.item.type
+    todoInfo.id = props.item.id
+    todoInfo.isCompleted = props.item.isCompleted
+    todoInfo.createdAt = props.item.createdAt
+    todoInfo.updatedAt = props.item.updatedAt
   }
 
   function handleEditTodoConfirm(e: MouseEvent | KeyboardEvent) {
@@ -150,6 +191,9 @@
       if (err) return
       const editDataIndex = store.todoData.findIndex(v => v.id === todoInfo.id)
       if (editDataIndex!== -1) {
+        if (!todoInfo.isCompleted) {
+          todoInfo.updatedAt = `${new Date()}`
+        }
         store.todoData[editDataIndex] = { ...store.todoData[editDataIndex], ...todoInfo }
       }
       todoInfo.isShow = false
@@ -163,11 +207,11 @@
       positiveText: '确定',
       negativeText: '不确定',
       onPositiveClick: () => {
-        if (item.id) {
-          const index = store.todoData.findIndex((v) => v.id === item.id)
+        if (props.item.id) {
+          const index = store.todoData.findIndex((v) => v.id === props.item.id)
           store.todoData.splice(index, 1)
-        } else if (item.content) {
-          const index = store.todoData.findIndex((v) => v.content === item.content)
+        } else if (props.item.content) {
+          const index = store.todoData.findIndex((v) => v.content === props.item.content)
           store.todoData.splice(index, 1)
         }
         window.$notification.success({
@@ -187,8 +231,8 @@
 
   function keyDown(e: KeyboardEvent) {
     if (e.ctrlKey) {
-      if (item.content.trim() !== '') {
-        todoInfo.content = item.content
+      if (props.item.content.trim() !== '') {
+        todoInfo.content = props.item.content
         handleEditTodoConfirm(e)
         isEdit.value = false
       } else {
@@ -198,10 +242,10 @@
   }
 
   const props = defineProps<{
-    item: Record<string, any>
+    item: Record<string, any>,
+    isList: Boolean
   }>()
 
-  const { item } = props
 </script>
   
 <style scoped>

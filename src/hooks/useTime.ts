@@ -92,6 +92,10 @@ export function getTimeDuration(date1: Date, date2: Date){
   return formatTimeDifference(getTimeDifference(date1, date2))
 }
 
+export function formatTimeNormal(date: Date) {
+  return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`
+}
+
 // 使用示例
 // const formattedDiff = formatTimeDifference(difference);
 // console.log(`格式化的时间间隔：${formattedDiff.days}天 ${formattedDiff.hours}小时 ${formattedDiff.minutes}分钟 ${formattedDiff.seconds}秒`);
