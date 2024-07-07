@@ -4,6 +4,7 @@
       hoverable
       embedded
       class="w-full cursor-pointer"
+      size="small"
       @contextmenu="handleContextMenu"
       @click="handleOpen(item.value)"
     >

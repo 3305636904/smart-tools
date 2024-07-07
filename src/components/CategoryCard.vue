@@ -4,6 +4,7 @@
     :segmented="{
       content: 'soft',
     }"
+    size="small"
     hoverable
   >
     <template #header>
@@ -29,12 +30,12 @@
     </template>
     <n-space class="min-h-20px" vertical>
       <item-card
-        class="w-full"
         v-for="item in cate.list"
+        class="w-full"
         :key="cate.label"
         :item="item"
         :cate="cate.label"
-      ></item-card>
+        ></item-card>
     </n-space>
   </n-card>
 </template>

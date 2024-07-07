@@ -22,6 +22,20 @@ export const useStore = defineStore('global', () => {
   const todoData = ref<Record<string, any>[]>([])
   const isTodoList = ref(<Boolean>false)
 
+  const levelOptions = ref([
+    { label: '重要或紧急', value: '1'},
+    { label: '重要不紧急', value: '2'},
+    { label: '紧急不重要', value: '3'},
+    { label: '一般', value: '4'},
+  ])
+
+  const typeOptions = ref([
+    { label: '工作', value: '1'},
+    { label: '日常', value: '2'},
+    { label: '计划', value: '3'},
+    { label: '其他', value: '4'},
+  ])
+
   const itemModal = ref({
     isShow: false,
     title: '',
@@ -103,6 +117,9 @@ export const useStore = defineStore('global', () => {
     screenLocked,
     fullscreen,
     getData,
+
+    levelOptions,
+    typeOptions,
 
     cateToolList,
     activeVal,

@@ -2,6 +2,8 @@
   <n-card v-if="!props.isList" :class="['w-20vw', 'text-left', 'p-0', 'pos-relative', 'overflow-hidden', {'color-gray-500': props.item.isCompleted }]"
   @mouseenter="() => (isEnter = true)" @mouseleave="() => (isEnter = false)"
   :bordered="!props.item.isCompleted" :content-style="isEdit ? `padding: 0;` : ''" hoverable>
+    <!-- <n-checkbox v-show="props.isBatch" class="pos-absolute top-1 left-1 w-2px h-2px" :checked="checked" @update:checked="handleCheckedChange" /> -->
+    <n-checkbox v-show="props.isBatch" class="pos-absolute top-1 left-1 w-2px h-2px" :value="props.item" />
     <span v-show="!props.item.isCompleted && !isEdit">
       <n-popover trigger="hover" raw>
         <template #trigger>
@@ -75,7 +77,7 @@
       <n-form-item label="重要程度" path="level">
         <n-radio-group v-model:value="todoInfo.level" name="radiobuttongroup1">
             <n-radio-button
-              v-for="lev in levelOptions"
+              v-for="lev in store.levelOptions"
               :key="lev.value"
               :value="lev.value"
               :label="lev.label"
@@ -83,7 +85,7 @@
           </n-radio-group>
       </n-form-item>
       <n-form-item label="事项分类" path="type">
-        <n-select v-model:value="todoInfo.type" multiple :options="typeOptions" />
+        <n-select v-model:value="todoInfo.type" multiple :options="store.typeOptions" />
       </n-form-item>
       <n-form-item label="创建时间" path="createdAt">
         <n-p>{{ formatTime(new Date(todoInfo.createdAt))  }}</n-p>
@@ -113,14 +115,16 @@
   </n-modal>
 </template>
   
-<script lang="ts" setup>
-  const isEdit = ref(false)
+<script lang="ts" setup name="todoItem">
+  let isEdit = ref(false)
   const inputRef = ref<InputInst | null>()
   import { formatTime, formatTimeDifference } from '../../hooks/useTime'
   import { FormInst, InputInst } from 'naive-ui'
 
   import { useStore } from '../../store'
   const store = useStore()
+
+  const emits = defineEmits(['changeCheckOptions'])
 
   const todoInfo = reactive({
     isShow: false,
@@ -149,6 +153,29 @@
   })
 
   const isEnter = ref(false)
+  const checked = ref(false)
+
+  // onMounted(() => {
+  //   if (props.checkOptions.some(v => v.id === props.item.id)) {
+  //     checked.value = true
+  //   }
+  // })
+
+  let checkedTodoData: Record<string, any> = [] 
+  function handleCheckedChange(curChecked: boolean) {
+    checked.value = curChecked
+    const targetIndex = store.todoData.findIndex(v => v.id === props.item.id)
+    if (checked) {
+      if (targetIndex === -1) {
+        checkedTodoData.push(props.item)
+      }
+    } else {
+      if (targetIndex !== -1) {
+        checkedTodoData.splice(targetIndex, 1)
+      }
+    }
+    emits('changeCheckOptions', checkedTodoData)
+  }
 
   const spendDuration = computed(() => {
     const {days, hours, minutes, seconds} = formatTimeDifference((props.item.isCompleted ? new Date(props.item.updatedAt).getTime() : new Date().getTime()) - new Date(props.item.createdAt).getTime())
@@ -159,20 +186,6 @@
     return `${day}${hour}${minute}${second}`
   })
   
-  const levelOptions = ref([
-    { label: '重要或紧急', value: '1'},
-    { label: '重要不紧急', value: '2'},
-    { label: '紧急不重要', value: '3'},
-    { label: '一般', value: '4'},
-  ])
-
-  const typeOptions = ref([
-    { label: '工作', value: '1'},
-    { label: '日常', value: '2'},
-    { label: '��假', value: '3'},
-    { label: '其他', value: '4'},
-  ])
-
 
   function editItem() {
     todoInfo.isShow = true
@@ -243,20 +256,11 @@
 
   const props = defineProps<{
     item: Record<string, any>,
-    isList: Boolean
+    isList: Boolean,
+    isBatch: Boolean
   }>()
 
 </script>
   
 <style scoped>
-  .n-card > .n-card__content {
-    padding: 0;
-  }
-  .text-ellipsis-3 {
-    overflow:hidden;
-    text-overflow: ellipsis;
-    -webkit-line-clamp: 3;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-  }
 </style>
