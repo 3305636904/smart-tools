@@ -1,5 +1,6 @@
 import { createPinia, defineStore } from 'pinia'
 import { ref, watchEffect } from 'vue'
+import { saveWindowState, StateFlags } from 'tauri-plugin-window-state-api'
 import { appWindow } from '@tauri-apps/api/window';
 import jsonData from './data.json'
 
@@ -84,6 +85,7 @@ export const useStore = defineStore('global', () => {
     const storageDarkTheme = window.localStorage.getItem('darkTheme')
     darkTheme.value = storageDarkTheme === 'true' ? true : false
   }
+  saveWindowState(StateFlags.ALL)
   getData()
   getDarkTheme()
   watchEffect(() => {

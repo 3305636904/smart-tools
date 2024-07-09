@@ -20,6 +20,7 @@
     "unplugin-auto-import": "^0.14.2",
     "unplugin-icons": "^0.15.3",
     "unplugin-vue-components": "^0.23.0",
+    "tauri-plugin-window-state-api": "github:tauri-apps/tauri-plugin-window-state",
     "vue": "^3.2.45"
   },
   "devDependencies": {

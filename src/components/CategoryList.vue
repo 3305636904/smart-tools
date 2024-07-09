@@ -93,7 +93,7 @@
                       <i-line-md-upload-outline-loop class="text-18px" @click.stop="handleExport" />
                     </n-icon>
                   </template>
-                  <n-p>导出待办事项</n-p>
+                  <n-p>导出所有待办事项</n-p>
                 </n-tooltip>
                 <n-tooltip placement="left" trigger="hover">
                   <template #trigger>
@@ -103,14 +103,6 @@
                   </template>
                   <n-p>导入待办事项</n-p>
                 </n-tooltip>
-                <n-popover  v-if="checkedTodoOptions.length" placement="left" trigger="hover">
-                  <template #trigger>
-                    <n-icon class="mr-5" @click.stop="handleBatchDelete">
-                      <IMaterialSymbolsDeleteOutline class="text-16px" />
-                    </n-icon>
-                  </template>
-                  <n-p>批量删除</n-p>
-                </n-popover>
                 <n-popover placement="left" trigger="hover">
                   <template #trigger>
                     <n-icon>
@@ -207,7 +199,10 @@ const handleExport = async (data: string) => {
       },
     ],
   })
-  const exportData = store.activeVal === 1 ? store.data : store.todoData
+  let exportData = store.activeVal === 1 ? store.data : store.todoData
+  // if (store.activeVal === 2) {
+  //   exportData = checkedTodoOptions.value
+  // }
   if (selete) {
     await writeTextFile(selete, JSON.stringify(exportData))
     window.$notification.success({
@@ -258,9 +253,6 @@ const handleImport = async () => {
   }
 }
 
-function handleBatchDelete() {
-  todoRef.value?.handleDeleteTodo()
-}
 
 const handleAddCate = () => {
   store.cateModal.title = '添加分类'

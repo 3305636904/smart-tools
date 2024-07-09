@@ -16,7 +16,23 @@
           <IMdiCancelBoxMultiple class="text-19px" v-else />
         </n-icon>
       </template>
-      <n-p>{{ isBatch ? '批量操作' : '取消批量操作'  }}</n-p>
+      <n-p>{{ isBatch ? '取消批量操作' : '批量操作' }}</n-p>
+    </n-tooltip>
+    <n-tooltip v-if="checkedTodos.length" placement="left" trigger="hover">
+      <template #trigger>
+        <n-icon class="pos-absolute right-18 top-16 z-99 cursor-pointer" @click.stop="handleDeleteTodo">
+          <IMaterialSymbolsDeleteOutline class="text-19px" />
+        </n-icon>
+      </template>
+      <n-p>批量删除</n-p>
+    </n-tooltip>
+    <n-tooltip placement="left" trigger="hover">
+      <template #trigger>
+        <n-icon :class="['pos-absolute', 'right-18', 'top-16', {'top-24': checkedTodos.length }, 'z-99', 'cursor-pointer']" @click.stop="exportShowTodoList">
+          <i-line-md-upload-outline-loop class="text-19px" />
+        </n-icon>
+      </template>
+      <n-p>{{ checkedTodos.length ? '导出勾选展示数据' : '导出展示数据' }}</n-p>
     </n-tooltip>
     <n-form
       :label-width="80"
@@ -24,33 +40,30 @@
       size="small"
       v-if="!hiddenCondition"
     >
-    <n-grid cols="2 s:3 m:4 l:5 xl:6 2xl:7" :x-gap="12" responsive="screen">
-      <n-grid-item>
-        <n-form-item label="待办内容关键字:">
-          <n-input v-model:value="searchTodoKey" class="text-left" placeholder="输入待办内容关键字" clearable />
+    <n-grid cols="1 s:3 m:4 l:5 xl:6" :x-gap="12" responsive="screen">
+    <!-- <n-grid> -->
+      <n-gi>
+        <n-form-item label="待办内容关键字">
+          <n-input v-model:value="searchTodoKey" class="text-left max-w-350px" placeholder="输入待办内容关键字" clearable />
         </n-form-item>
-      </n-grid-item>
-      <n-grid-item>
-        <n-form-item label="创建日期范围:">
+      </n-gi>
+      <n-gi>
+        <n-form-item label="创建日期范围">
           <n-date-picker v-model:value="dateRange" type="daterange" clearable />
         </n-form-item>
-      </n-grid-item>
-      <n-grid-item>
-        <n-form-item >
-          <n-button @click="exportShowTodoList">
-            <template #icon>
-              <n-icon>
-                <i-line-md-upload-outline-loop />
-              </n-icon>
-            </template>
-            <n-p>导出展示数据</n-p>
-          </n-button>
+      </n-gi>
+      <n-gi>
+        <n-form-item label="完成日期范围">
+          <n-date-picker v-model:value="endDateRange" type="daterange" clearable />
         </n-form-item>
-      </n-grid-item>
+      </n-gi>
     </n-grid>
     </n-form>
+    <p class="w-full text-left">
+      <n-checkbox v-if="isBatch" label="全选" size="small" v-model:checked="isCheckAll" />
+    </p>
     <n-checkbox-group v-model:value="checkedTodos">
-        <n-space>
+      <n-space>
         <TodoItem v-for="(v, i) of showTodoList" :key="i" :item="v" :is-list="store.isTodoList" :isBatch="isBatch" />
       </n-space>
     </n-checkbox-group>
@@ -135,11 +148,14 @@
 
   const searchTodoKey = ref('')
   const dateRange = ref<[number, number]>([new Date(new Date().getFullYear(), new Date().getMonth(), 1).getTime(), Date.now()])
+  const endDateRange = ref<[number, number] | null>(null)
   function getTimeStamp(date: string) {
     return new Date(date).getTime()
   }
+
   const showTodoList = computed(() => {
     let retArr: Record<string, any>[] = store.todoData
+    const dayofWeek = new Date().getDay()
     if (!searchTodoKey.value.trim()) {
       retArr = retArr.sort((v2, v1) => dayjs(v1.createdAt).valueOf() - dayjs(v2.createdAt).valueOf());
     } else {
@@ -151,6 +167,17 @@
     if (dateRange.value && dateRange.value[1]) {
       retArr = retArr.filter(v => dayjs(dayjs(dateRange.value[1]).format('YYYY-MM-DD') + ' 23:59:59').valueOf() > dayjs(v.createdAt).valueOf())
     }
+    if (endDateRange.value && Array.isArray(endDateRange.value) && endDateRange.value[0]) {
+      retArr = retArr.filter(v => dayjs(dayjs(endDateRange.value?.[0]).format('YYYY-MM-DD') + ' 00:00:00').valueOf() < dayjs(v.updatedAt).valueOf())
+    }
+    if (endDateRange.value &&  Array.isArray(endDateRange.value) && endDateRange.value[1]) {
+      retArr = retArr.filter(v => dayjs(dayjs(endDateRange.value?.[1]).format('YYYY-MM-DD') + ' 23:59:59').valueOf() > dayjs(v.updatedAt).valueOf())
+    }
+    if ([6, 7].includes(dayofWeek)) {
+      retArr = retArr.filter(v => v.type.indexOf('3') !== -1).concat(retArr.filter(v => v.type.indexOf('3') == -1))
+    } else {
+      retArr = retArr.filter(v => v.type.indexOf('1') !== -1).concat(retArr.filter(v => v.type.indexOf('1') == -1))
+    }
     return retArr.filter(v => !v.isCompleted).concat(retArr.filter(v => v.isCompleted))
   })
 
@@ -161,21 +188,20 @@
     type: ''
   })
 
+  const isCheckAll = ref<Boolean>(false)
   const checkedTodos = ref<Record<string, any>[]>([])
 
-  const hiddenCondition = ref(true)
-  const isBatch = ref(false)
+  const hiddenCondition = ref<Boolean>(true)
+  const isBatch = ref<Boolean>(false)
 
   watch(checkedTodos, (vals, oldVals) => {
     if (vals) {
       emits('update:checkedOptions', checkedTodos.value)
     }
   })
-  // watchEffect(() => {
-  //   nextTick(() => {
-  //     emits('update:checkedOptions', checkedTodos.value)
-  //   })
-  // })
+  watchEffect(() => {
+    checkedTodos.value = isCheckAll.value ? showTodoList.value: []
+  })
 
   function switchCondition() {
     hiddenCondition.value = !hiddenCondition.value
@@ -185,6 +211,7 @@
     isBatch.value = !isBatch.value
     if (!isBatch.value) {
       checkedTodos.value = []
+      isCheckAll.value = false
     }
   }
 
@@ -206,10 +233,13 @@
     });
 
     if (filePath) {
-      const exportData = showTodoList.value.map(v => `${v.isCompleted ? '已完成': '进行中'}-${v.content}-${formatTimeNormal(new Date(v.createdAt))}-${formatTimeNormal(new Date(v.updatedAt))} ${v.isCompleted ? '耗时：' + timeDuration(v) : ''}\n`).join('')
+      let exportData = showTodoList.value.map(v => `${v.isCompleted ? '已完成': '进行中'}-${v.content}-${formatTimeNormal(new Date(v.createdAt))}-${formatTimeNormal(new Date(v.updatedAt))} ${v.isCompleted ? '耗时：' + timeDuration(v) : ''}\n`).join('')
+      if (checkedTodos.value.length > 0) { 
+        exportData = checkedTodos.value.map(v => `${v.isCompleted? '已完成': '进行中'}-${v.content}-${formatTimeNormal(new Date(v.createdAt))}-${formatTimeNormal(new Date(v.updatedAt))} ${v.isCompleted ? '耗时：' + timeDuration(v) : ''}\n`).join('')
+      }
       writeTextFile(filePath, exportData)
       window.$notification.success({
-        title: '导出成功',
+        title: checkedTodos.value.length ? '勾选待办导出成功': '导出成功',
         duration: 3000,
       })
     }else {

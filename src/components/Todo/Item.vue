@@ -3,7 +3,7 @@
   @mouseenter="() => (isEnter = true)" @mouseleave="() => (isEnter = false)"
   :bordered="!props.item.isCompleted" :content-style="isEdit ? `padding: 0;` : ''" hoverable>
     <!-- <n-checkbox v-show="props.isBatch" class="pos-absolute top-1 left-1 w-2px h-2px" :checked="checked" @update:checked="handleCheckedChange" /> -->
-    <n-checkbox v-show="props.isBatch" class="pos-absolute top-1 left-1 w-2px h-2px" :value="props.item" />
+    <n-checkbox size="small" v-show="props.isBatch" class="pos-absolute top-1 left-1 w-2px h-2px" :value="props.item" />
     <span v-show="!props.item.isCompleted && !isEdit">
       <n-popover trigger="hover" raw>
         <template #trigger>
@@ -29,9 +29,18 @@
   </n-card>
   <n-p v-else :class="['w-93vw', 'text-left', 'p-1', 'pt-2', 'pos-relative', 'overflow-hidden', 'border-b-emerald', {'hover:bg-dark': store.darkTheme, 'hover:bg-gray-200': !store.darkTheme}, {'color-gray-500': props.item.isCompleted }]"
     @mouseenter="() => (isEnter = true)" @mouseleave="() => (isEnter = false)">
-    <span class="block w-85vw" @dblclick="dbEditItem" @blur="isEdit = false">
+    <span v-show="!props.item.isCompleted && !isEdit">
+      <n-popover trigger="hover" raw>
+        <template #trigger>
+          <span class="pos-absolute top-0 left-3 text-size-6px color-red">{{ spendDuration }}</span>
+        </template>
+        <span :class="['text-size-12px', 'color-red', 'p-1', {'bg-gray-700': store.darkTheme, 'bg-gray-400': !store.darkTheme}]">{{ spendDuration }}</span>
+      </n-popover>
+    </span>
+    <span class="block w-85vw position-relative" @dblclick="dbEditItem" @blur="isEdit = false">
+      <n-checkbox size="small" v-if="!isEdit" v-show="props.isBatch" class="position-absolute left-0 top-1 w-2 h-2" :value="props.item" />
       <n-input ref="inputRef" type="textarea" :autosize="{ minRows: 1 }" v-if="isEdit" @blur="isEdit = false" @keydown.enter="keyDown" v-model:value="item.content" ></n-input>
-      <n-ellipsis class="w-full" v-else expand-trigger="click" line-clamp="1" :tooltip="false">
+      <n-ellipsis :class="['w-full', { 'pl-5' : !isEdit && props.isBatch }]" v-else expand-trigger="click" line-clamp="1" :tooltip="false">
         {{props.item.content}}
       </n-ellipsis>
     </span>
