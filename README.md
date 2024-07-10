@@ -1,37 +1,23 @@
-# smart-tools
+# smart-tool
 
-#### 介绍
-tauri
+## 快捷方式管理
+一个简单的快捷方式管理工具，可以将一些常用文件、文件夹、网址、脚本加到里面进行管理，相对于wails版本，tarui支持Windows、Linux、MacOS，但是不支持系统原生窗体的深色浅色切换。
 
-#### 软件架构
-软件架构说明
+如果加进去的是某些文件路径比如`c:\myDoc.docx`文件将会调用系统默认打开程序进行打开，如果是目录就会直接打开文件管理器并进入某个目录，如果是网址将会使用默认浏览器打开，如果需要选择某个浏览器，可以将浏览器安装路径添加到PATH，然后用类似`chrome https://baidu.com`的格式填入即可选择浏览器，当然也可以编写一些脚本比如js脚本，通过node快速调用：`node c:\test.js`。
 
+## 待办事项管理
 
-#### 安装教程
+## 技术栈
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+- 语言：Rust、TypeScript
+- 打包工具：Tauri
+- 前端框架：Vue
+- UI 库：Navie-UI
 
-#### 使用说明
+## 使用方式
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+1. 安装 rust工具链、node1.16+
+2. 下载项目，命令行打开到项目目录
+3. 按照依赖：`pnpm i`
+4. 启动 dev：`pnpm tauri dev`， 打包：`pnpm tauri build`，建议安装 upx，打包时通过upx进行压缩能大幅减少体积
 
-#### 参与贡献
-
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
-
-
-#### 特技
-
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
-5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
