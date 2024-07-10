@@ -91,12 +91,16 @@
     },
     "windows": [
       {
+        "label": "main",
         "fullscreen": false,
         "height": 600,
         "resizable": true,
         "title": "smart-tool",
         "width": 800
       }
-    ]
+    ],
+    "systemTray": {
+      "iconPath": "icons/32x32.png"
+    }
   }
 }
