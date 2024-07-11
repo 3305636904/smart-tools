@@ -8,7 +8,8 @@
     hoverable
   >
     <template #header>
-      <n-tag class="cursor-pointer" type="success" @dblclick="handleSelect('edit')">{{ cate.label }}</n-tag>
+      <n-tag v-if="!isSearch" class="cursor-pointer" type="success" @dblclick="handleSearchList">{{ cate.label }}</n-tag>
+      <n-input v-else v-model:value="searchCateKey" ref="searchCateInputRef" class="w-8vw text-left" @blur="isSearch = false" placeholder="请输入快捷网站名称" />
     </template>
     <template #header-extra>
       <n-dropdown :options="cateOptions" @select="handleSelect">
@@ -29,13 +30,29 @@
       </n-button>
     </template>
     <n-space class="min-h-20px" vertical>
+      <template v-if="isNeedShowMore">
+        <item-card
+          v-for="item in searchedCateList.slice(0, 2)"
+          class="w-full"
+          :key="item.label + '1'"
+          :item="item"
+          :cate="cate.label"
+          ></item-card>
+          <div v-if="searchedCateList.slice(0, 2).length > 2" @click.stop="handleShowMore" class="cursor-default w-full h-full flex-1 flex items-center justify-center hover:accent-emerald">
+            展开
+          </div>
+      </template>
       <item-card
-        v-for="item in cate.list"
+        v-else
+        v-for="item in searchedCateList"
         class="w-full"
-        :key="cate.label"
+        :key="item.label"
         :item="item"
         :cate="cate.label"
         ></item-card>
+        <div v-if="searchedCateList.length > 2" @click.stop="handleShowMore" class="cursor-default w-full h-full flex-1 flex items-center justify-center hover:accent-emerald">
+          收起
+        </div>
     </n-space>
   </n-card>
 </template>
@@ -48,6 +65,9 @@ import ClearCate from '~icons/line-md/document-remove'
 import { NIcon } from 'naive-ui'
 import { useStore } from '../store'
 const store = useStore()
+const props = defineProps<{
+  cate: Category
+}>()
 const cateOptions = [
   {
     label: '添加快捷方式',
@@ -70,6 +90,8 @@ const cateOptions = [
     icon: () => h(NIcon, null, { default: () => h(DeleteCate) }),
   },
 ]
+
+const searchCateInputRef = ref()
 
 const handleSelect = (key: string) => {
   if (key === 'add') {
@@ -118,7 +140,27 @@ const handleSelect = (key: string) => {
   }
 }
 
-const props = defineProps<{
-  cate: Category
-}>()
+const isSearch = ref<Boolean>(false)
+const searchCateKey = ref('')
+const handleSearchList = () => {
+  isSearch.value = true
+  nextTick(() => {
+    searchCateInputRef.value?.focus()
+  })
+}
+
+const isNeedShowMore = ref<Boolean>(true)
+function handleShowMore() {
+  isNeedShowMore.value = !isNeedShowMore.value
+}
+
+let searchedCateList = computed(() => {
+  let returnList = props.cate.list
+  if (isSearch.value && searchCateKey.value) {
+    returnList = props.cate.list.filter(v => v.label.indexOf(searchCateKey.value) !== -1)
+  }
+  return returnList
+})
+
+
 </script>
