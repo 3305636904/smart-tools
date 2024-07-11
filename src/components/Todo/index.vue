@@ -48,6 +48,11 @@
         </n-form-item>
       </n-gi>
       <n-gi>
+        <n-form-item label="待办类型">
+          <n-select v-model:value="searchTodoTypes" multiple :options="store.typeOptions" />
+        </n-form-item>
+      </n-gi>
+      <n-gi>
         <n-form-item label="创建日期范围">
           <n-date-picker v-model:value="dateRange" type="daterange" clearable />
         </n-form-item>
@@ -147,6 +152,7 @@
   })
 
   const searchTodoKey = ref('')
+  const searchTodoTypes = ref([])
   const dateRange = ref<[number, number]>([new Date(new Date().getFullYear(), new Date().getMonth(), 1).getTime(), Date.now()])
   const endDateRange = ref<[number, number] | null>(null)
   function getTimeStamp(date: string) {
@@ -172,6 +178,9 @@
     }
     if (endDateRange.value &&  Array.isArray(endDateRange.value) && endDateRange.value[1]) {
       retArr = retArr.filter(v => dayjs(dayjs(endDateRange.value?.[1]).format('YYYY-MM-DD') + ' 23:59:59').valueOf() > dayjs(v.updatedAt).valueOf())
+    }
+    if (searchTodoTypes.value && searchTodoTypes.value.length > 0) {
+      retArr = retArr.filter(v =>  searchTodoTypes.value.some(type => v.type.includes(type)))
     }
     if ([6, 7].includes(dayofWeek)) {
       retArr = retArr.filter(v => v.type.indexOf('3') !== -1).concat(retArr.filter(v => v.type.indexOf('3') == -1))

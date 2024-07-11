@@ -30,7 +30,7 @@ export const useStore = defineStore('global', () => {
     { label: '一般', value: '4'},
   ])
 
-  const typeOptions = ref([
+  const typeOptions = ref<Record<string, string>[]>([
     { label: '工作', value: '1'},
     { label: '日常', value: '2'},
     { label: '计划', value: '3'},
