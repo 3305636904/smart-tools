@@ -3,7 +3,7 @@
     <n-tooltip placement="left" trigger="hover">
       <template #trigger>
         <n-icon class="pos-absolute right-18 z-99 cursor-pointer" @click.stop="switchCondition">
-          <IMaterialSymbolsTopPanelCloseOutline v-if="hiddenCondition" class="text-18px" />
+          <IMaterialSymbolsTopPanelCloseOutline v-if="!hiddenCondition" class="text-18px" />
           <IMaterialSymbolsBottomPanelCloseOutlineSharp v-else class="text-18px" />
         </n-icon>
       </template>
@@ -152,16 +152,22 @@
   })
 
   const searchTodoKey = ref('')
-  const searchTodoTypes = ref([])
+  let searchTodoTypes = ref<string[]>([])
   const dateRange = ref<[number, number]>([new Date(new Date().getFullYear(), new Date().getMonth(), 1).getTime(), Date.now()])
   const endDateRange = ref<[number, number] | null>(null)
   function getTimeStamp(date: string) {
     return new Date(date).getTime()
   }
 
+  const dayofWeek = new Date().getDay()
+  if ([6, 7].includes(dayofWeek)) {
+    searchTodoTypes.value = ['3']
+  } else {
+    searchTodoTypes.value = ['1']
+  }
+
   const showTodoList = computed(() => {
     let retArr: Record<string, any>[] = store.todoData
-    const dayofWeek = new Date().getDay()
     if (!searchTodoKey.value.trim()) {
       retArr = retArr.sort((v2, v1) => dayjs(v1.createdAt).valueOf() - dayjs(v2.createdAt).valueOf());
     } else {

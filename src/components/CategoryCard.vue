@@ -38,12 +38,12 @@
           :item="item"
           :cate="cate.label"
           ></item-card>
-          <div v-if="searchedCateList.slice(0, 2).length > 2" @click.stop="handleShowMore" class="cursor-default w-full h-full flex-1 flex items-center justify-center hover:accent-emerald">
+          <div v-if="searchedCateList.length > 2" @click.stop="handleShowMore" class="cursor-default w-full h-full flex-1 flex items-center justify-center hover:accent-emerald">
             展开
           </div>
       </template>
+      <template v-else>
       <item-card
-        v-else
         v-for="item in searchedCateList"
         class="w-full"
         :key="item.label"
@@ -53,6 +53,7 @@
         <div v-if="searchedCateList.length > 2" @click.stop="handleShowMore" class="cursor-default w-full h-full flex-1 flex items-center justify-center hover:accent-emerald">
           收起
         </div>
+      </template>
     </n-space>
   </n-card>
 </template>
