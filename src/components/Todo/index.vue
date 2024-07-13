@@ -1,5 +1,5 @@
 <template>
-  <n-layout class="h-75vh w-100vw pos-relative">
+  <n-layout class="w-100vw pos-relative">
     <n-tooltip placement="left" trigger="hover">
       <template #trigger>
         <n-icon class="pos-absolute right-18 z-99 cursor-pointer" @click.stop="switchCondition">
@@ -65,7 +65,7 @@
     </n-grid>
     </n-form>
     <p class="w-full text-left">
-      <n-checkbox v-if="isBatch" label="全选" size="small" v-model:checked="isCheckAll" />
+      <n-checkbox v-if="isBatch" :label="checkedTodos.length ? `选中${checkedTodos.length}` : '全选'" size="small" v-model:checked="isCheckAll" />
     </p>
     <n-checkbox-group v-model:value="checkedTodos">
       <n-space>
