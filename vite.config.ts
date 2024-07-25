@@ -38,6 +38,11 @@ export default defineConfig({
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
   // prevent vite from obscuring rust errors
   clearScreen: false,
+  resolve: {
+    alias: {
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+    },
+  },
   // tauri expects a fixed port, fail if that port is not available
   server: {
     port: 1420,

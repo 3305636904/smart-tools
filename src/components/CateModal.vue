@@ -54,7 +54,7 @@ const handleConfirm = () => {
   if (store.activeVal === 1) {
     isExist = store.data.some((v) => v.label === store.cateModal.label)
   } else if (store.activeVal === 2) {
-    isExist = store.todoData.some((v) => v.label === store.cateModal.label)
+    // isExist = store.todoData.some((v) => v.content === store.cateModal.label)
   }
   if (isExist) {
     window.$message.error('该分类已存在')
@@ -67,10 +67,10 @@ const handleConfirm = () => {
         list: [],
       })
     } else if (store.activeVal === 2) {
-      store.todoData.push({
-        label: store.cateModal.label,
-        list: [],
-      })
+      // store.todoData.push({
+      //   content: store.cateModal.label,
+      //   list: [],
+      // })
     }
     window.$notification.success({
       title: '分类：' + store.cateModal.label + '创建成功',
@@ -83,10 +83,10 @@ const handleConfirm = () => {
       )
       store.data[index].label = store.cateModal.label
     }else if (store.activeVal === 2) {
-      const index = store.todoData.findIndex(
-        (v) => v.label === store.cateModal.prevLabel
-      )
-      store.todoData[index].label = store.cateModal.label
+      // const index = store.todoData.findIndex(
+      //   (v) => v.label === store.cateModal.prevLabel
+      // )
+      // store.todoData[index].label = store.cateModal.label
     }
     window.$notification.success({
       title:

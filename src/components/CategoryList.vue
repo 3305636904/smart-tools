@@ -1,59 +1,58 @@
 <template>
-  <n-layout class="h-full w-100vw">
+  <n-layout class="h-100vh w-full main-layout">
     <n-layout-header
-      class="fixed top-0 left-0 flex justify-between items-center h-64px shadow-lg z-10 pr-8"
-      :class="{ 'shadow-gray-600': store.darkTheme }"
+      class="aa-header flex justify-between items-center h-64px"
     >
       <n-h2 prefix="bar" class="m-0 ml-4">
         <n-text type="primary">{{activeTitle}}</n-text>
       </n-h2>
     </n-layout-header>
-    <n-scrollbar>
-      <n-layout-content class="h-full mt-64px mb-2 p-8">
-        <n-collapse class="w-100vw overflow-hidden" :default-expanded-names="store.activeVal" @item-header-click="handleItemHeaderClick" accordion>
+    <n-scrollbar style="height: calc(100% - 64px);">
+      <n-layout-content class="overflow-hidden p-6 pr-10px">
+        <n-collapse class="overflow-hidden" :default-expanded-names="store.activeVal" @item-header-click="handleItemHeaderClick" accordion>
           <n-collapse-item title="快捷网站" :name="1">
             <template #header-extra>
-              <span class="mr-20">
+              <span class="mr-6">
                 <n-tooltip placement="left" trigger="hover">
-                <template #trigger>
-                  <n-icon class="mr-5" @click.stop="clearAllData">
-                    <i-carbon-clean v-if="store.activeVal === 1" class="text-20px" />
-                  </n-icon>
-                </template>
-                <n-p>清除所有快捷网站</n-p>
-              </n-tooltip>
-              <n-tooltip placement="left" trigger="hover">
-                <template #trigger>
-                  <n-icon class="mr-5">
-                    <i-line-md-upload-outline-loop v-show="store.activeVal === 1" class="text-20px" @click.stop="handleExport" />
-                  </n-icon>
-                </template>
-                <n-p>导出快捷网站</n-p>
-              </n-tooltip>
-              <n-tooltip placement="left" trigger="hover">
-                <template #trigger>
-                  <n-icon class="mr-5">
-                    <i-line-md-download-outline-loop v-show="store.activeVal === 1" class="text-20px" @click.stop="handleImport"/>
-                  </n-icon>
-                </template>
-                <n-p>导入快捷网站</n-p>
-              </n-tooltip>
-              <n-popover placement="left" trigger="hover">
-                <template #trigger>
-                  <n-icon class="mr-5">
-                    <i-carbon-category-new v-show="store.activeVal === 1" class="text-20px" @click.stop="handleAddCate"/>
-                  </n-icon>
-                </template>
-                <n-p>添加分类</n-p>
-              </n-popover>
-              <n-popover placement="left" trigger="hover">
-                <template #trigger>
-                  <n-icon>
-                    <i-ri-question-line v-show="store.activeVal === 1" class="text-20px" />
-                  </n-icon>
-                </template>
-                <n-p>左键跳转，右键卡片编辑和删除</n-p>
-              </n-popover>
+                  <template #trigger>
+                    <n-icon class="mr-5" @click.stop="clearAllData">
+                      <i-carbon-clean v-if="store.activeVal === 1" class="text-20px" />
+                    </n-icon>
+                  </template>
+                  <n-p>清除所有快捷网站</n-p>
+                </n-tooltip>
+                <n-tooltip placement="left" trigger="hover">
+                  <template #trigger>
+                    <n-icon class="mr-5">
+                      <i-line-md-upload-outline-loop v-show="store.activeVal === 1" class="text-20px" @click.stop="handleExport" />
+                    </n-icon>
+                  </template>
+                  <n-p>导出快捷网站</n-p>
+                </n-tooltip>
+                <n-tooltip placement="left" trigger="hover">
+                  <template #trigger>
+                    <n-icon class="mr-5">
+                      <i-line-md-download-outline-loop v-show="store.activeVal === 1" class="text-20px" @click.stop="handleImport"/>
+                    </n-icon>
+                  </template>
+                  <n-p>导入快捷网站</n-p>
+                </n-tooltip>
+                <n-popover placement="left" trigger="hover">
+                  <template #trigger>
+                    <n-icon class="mr-5">
+                      <i-carbon-category-new v-show="store.activeVal === 1" class="text-20px" @click.stop="handleAddCate"/>
+                    </n-icon>
+                  </template>
+                  <n-p>添加分类</n-p>
+                </n-popover>
+                <n-popover placement="left" trigger="hover">
+                  <template #trigger>
+                    <n-icon>
+                      <i-ri-question-line v-show="store.activeVal === 1" class="text-20px" />
+                    </n-icon>
+                  </template>
+                  <n-p>左键跳转，右键卡片编辑和删除</n-p>
+                </n-popover>
               </span>
             </template>
             <n-p class="w-20vw">
@@ -69,7 +68,7 @@
           </n-collapse-item>
           <n-collapse-item title="待办纪要" :name="2">
             <template #header-extra>
-              <span class="mr-20" v-if="store.activeVal === 2">
+              <span class="mr-6" v-if="store.activeVal === 2">
                 <n-tooltip placement="left" trigger="hover">
                   <template #trigger>
                     <n-icon class="mr-5" @click.stop="switchListType">

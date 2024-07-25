@@ -5,6 +5,7 @@ import type {
   DialogProviderInst,
   MessageProviderInst,
   NotificationProviderInst,
+  UploadFileInfo
 } from 'naive-ui'
 
 declare module '*.vue' {
@@ -27,5 +28,24 @@ declare global {
   interface Category {
     label: string
     list: Item[]
+  }
+
+  type attachMentsType = UploadFileInfo & {
+    id: string
+    name: T | undefined
+    sourcePath?: string
+  }
+
+  type todoInfoType = {
+    isShow?: boolean
+    id: string | number
+    content: string
+    level: string[] | null
+    type: string
+    attachMents: attachMentsType[]
+    memo?: string
+    createdAt?: string | number | Date | undefined
+    updatedAt?: string | number | Date | undefined
+    isCompleted: boolean
   }
 }

@@ -2,7 +2,7 @@ import { createPinia, defineStore } from 'pinia'
 import { ref, watchEffect } from 'vue'
 import { saveWindowState, StateFlags } from 'tauri-plugin-window-state-api'
 import { appWindow } from '@tauri-apps/api/window';
-import jsonData from './data.json'
+// import jsonData from './data.json'
 
 // import {
 //   WindowFullscreen,
@@ -20,7 +20,7 @@ export const useStore = defineStore('global', () => {
   const cateToolList = ref<Record<string, any>>({ 1: `快捷网站`, 2: `待办纪要`, 3: `驼峰下划线相互转换` })
   const activeVal = ref(<Number | null>1)
 
-  const todoData = ref<Record<string, any>[]>([])
+  const todoData = ref<todoInfoType[]>([])
   const isTodoList = ref(<Boolean>false)
 
   const levelOptions = ref([
@@ -69,9 +69,9 @@ export const useStore = defineStore('global', () => {
       let storageData
       const isWindow = 'tauri' in window
       if (isWindow) {
-        storageData = JSON.stringify(jsonData)
-        const jsonParse = JSON.parse(storageData)
-        data.value = jsonParse
+        // storageData = JSON.stringify(jsonData)
+        // const jsonParse = JSON.parse(storageData)
+        // data.value = jsonParse
       } else {
         data.value = JSON.parse(window.localStorage.getItem('data') as string)
         todoData.value = JSON.parse(window.localStorage.getItem('todoData') as string)

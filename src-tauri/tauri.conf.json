@@ -17,17 +17,15 @@
         "all": false,
         "setFullscreen": true
       },
-      "fs": {
-        "all": false,
-        "readFile": true,
-        "writeFile": true
-      },
       "dialog": {
         "all": true
       },
       "os": {
         "all": true
       },
+      "globalShortcut": {
+				"all": true
+			},
       "http": {
         "all": true,
         "scope": ["https://v1.hitokoto.cn/*"]
@@ -49,6 +47,17 @@
             "args": true
           }
         ]
+      },
+      "path": {
+				"all": true
+			},
+      "fs": {
+				"all": true,
+				"scope": ["$APPDATA/**", "$DOWNLOAD/**"]
+			},
+      "protocol": {
+        "asset": true,
+        "assetScope": ["$APPDATA/assets/*"]
       }
     },
     "bundle": {

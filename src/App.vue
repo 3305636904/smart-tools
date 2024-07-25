@@ -1,30 +1,12 @@
 <template>
-  <naive-provider class="max-h-100vh overflow-hidden">
+  <naive-provider :class="['h-100vh', {'shadow-gray-600': store.darkTheme }]">
     <transition
       :name="store.screenLocked ? 'fade-top' : 'fade-bottom'"
       mode="out-in"
       appear
     >
       <lock-screen v-if="store.screenLocked" />
-      <div class="h-100vh" v-else>
-        <category-list/>
-        <div
-          v-if="store.data.length === 0"
-          class="w-full h-80vh flex justify-center items-center"
-        >
-          <n-result
-            title="空空如也"
-            description="这里应该是一片荒漠。"
-            size="huge"
-          >
-            <template #icon>
-              <n-icon style="width: 300px; height: 300px">
-                <i-custom-empty class="text-300px" />
-              </n-icon>
-            </template>
-          </n-result>
-        </div>
-      </div>
+      <category-list v-else/>
     </transition>
   </naive-provider>
 </template>

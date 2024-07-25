@@ -15,7 +15,6 @@ declare module '@vue/runtime-core' {
     ICarbonBatchJob: typeof import('~icons/carbon/batch-job')['default']
     ICarbonCategoryNew: typeof import('~icons/carbon/category-new')['default']
     ICarbonClean: typeof import('~icons/carbon/clean')['default']
-    ICustomEmpty: typeof import('~icons/custom/empty')['default']
     IGgMenuGridR: typeof import('~icons/gg/menu-grid-r')['default']
     IGridiconsAddOutline: typeof import('~icons/gridicons/add-outline')['default']
     ILineMdDownloadOutlineLoop: typeof import('~icons/line-md/download-outline-loop')['default']
@@ -72,7 +71,6 @@ declare module '@vue/runtime-core' {
     NPopover: typeof import('naive-ui')['NPopover']
     NRadioButton: typeof import('naive-ui')['NRadioButton']
     NRadioGroup: typeof import('naive-ui')['NRadioGroup']
-    NResult: typeof import('naive-ui')['NResult']
     NScrollbar: typeof import('naive-ui')['NScrollbar']
     NSelect: typeof import('naive-ui')['NSelect']
     NSpace: typeof import('naive-ui')['NSpace']
@@ -80,6 +78,7 @@ declare module '@vue/runtime-core' {
     NTag: typeof import('naive-ui')['NTag']
     NText: typeof import('naive-ui')['NText']
     NTooltip: typeof import('naive-ui')['NTooltip']
+    NUpload: typeof import('naive-ui')['NUpload']
     SearchModal: typeof import('./../components/SearchModal.vue')['default']
     Todo: typeof import('./../components/Todo/index.vue')['default']
   }
