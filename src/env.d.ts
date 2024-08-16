@@ -41,7 +41,7 @@ declare global {
     id: string | number
     content: string
     level: string[] | null
-    type: string
+    type: string[] | string
     attachMents: attachMentsType[]
     memo?: string
     createdAt?: string | number | Date | undefined

@@ -1,53 +1,5 @@
 <template>
   <div class="fixed flex flex-col bottom-8 right-4 z-9999">
-    <!-- <n-tooltip placement="top-end" trigger="hover">
-      <template #trigger>
-        <n-button class="mb-2" circle size="large" @click="handleExport">
-          <template #icon>
-            <n-icon>
-              <i-line-md-upload-outline-loop />
-            </n-icon>
-          </template>
-        </n-button>
-      </template>
-      导出到文件
-    </n-tooltip> -->
-    <!-- <n-tooltip placement="top-end" trigger="hover">
-      <template #trigger>
-        <n-button class="mb-2" circle size="large" @click="handleImport">
-          <template #icon>
-            <n-icon>
-              <i-line-md-download-outline-loop />
-            </n-icon>
-          </template>
-        </n-button>
-      </template>
-      从文件导入
-    </n-tooltip> -->
-    <!-- <n-tooltip placement="top-end" trigger="hover">
-      <template #trigger>
-        <n-button class="mb-2" circle size="large" @click="clearAll">
-          <template #icon>
-            <n-icon>
-              <i-carbon-clean />
-            </n-icon>
-          </template>
-        </n-button>
-      </template>
-      清除所有数据
-    </n-tooltip> -->
-    <!-- <n-tooltip placement="top-end" trigger="hover">
-      <template #trigger>
-        <n-button class="mb-2" circle size="large" @click="handleAddCate">
-          <template #icon>
-            <n-icon>
-              <i-carbon-category-new />
-            </n-icon>
-          </template>
-        </n-button>
-      </template>
-      添加一个分类
-    </n-tooltip> -->
     <n-tooltip placement="top-end" trigger="hover">
       <template #trigger>
         <n-button class="mb-2" circle size="large" @click="themeSwitch">
@@ -111,19 +63,4 @@ const themeSwitch = () => {
     window.$loading.finish()
   }, 100)
 }
-// const clearAll = () => {
-//   window.$dialog.warning({
-//     title: '警告',
-//     content: '确定删除所有数据？建议先点击上方按钮导出备份',
-//     positiveText: '确定',
-//     negativeText: '不确定',
-//     onPositiveClick: () => {
-//       store.data = []
-//       window.$notification.success({
-//         title: '清空成功',
-//         duration: 3000,
-//       })
-//     },
-//   })
-// }
 </script>

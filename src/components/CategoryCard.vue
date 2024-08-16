@@ -1,6 +1,6 @@
 <template>
   <n-card
-    class="max-w-400px min-w-200px"
+    :class="['max-w-400px', 'min-w-200px', {'shadow-gray-600': store.darkTheme }]"
     :segmented="{
       content: 'soft',
     }"

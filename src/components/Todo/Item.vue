@@ -1,16 +1,20 @@
 <template>
-  <n-card v-if="!props.isList" :class="['w-20vw', 'text-left', 'p-0', 'pos-relative', 'overflow-hidden', {'color-gray-500': props.item.isCompleted }]"
+  <n-card v-if="!props.isList" content-class="content-clz" :class="['w-20vw', 'text-left', 'p-0', 'relative', 'overflow-hidden', {'color-gray-500': props.item.isCompleted }]"
   @mouseenter="() => (isEnter = true)" @mouseleave="() => (isEnter = false)"
   :bordered="!props.item.isCompleted" :content-style="isEdit ? `padding: 0;` : ''" hoverable>
-    <n-checkbox size="small" v-show="props.isBatch" class="pos-absolute top-1 left-1 w-2px h-2px" :value="props.item" />
+    <n-checkbox size="small" v-show="props.isBatch" class="absolute top-1 left-3.5 w-2px h-2px" :value="props.item" />
     <span v-show="!props.item.isCompleted && !isEdit">
       <n-popover trigger="hover" raw>
         <template #trigger>
-          <span class="pos-absolute top-1 left-5 text-size-8px color-red">{{ spendDuration }}</span>
+          <span :class="['absolute', 'top-1', {'left-8': props.isBatch, 'left-3' : !props.isBatch }, 'text-size-8px', 'color-red']">{{ spendDuration }}</span>
         </template>
         <span :class="['text-size-12px', 'color-red', 'p-1', {'bg-gray-700': store.darkTheme, 'bg-gray-400': !store.darkTheme}]">{{ spendDuration }}</span>
       </n-popover>
     </span>
+    <n-switch :round="false" :railStyle="switchStatusColor" class="v-base mr-1.5" size="small" v-model:value="props.item.isCompleted" >
+      <template #unchecked>待关闭</template>
+      <template #checked>已关闭</template>
+    </n-switch>
     <span :class="['top-1', 'transition-all', 'transition-duration-800', { 'hidden' : !isEnter }]">
       <n-icon class="m-r-2" @click.stop="editItem">
         <IMaterialSymbolsEditSquareOutlineRounded v-show="!isEdit" class="text-15px cursor-pointer hover:color-blue-400" />
@@ -22,12 +26,13 @@
     <section @dblclick="dbEditItem" @blur="isEdit = false">
       <n-input ref="inputRef" type="textarea" :autosize="{ minRows: 1 }" v-if="isEdit" @blur="isEdit = false" @keydown.enter="keyDown" v-model:value="item.content" ></n-input>
       <n-ellipsis v-else expand-trigger="click" line-clamp="3" :tooltip="false">
-        {{props.item.content}}
+        <span>{{ props.index }}. </span>
+        <span :class="{ 'line-through': props.item.isCompleted }">{{props.item.content}}</span>
       </n-ellipsis>
     </section>
   </n-card>
   <n-p v-else 
-    :class="['text-left', 'p-1', 'pt-2', 'pos-relative', 'overflow-hidden', 'border-b-emerald', {'hover:bg-dark': store.darkTheme, 'hover:bg-gray-200': !store.darkTheme}, {'color-gray-500': props.item.isCompleted }]"
+    :class="['text-left', 'p-1', 'pt-2', 'pos-relative', 'overflow-hidden', 'border-b-emerald', 'b-rounded-1.5', {'hover:bg-dark': store.darkTheme, 'hover:bg-gray-200': !store.darkTheme}]"
     style="width: calc(100% - 15px);"
     @mouseenter="() => (isEnter = true)" @mouseleave="() => (isEnter = false)">
     <!--  -->
@@ -39,16 +44,19 @@
         <span :class="['text-size-12px', 'color-red', 'p-1', {'bg-gray-700': store.darkTheme, 'bg-gray-400': !store.darkTheme}]">{{ spendDuration }}</span>
       </n-popover>
     </span>
-    <div class="block w-90vw position-relative" @dblclick="dbEditItem" @blur="isEdit = false">
+    <div class="block w-full position-relative" @dblclick="dbEditItem" @blur="isEdit = false">
       <n-checkbox size="small" v-if="!isEdit" v-show="props.isBatch" class="position-absolute left-0 top-1 w-2 h-2" :value="props.item" />
       <n-input ref="inputRef" type="textarea" :autosize="{ minRows: 1 }" v-if="isEdit" @blur="isEdit = false" @keydown.enter="keyDown" v-model:value="item.content" ></n-input>
-      <n-ellipsis :class="['w-full', { 'pl-5' : !isEdit && props.isBatch }]" v-else expand-trigger="click" line-clamp="1" :tooltip="false">
-        {{props.item.content}}
-        <span :class="['ml-5', 'v-text-top', 'transition-all', 'transition-duration-800', { 'hidden' : !isEnter }]">
-          <n-switch :round="false" class="v-base" size="small" v-model:value="props.item.isCompleted" >
-            <template #checked>已完成</template>
-            <template #unchecked>待完成</template>
-          </n-switch>
+      <p v-else class="m-0 w-full flex justify-start">
+        <n-ellipsis :class="['w-90%', 'flex-1', { 'pl-5' : !isEdit && props.isBatch }]" expand-trigger="click" line-clamp="1" :tooltip="false">
+          <span>{{ props.index }}. </span>
+          <span :class="['mr-1.5', { 'color-gray-700': !store.darkTheme, 'color-gray-400': store.darkTheme, 'line-through': props.item.isCompleted }]">{{props.item.content}}</span>
+        </n-ellipsis>
+        <n-switch :round="false" :railStyle="switchStatusColor" class="v-text-top" size="small" v-model:value="props.item.isCompleted" >
+          <template #unchecked>待关闭</template>
+          <template #checked>已关闭</template>
+        </n-switch>
+        <span :class="['v-text-top', 'transition-all', 'transition-duration-800', { 'hidden' : !isEnter }]">
           <n-icon class="ml-3 mr-3" @click.stop="editItem">
             <IMaterialSymbolsEditSquareOutlineRounded v-show="!isEdit" class="text-18px cursor-pointer hover:color-blue-400" />
           </n-icon>
@@ -56,8 +64,7 @@
             <IMdiCloseCircleOutline v-show="!isEdit" class="text-18px cursor-pointer hover:color-red-500" />
           </n-icon>
         </span>
-      </n-ellipsis>
-      
+      </p>
     </div>
   </n-p >
 
@@ -208,6 +215,12 @@
 
   const isEnter = ref(false)
   const checked = ref(false)
+
+  function switchStatusColor({ focused, checked }: { focused: boolean, checked: boolean }) {
+    return {
+      background: !checked ? '#2a947d' : '#816060'
+    }
+  }
 
   function formatTime(val: any) {
     return dayjs(val).format('YYYY-MM-DD HH:mm:ss')
@@ -374,6 +387,7 @@
   }
 
   const props = defineProps<{
+    index: number,
     item: todoInfoType,
     isList: Boolean,
     isBatch: Boolean
@@ -382,4 +396,7 @@
 </script>
   
 <style scoped>
+::v-deep .content-clz {
+  padding: 1em;
+}
 </style>

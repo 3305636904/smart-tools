@@ -1,58 +1,64 @@
 <template>
-  <n-layout class="h-100vh w-full main-layout">
+  <n-layout :class="['h-100vh', 'w-full']">
     <n-layout-header
-      class="aa-header flex justify-between items-center h-64px"
+      class="flex justify-between items-center h-64px"
     >
-      <n-h2 prefix="bar" class="m-0 ml-4">
+      <n-h2 prefix="bar" class="m-0 ml-4 flex">
         <n-text type="primary">{{activeTitle}}</n-text>
       </n-h2>
+      <n-tooltip placement="left" trigger="hover">
+        <template #trigger>
+          <span class="ml-2 mr-2">今年剩余： <span class="color-orange text-12">{{ leftDays }}</span>天</span>
+        </template>
+        <span>{{ (leftDays < 182) ? '虽已过半年，但切莫焦虑' : '珍惜每天，切勿浪费时间' }}</span>
+      </n-tooltip>
     </n-layout-header>
-    <n-scrollbar style="height: calc(100% - 64px);">
+    <n-scrollbar ref="contentRef" style="height: calc(100% - 64px);"  @scroll="handleScroll">
       <n-layout-content class="overflow-hidden p-6 pr-10px">
-        <n-collapse class="overflow-hidden" :default-expanded-names="store.activeVal" @item-header-click="handleItemHeaderClick" accordion>
-          <n-collapse-item title="快捷网站" :name="1">
+        <n-collapse class="overflow-hidden" display-directive="show" :default-expanded-names="store.activeVal" @item-header-click="handleItemHeaderClick" accordion>
+          <n-collapse-item title="快捷网站" :name="1" display-directive="show">
             <template #header-extra>
-              <span  class="mr-6 rounded-8 p-2 pb-1 z-50 hover:bg-gray-700">
+              <span :class="['mr-6', 'rounded-8', 'p-2', 'pb-1', 'z-50', {'hover:bg-gray-700': store.darkTheme, 'hover:bg-gray-200': !store.darkTheme }]" @click.stop="()=>{}" v-if="store.activeVal === 1">
                 <n-tooltip placement="left" trigger="hover">
                   <template #trigger>
                     <n-icon class="mr-5" @click.stop="clearAllData">
                       <i-carbon-clean v-if="store.activeVal === 1" class="text-20px" />
                     </n-icon>
                   </template>
-                  <n-p>清除所有快捷网站</n-p>
+                  清除所有快捷网站
                 </n-tooltip>
                 <n-tooltip placement="left" trigger="hover">
                   <template #trigger>
                     <n-icon class="mr-5">
-                      <i-line-md-upload-outline-loop v-show="store.activeVal === 1" class="text-20px" @click.stop="handleExport" />
+                      <IClarityExportLine v-show="store.activeVal === 1" class="text-20px" @click.stop="handleExport" />
                     </n-icon>
                   </template>
-                  <n-p>导出快捷网站</n-p>
+                  导出快捷网站
                 </n-tooltip>
                 <n-tooltip placement="left" trigger="hover">
                   <template #trigger>
                     <n-icon class="mr-5">
-                      <i-line-md-download-outline-loop v-show="store.activeVal === 1" class="text-20px" @click.stop="handleImport"/>
+                      <IClarityImportLine v-show="store.activeVal === 1" class="text-20px" @click.stop="handleImport"/>
                     </n-icon>
                   </template>
-                  <n-p>导入快捷网站</n-p>
+                  导入快捷网站
                 </n-tooltip>
-                <n-popover placement="left" trigger="hover">
+                <n-tooltip placement="left" trigger="hover">
                   <template #trigger>
                     <n-icon class="mr-5">
                       <i-carbon-category-new v-show="store.activeVal === 1" class="text-20px" @click.stop="handleAddCate"/>
                     </n-icon>
                   </template>
-                  <n-p>添加分类</n-p>
-                </n-popover>
-                <n-popover placement="left" trigger="hover">
+                  添加分类
+                </n-tooltip>
+                <n-tooltip placement="left" trigger="hover">
                   <template #trigger>
                     <n-icon>
                       <i-ri-question-line v-show="store.activeVal === 1" class="text-20px" />
                     </n-icon>
                   </template>
-                  <n-p>左键跳转，右键卡片编辑和删除</n-p>
-                </n-popover>
+                  左键跳转，右键卡片编辑和删除
+                </n-tooltip>
               </span>
             </template>
             <n-p class="w-20vw">
@@ -66,9 +72,9 @@
               />
             </n-space>
           </n-collapse-item>
-          <n-collapse-item title="待办纪要" :name="2">
+          <n-collapse-item title="待办纪要" :name="2" display-directive="show">
             <template #header-extra>
-              <span class="mr-6 rounded-8 p-2 pb-1 z-50 hover:bg-gray-700" v-if="store.activeVal === 2">
+              <span :class="['mr-6', 'rounded-8', 'p-2', 'pb-1', 'z-50', {'hover:bg-gray-700': store.darkTheme, 'hover:bg-gray-200': !store.darkTheme }]" @click.stop="()=>{}" v-if="store.activeVal === 2">
                 <n-tooltip placement="left" trigger="hover">
                   <template #trigger>
                     <n-icon class="mr-5" @click.stop="switchListType">
@@ -76,7 +82,7 @@
                       <IGgMenuGridR v-else class="text-18px" />
                     </n-icon>
                   </template>
-                  <n-p>切换为{{ store.isTodoList ? '方块' : '列表' }}</n-p>
+                  切换为{{ store.isTodoList ? '方块' : '列表' }}
                 </n-tooltip>
                 <n-tooltip placement="left" trigger="hover">
                   <template #trigger>
@@ -84,23 +90,23 @@
                       <i-carbon-clean class="text-18px" />
                     </n-icon>
                   </template>
-                  <n-p>清除所有待办事项</n-p>
+                  清除所有待办事项
                 </n-tooltip>
                 <n-tooltip placement="left" trigger="hover">
                   <template #trigger>
                     <n-icon class="mr-5">
-                      <i-line-md-upload-outline-loop class="text-18px" @click.stop="handleExport" />
+                      <IClarityExportLine class="text-18px" @click.stop="handleExport" />
                     </n-icon>
                   </template>
-                  <n-p>导出所有待办事项</n-p>
+                  导出所有待办事项
                 </n-tooltip>
                 <n-tooltip placement="left" trigger="hover">
                   <template #trigger>
                     <n-icon class="mr-5">
-                      <i-line-md-download-outline-loop class="text-18px" @click.stop="handleImport"/>
+                      <IClarityImportLine class="text-18px" @click.stop="handleImport"/>
                     </n-icon>
                   </template>
-                  <n-p>导入待办事项</n-p>
+                  导入待办事项
                 </n-tooltip>
                 <n-popover placement="left" trigger="hover">
                   <template #trigger>
@@ -108,18 +114,32 @@
                       <IZondiconsAddOutline class="text-16px" @click.stop="handleAddTodo"/>
                     </n-icon>
                   </template>
-                  <n-p>添加待办纪要</n-p>
+                  添加待办纪要
                 </n-popover>
               </span>
             </template>
             <TodoList ref="todoRef" v-model:checkedOptions="checkedTodoOptions" />
           </n-collapse-item>
-        </n-collapse>
+        </n-collapse>        
       </n-layout-content>
+      <n-tooltip v-if="showTopButton" placement="top" trigger="hover">
+        <template #trigger>
+          <n-button
+            circle
+            size="large"
+            class="fixed right-16 bottom-10" 
+            @click="scrollToTop"
+          >
+            <ISystemUiconsPushUp/>
+          </n-button>
+        </template>
+        回到顶部
+      </n-tooltip>
     </n-scrollbar>
     <cate-modal />
     <item-modal />
     <float-btn />
+
   </n-layout>
 </template>
 
@@ -137,10 +157,20 @@ import type { CollapseProps } from 'naive-ui'
 import { writeTextFile, readTextFile } from '@tauri-apps/api/fs'
 import { open, save } from '@tauri-apps/api/dialog'
 
+import dayjs from 'dayjs'
+
 const store = useStore()
 const todoRef = ref<typeof TodoList>()
 
+const contentRef = ref()
+
 const checkedTodoOptions = ref<Record<string, any>[]>([])
+
+onMounted(() => {
+  getLeftDays()
+})
+
+const showTopButton = ref(false)
 
 const searchWebKey = ref('')
 const showWebList = computed(() => {
@@ -158,6 +188,7 @@ const handleItemHeaderClick: CollapseProps['onItemHeaderClick'] = ({ name, expan
     store.activeVal = null
     return
   }
+  showTopButton.value = false
   store.activeVal = name
 }
 
@@ -252,11 +283,35 @@ const handleImport = async () => {
   }
 }
 
-
 const handleAddCate = () => {
   store.cateModal.title = '添加分类'
   store.cateModal.label = ''
   store.cateModal.prevLabel = ''
   store.cateModal.isShow = true
 }
+
+const leftDays = ref(0)
+const getLeftDays = () => {
+  // 今天的标准时间
+  let today = new Date();
+  // 本年最后标准时间
+  let endYear = new Date(today.getFullYear(), 11, 31, 23, 59, 59);
+  // 一天的毫秒数
+  let msPerDay = 24 * 60 * 60 * 1000;
+  // 计算剩余毫秒除以一天的毫秒数，就是天数
+  leftDays.value = Math.round((endYear.getTime() - today.getTime()) / msPerDay);
+}
+
+
+function handleScroll(e: Event) {
+  const scrollTop = (e.target as HTMLElement).scrollTop || (e.target as HTMLElement).scrollTop;
+  // const distanceToBottom = (e.target as HTMLElement).scrollHeight - (e.target as HTMLElement).scrollTop - window.innerHeight;
+  showTopButton.value =  scrollTop > (window.innerHeight*1.45)
+}
+const scrollToTop = () => {
+  contentRef?.value.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  });
+};
 </script>

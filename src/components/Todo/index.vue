@@ -1,23 +1,23 @@
 <template>
-  <n-layout class="w-100vw">
-    <div class="w-20px flex flex-col rounded-4 pos-fixed right-20px p-8px pb-15px z-50 hover:bg-gray-700">
-      <n-tooltip placement="left" trigger="hover">
+  <n-layout class="w-92%">
+    <div :class="['w-20px', 'flex', 'flex-col', 'rounded-4', 'pos-fixed', 'right-20px', 'p-8px', 'pb-15px', 'z-50', {'hover:bg-gray-700': store.darkTheme, 'hover:bg-gray-200': !store.darkTheme }]">
+      <n-tooltip placement="left" trigger="hover" >
         <template #trigger>
           <n-icon class="cursor-pointer" @click.stop="switchCondition">
             <IMaterialSymbolsTopPanelCloseOutline v-if="!hiddenCondition" class="text-18px" />
             <IMaterialSymbolsBottomPanelCloseOutlineSharp v-else class="text-18px" />
           </n-icon>
         </template>
-        <n-p>{{ hiddenCondition ? '展开工具栏' : '收起工具栏' }}</n-p>
+        {{ hiddenCondition ? '展开工具栏' : '收起工具栏' }}
       </n-tooltip>
-      <n-tooltip placement="left" trigger="hover">
+      <n-tooltip v-if="showTodoList.length" placement="left" trigger="hover">
         <template #trigger>
           <n-icon class="mt-18px cursor-pointer" @click.stop="batchClick">
             <ICarbonBatchJob class="text-19px" v-if="!isBatch" />
             <IMdiCancelBoxMultiple class="text-19px" v-else />
           </n-icon>
         </template>
-        <n-p>{{ isBatch ? '取消批量操作' : '批量操作' }}</n-p>
+        {{ isBatch ? '取消批量操作' : '批量操作' }}
       </n-tooltip>
       <n-tooltip v-if="checkedTodos.length" placement="left" trigger="hover">
         <template #trigger>
@@ -25,15 +25,15 @@
             <IMaterialSymbolsDeleteOutline class="text-19px" />
           </n-icon>
         </template>
-        <n-p>批量删除</n-p>
+        批量删除
       </n-tooltip>
       <n-tooltip placement="left" trigger="hover">
         <template #trigger>
           <n-icon class="mt-18px" @click.stop="exportShowTodoList">
-            <i-line-md-upload-outline-loop class="text-19px" />
+            <IClarityExportLine class="text-19px" />
           </n-icon>
         </template>
-        <n-p>{{ checkedTodos.length ? '导出勾选展示数据' : '导出展示数据' }}</n-p>
+        {{ checkedTodos.length ? '导出勾选展示数据' : '导出展示数据' }}
       </n-tooltip>
     </div>
     <n-form
@@ -43,7 +43,6 @@
       v-if="!hiddenCondition"
     >
       <n-grid cols="1 s:2 m:3 l:5 xl:6" :x-gap="12" responsive="screen">
-      <!-- <n-grid> -->
         <n-gi>
           <n-form-item label="待办内容关键字">
             <n-input v-model:value="searchTodoKey" class="text-left max-w-350px" placeholder="输入待办内容关键字" clearable />
@@ -70,8 +69,8 @@
       <n-checkbox v-if="isBatch" :label="checkedTodos.length ? `选中${checkedTodos.length}` : '全选'" size="small" v-model:checked="isCheckAll" />
     </p>
     <n-checkbox-group v-model:value="checkedTodos">
-      <n-space>
-        <TodoItem v-for="(v, i) of showTodoList" :key="i" :item="v" :is-list="store.isTodoList" :isBatch="isBatch" />
+      <n-space :vertical="store.isTodoList">
+        <TodoItem v-for="(v, i) of showTodoList" :key="i" :item="v" :index="i + 1" :is-list="store.isTodoList" :isBatch="isBatch" />
       </n-space>
     </n-checkbox-group>
   </n-layout>
@@ -240,7 +239,7 @@
     id: '',
     content: '',
     level: ['4'],
-    type: '',
+    type: [],
     attachMents: [],
     memo: '',
     isCompleted: false
@@ -341,7 +340,7 @@
     todoInfo.isShow = true
     todoInfo.content = ''
     todoInfo.level = ['4']
-    todoInfo.type = ''
+    todoInfo.type = searchTodoTypes.value
     todoInfo.isCompleted = false
     todoInfo.createdAt = new Date()
     todoInfo.updatedAt = new Date()
