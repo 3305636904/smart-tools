@@ -12,7 +12,7 @@
         <n-collapse class="overflow-hidden" :default-expanded-names="store.activeVal" @item-header-click="handleItemHeaderClick" accordion>
           <n-collapse-item title="快捷网站" :name="1">
             <template #header-extra>
-              <span class="mr-6">
+              <span  class="mr-6 rounded-8 p-2 pb-1 z-50 hover:bg-gray-700">
                 <n-tooltip placement="left" trigger="hover">
                   <template #trigger>
                     <n-icon class="mr-5" @click.stop="clearAllData">
@@ -68,7 +68,7 @@
           </n-collapse-item>
           <n-collapse-item title="待办纪要" :name="2">
             <template #header-extra>
-              <span class="mr-6" v-if="store.activeVal === 2">
+              <span class="mr-6 rounded-8 p-2 pb-1 z-50 hover:bg-gray-700" v-if="store.activeVal === 2">
                 <n-tooltip placement="left" trigger="hover">
                   <template #trigger>
                     <n-icon class="mr-5" @click.stop="switchListType">

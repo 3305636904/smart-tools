@@ -11,7 +11,7 @@
         <span :class="['text-size-12px', 'color-red', 'p-1', {'bg-gray-700': store.darkTheme, 'bg-gray-400': !store.darkTheme}]">{{ spendDuration }}</span>
       </n-popover>
     </span>
-    <span :class="['pos-absolute', 'top-1', 'right-1', 'transition-all', 'transition-duration-800', { 'hidden' : !isEnter }]">
+    <span :class="['top-1', 'transition-all', 'transition-duration-800', { 'hidden' : !isEnter }]">
       <n-icon class="m-r-2" @click.stop="editItem">
         <IMaterialSymbolsEditSquareOutlineRounded v-show="!isEdit" class="text-15px cursor-pointer hover:color-blue-400" />
       </n-icon>
@@ -44,16 +44,21 @@
       <n-input ref="inputRef" type="textarea" :autosize="{ minRows: 1 }" v-if="isEdit" @blur="isEdit = false" @keydown.enter="keyDown" v-model:value="item.content" ></n-input>
       <n-ellipsis :class="['w-full', { 'pl-5' : !isEdit && props.isBatch }]" v-else expand-trigger="click" line-clamp="1" :tooltip="false">
         {{props.item.content}}
+        <span :class="['ml-5', 'v-text-top', 'transition-all', 'transition-duration-800', { 'hidden' : !isEnter }]">
+          <n-switch :round="false" class="v-base" size="small" v-model:value="props.item.isCompleted" >
+            <template #checked>已完成</template>
+            <template #unchecked>待完成</template>
+          </n-switch>
+          <n-icon class="ml-3 mr-3" @click.stop="editItem">
+            <IMaterialSymbolsEditSquareOutlineRounded v-show="!isEdit" class="text-18px cursor-pointer hover:color-blue-400" />
+          </n-icon>
+          <n-icon @click.stop="removeItem">
+            <IMdiCloseCircleOutline v-show="!isEdit" class="text-18px cursor-pointer hover:color-red-500" />
+          </n-icon>
+        </span>
       </n-ellipsis>
+      
     </div>
-    <span :class="['pos-absolute', 'top-25%', 'right-2', 'transition-all', 'transition-duration-800', { 'hidden' : !isEnter }]">
-      <n-icon class="m-r-2" @click.stop="editItem">
-        <IMaterialSymbolsEditSquareOutlineRounded v-show="!isEdit" class="text-15px cursor-pointer hover:color-blue-400" />
-      </n-icon>
-      <n-icon class="m-r-1" @click.stop="removeItem">
-        <IMdiCloseCircleOutline v-show="!isEdit" class="text-15px cursor-pointer hover:color-red-500" />
-      </n-icon>
-    </span>
   </n-p >
 
   <n-modal

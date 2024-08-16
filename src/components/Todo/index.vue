@@ -170,7 +170,7 @@
 
   import dayjs from 'dayjs'
   import TodoItem from './Item.vue'
-  import { FormInst, UploadCustomRequestOptions } from 'naive-ui'
+  import { FormInst, UploadCustomRequestOptions, useDialog } from 'naive-ui'
   import type { UploadFileInfo } from 'naive-ui'
   import { useStore } from '../../store'
   import { formatTimeNormal, formatTimeDifference } from '../../hooks/useTime'
@@ -282,30 +282,39 @@
     return `${day}${hour}${minute}${second}`
   }
 
+  const dialog = useDialog()
   async function exportShowTodoList() {
-    const filePath = await save({
-      filters: [{
-        name: 'showTodoList',
-        extensions: ['txt']
-      }]
-    });
+    const exportInfo2Txt = async (needMemo: boolean = false) => {
+      const filePath = await save({
+        filters: [{
+          name: 'showTodoList',
+          extensions: ['txt']
+        }]
+      });
 
-    if (filePath) {
-      let exportData = showTodoList.value.map(v => `${v.isCompleted ? '已完成': '进行中'}-${v.content} ${v.isCompleted ? '耗时：' + timeDuration(v) : ''}\n`).join('')
-      if (checkedTodos.value.length > 0) { 
-        exportData = checkedTodos.value.map(v => `${v.isCompleted? '已完成': '进行中'}-${v.content}\n`).join('')
+      if (filePath) {
+        let exportData = showTodoList.value.map(v => `${v.isCompleted ? '已完成': '进行中'}-${v.content} ${v.isCompleted ? '耗时：' + timeDuration(v) : ''}\n`).join('')
+        if (checkedTodos.value.length > 0) { 
+          exportData = checkedTodos.value.map(v => `${v.isCompleted? '已完成': '进行中'}-${v.content}${needMemo ? '-' + v.memo : ''}\n`).join('')
+        }
+        writeTextFile(filePath, exportData)
+        window.$notification.success({
+          title: checkedTodos.value.length ? '勾选待办导出成功': '导出成功',
+          duration: 3000,
+        })
+      } else {
+        window.$notification.info({
+          title: '取消导出',
+          duration: 3000,
+        })
       }
-      writeTextFile(filePath, exportData)
-      window.$notification.success({
-        title: checkedTodos.value.length ? '勾选待办导出成功': '导出成功',
-        duration: 3000,
-      })
-    }else {
-      window.$notification.info({
-        title: '取消导出',
-        duration: 3000,
-      })
     }
+    console.log('dialog: ', dialog)
+    dialog.info({
+      title: `提示`, content: `是否导出备注？`, positiveText: `是`, negativeText: `否`, 
+      onPositiveClick: async () => exportInfo2Txt(true),
+      onNegativeClick: () => exportInfo2Txt()
+    })
   }
 
   const handleAddTodoConfirm = (e: MouseEvent) => {

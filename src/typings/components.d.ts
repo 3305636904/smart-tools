@@ -79,6 +79,7 @@ declare module '@vue/runtime-core' {
     NText: typeof import('naive-ui')['NText']
     NTooltip: typeof import('naive-ui')['NTooltip']
     NUpload: typeof import('naive-ui')['NUpload']
+    SearchForm: typeof import('./../components/SearchForm.vue')['default']
     SearchModal: typeof import('./../components/SearchModal.vue')['default']
     Todo: typeof import('./../components/Todo/index.vue')['default']
   }
