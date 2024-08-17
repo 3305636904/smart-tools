@@ -209,7 +209,7 @@
     if (!searchTodoKey.value.trim()) {
       retArr = retArr.sort((v2, v1) => dayjs(v1.createdAt).valueOf() - dayjs(v2.createdAt).valueOf());
     } else {
-      retArr = (retArr.filter(v => v.content.indexOf(searchTodoKey.value)!== -1)).sort((v2, v1) => getTimeStamp(v1.createdAt as string) - getTimeStamp(v2.createdAt as string))
+      retArr = (retArr.filter(v => v.content.toLocaleLowerCase().indexOf(searchTodoKey.value.toLocaleLowerCase())!== -1)).sort((v2, v1) => getTimeStamp(v1.createdAt as string) - getTimeStamp(v2.createdAt as string))
     }
     if (dateRange.value && dateRange.value[0]) {
       retArr = retArr.filter(v => dayjs(dayjs(dateRange.value[0]).format('YYYY-MM-DD') + ' 00:00:00').valueOf() < dayjs(v.createdAt).valueOf())
