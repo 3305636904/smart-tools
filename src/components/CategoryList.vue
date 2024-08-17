@@ -6,19 +6,21 @@
       <n-h2 prefix="bar" class="m-0 ml-4 flex">
         <n-text type="primary">{{activeTitle}}</n-text>
       </n-h2>
-      <n-tooltip placement="left" trigger="hover">
-        <template #trigger>
-          <span class="ml-2 mr-2">今年剩余： <span class="color-orange text-12">{{ leftDays }}</span>天</span>
-        </template>
-        <span>{{ (leftDays < 182) ? '虽已过半年，但切莫焦虑' : '珍惜每天，切勿浪费时间' }}</span>
-      </n-tooltip>
+      <div>
+        <n-tooltip placement="left" trigger="hover">
+          <template #trigger>
+            <span class="ml-2 mr-2 cursor-default" @click="isYearTimeShow = !isYearTimeShow">{{isYearTimeShow ? '今年': '今天' }}剩余： <span class="color-orange text-12">{{ isYearTimeShow ? leftDays : `${hour}:${minute}:${second}` }}</span>天</span>
+          </template>
+          <span>{{ (isYearTimeShow && leftDays < 182) ? '虽已过半年，但切莫焦虑' : `珍惜每${!isYearTimeShow ? '一分': '天'}，切勿浪费时间` }}</span>
+        </n-tooltip>
+      </div>
     </n-layout-header>
     <n-scrollbar ref="contentRef" style="height: calc(100% - 64px);"  @scroll="handleScroll">
       <n-layout-content class="overflow-hidden p-6 pr-10px">
         <n-collapse class="overflow-hidden" display-directive="show" :default-expanded-names="store.activeVal" @item-header-click="handleItemHeaderClick" accordion>
           <n-collapse-item title="快捷网站" :name="1" display-directive="show">
             <template #header-extra>
-              <span :class="['mr-6', 'rounded-8', 'p-2', 'pb-1', 'z-50', {'hover:bg-gray-700': store.darkTheme, 'hover:bg-gray-200': !store.darkTheme }]" @click.stop="()=>{}" v-if="store.activeVal === 1">
+              <span :class="['mr-4', 'rounded-8', 'p-2', 'pb-1', 'z-50', {'hover:bg-gray-700': store.darkTheme, 'hover:bg-gray-200': !store.darkTheme }]" @click.stop="()=>{}" v-if="store.activeVal === 1">
                 <n-tooltip placement="left" trigger="hover">
                   <template #trigger>
                     <n-icon class="mr-5" @click.stop="clearAllData">
@@ -74,7 +76,7 @@
           </n-collapse-item>
           <n-collapse-item title="待办纪要" :name="2" display-directive="show">
             <template #header-extra>
-              <span :class="['mr-6', 'rounded-8', 'p-2', 'pb-1', 'z-50', {'hover:bg-gray-700': store.darkTheme, 'hover:bg-gray-200': !store.darkTheme }]" @click.stop="()=>{}" v-if="store.activeVal === 2">
+              <span :class="['mr-4', 'rounded-8', 'p-2', 'pb-1', 'z-50', {'hover:bg-gray-700': store.darkTheme, 'hover:bg-gray-200': !store.darkTheme }]" @click.stop="()=>{}" v-if="store.activeVal === 2">
                 <n-tooltip placement="left" trigger="hover">
                   <template #trigger>
                     <n-icon class="mr-5" @click.stop="switchListType">
@@ -159,12 +161,18 @@ import { open, save } from '@tauri-apps/api/dialog'
 
 import dayjs from 'dayjs'
 
+import { formatTimeTodayLast } from '../hooks/useTime'
+
+const { hour, minute, second } = formatTimeTodayLast()
+
 const store = useStore()
 const todoRef = ref<typeof TodoList>()
 
 const contentRef = ref()
 
 const checkedTodoOptions = ref<Record<string, any>[]>([])
+
+const isYearTimeShow = ref<Boolean>(false)
 
 onMounted(() => {
   getLeftDays()

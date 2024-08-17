@@ -68,88 +68,49 @@
     </div>
   </n-p >
 
-  <n-modal
+  <search-modal 
     v-model:show="todoInfo.isShow"
     class="max-w-600px"
+    preset="card"
+    title="编辑待办事项"
     :segmented="{
       content: 'soft',
       footer: 'soft',
     }"
-    preset="card"
-    title="编辑待办事项"
-    size="small"
-    :bordered="false">
-    <template #default>
-      <n-scrollbar class="max-h-400px p-r-15px">
-        <n-form
-          label-placement="left"
-          label-width="auto"
-          size="small"
-          ref="formRef"
-          class="text-left"
-          require-mark-placement="right-hanging"
-          :model="todoInfo"
-          :rules="rules"
+    :bordered="false"
+  >
+    <search-form
+      ref="formRef"
+      class="text-left"
+      :model="todoInfo"
+      :rules="rules"
+      :formItems="formItems"
+    >
+      <template #createdAt>
+        <n-p>{{ formatTime(todoInfo.createdAt)  }}</n-p>
+      </template>
+      <template #updatedAt>
+        <n-p>{{ formatTime(todoInfo.updatedAt)  }}</n-p>
+      </template>
+      <template #spendDuration>
+        <n-p class="color-red">{{ spendDuration }}</n-p>
+      </template>
+      <template #attachMents>
+        <n-upload
+          :file-list="todoInfo.attachMents"
+          :show-trigger="false"
+          list-type="image-card"
+          @preview="handlePreview"
+          :on-remove="handleRemove"
+        />
+        <n-button
+          type="info" size="small"
+          :disabled="isUploading"
+          @click="overHandleClick"
+          >上传</n-button
         >
-          <n-form-item label="待办事项" path="content">
-            <n-input
-              v-model:value="todoInfo.content"
-              type="textarea"
-              :autosize="{ minRows: 1 }"
-              placeholder="待办事项内容"
-            />
-          </n-form-item>
-          <n-form-item label="重要程度" path="level">
-            <n-radio-group v-model:value="todoInfo.level" name="radiobuttongroup1">
-                <n-radio-button
-                  v-for="lev in store.levelOptions"
-                  :key="lev.value"
-                  :value="lev.value"
-                  :label="lev.label"
-                />
-              </n-radio-group>
-          </n-form-item>
-          <n-form-item label="事项分类" path="type">
-            <n-select v-model:value="todoInfo.type" multiple :options="store.typeOptions" />
-          </n-form-item>
-          <n-form-item label="创建时间" path="createdAt">
-            <n-p>{{ formatTime(todoInfo.createdAt)  }}</n-p>
-          </n-form-item>
-          <n-form-item label="上次修改时间" path="updatedAt">
-            <n-p>{{ formatTime(todoInfo.updatedAt)  }}</n-p>
-          </n-form-item>
-          <n-form-item label="是否完成" path="isCompleted">
-            <n-switch v-model:value="todoInfo.isCompleted" />
-          </n-form-item>
-          <n-form-item label="相关附件" path="attachMents">
-            <n-upload
-              :file-list="todoInfo.attachMents"
-              :show-trigger="false"
-              list-type="image-card"
-              @preview="handlePreview"
-              :on-remove="handleRemove"
-            />
-            <n-button
-              type="info" size="small"
-              :disabled="isUploading"
-              @click="overHandleClick"
-              >上传</n-button
-            >
-          </n-form-item>
-          <n-form-item label="备注" path="memo">
-            <n-input
-              v-model:value="todoInfo.memo"
-              type="textarea"
-              :autosize="{ minRows: 3 }"
-              placeholder="备注"
-            />
-          </n-form-item>
-          <n-form-item label="已花费时间" >
-            <n-p class="color-red">{{ spendDuration }}</n-p>
-          </n-form-item>
-        </n-form>
-      </n-scrollbar>
-    </template>
+      </template>
+    </search-form>
     <template #footer>
       <div class="w-full flex justify-end">
         <n-button class="mr04" size="small" @click="todoInfo.isShow = false"
@@ -162,7 +123,7 @@
         >
       </div>
     </template>
-  </n-modal>
+  </search-modal>
 </template>
   
 <script lang="ts" setup name="todoItem">
@@ -183,35 +144,12 @@
 
   const emits = defineEmits(['changeCheckOptions'])
 
-  const todoInfo = reactive<todoInfoType>({
-    isShow: false,
-    content: '',
-    level: null,
-    type: '',
-    id: '', // 随机生成的 id
-    isCompleted: false, // 初始状态为 false，即未完成
-    attachMents: [],
-    memo: '',
-    createdAt: '', // 创建时间
-    updatedAt: '' // 更新时间
-  })
-
   const isUploading = ref(false)
 
-  const formRef = ref<FormInst>()
+  import { useTodoEditForm } from './useTodo'
+  const { todoInfo, rules, formItems } = useTodoEditForm()
 
-  const rules = ref({
-    content: {
-      required: true,
-      message: '请输入待办事项内容',
-      trigger: 'blur'
-    },
-    isCompleted: {
-      type: 'boolean',
-      message: '请确认是否已完成',
-      trigger: 'blur'
-    }
-  })
+  const formRef = ref<FormInst>()
 
   const isEnter = ref(false)
   const checked = ref(false)
@@ -268,7 +206,9 @@
   function handleEditTodoConfirm(e: MouseEvent | KeyboardEvent) {
     e.preventDefault()
     formRef.value?.validate(err => {
-      if (err) return
+      if (err) {
+        console.log('err: ', err)
+      }
       const editDataIndex = store.todoData.findIndex(v => v.id === todoInfo.id)
       if (editDataIndex!== -1) {
         todoInfo.updatedAt = new Date()

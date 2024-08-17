@@ -47,6 +47,43 @@ export function useTime() {
   return { month, day, hour, minute, second, week }
 }
 
+
+export function formatTimeTodayLast() {
+  let timer: number // 定时器
+  const hour = ref<number | string>(0) // 小时
+  const minute = ref<number | string>(0) // 分钟
+  const second = ref(0) // 秒
+
+  // 更新时间
+  const updateTime = () => {
+    const dateNow = new Date()
+    // 获取明天0点的时间
+    const dateOfTomorrow = new Date(dateNow.getFullYear(), dateNow.getMonth(), dateNow.getDate() + 1)
+    
+    const timeInfos = getTimeDuration(dateNow, dateOfTomorrow)
+    hour.value = timeInfos.hours
+    minute.value = timeInfos.minutes
+    second.value = timeInfos.seconds
+  }
+
+  updateTime()
+
+  onMounted(() => {
+    clearInterval(timer)
+    timer = setInterval(() => updateTime(), 1000)
+  })
+
+  onUnmounted(() => {
+    clearInterval(timer)
+  })
+
+  return {
+    hour,
+    minute,
+    second
+  }
+}
+
 type NumStr = number | string 
 export function formatTime(date: Date) {
   let year: NumStr = date.getFullYear();
@@ -87,6 +124,8 @@ export function formatTimeDifference(diffMilliseconds: number) {
     seconds: seconds
   };
 }
+
+
 
 export function getTimeDuration(date1: Date, date2: Date){
   return formatTimeDifference(getTimeDifference(date1, date2))

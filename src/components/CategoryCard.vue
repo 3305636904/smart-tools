@@ -57,7 +57,7 @@
     </n-space>
   </n-card>
 </template>
-<script lang="ts" setup>
+<script lang="ts" setup name="CartegoryCard">
 import ItemCard from './ItemCard.vue'
 import AddItem from '~icons/line-md/document-add'
 import EditCate from '~icons/line-md/edit'

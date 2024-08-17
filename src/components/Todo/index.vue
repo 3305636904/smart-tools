@@ -74,7 +74,7 @@
       </n-space>
     </n-checkbox-group>
   </n-layout>
-  <n-modal
+  <search-modal
     v-model:show="todoInfo.isShow"
     class="max-w-600px"
     :segmented="{
@@ -82,68 +82,31 @@
       footer: 'soft',
     }"
     preset="card"
-    title="添加待办事项"
-    size="small"
-    :bordered="false">
-    <template #default>
-      <n-scrollbar class="max-h-400px p-r-15px">
-        <n-form
-          label-placement="left"
-          label-width="auto"
-          ref="formRef"
-          class="text-left"
-          require-mark-placement="right-hanging"
-          :model="todoInfo"
-          :rules="rules"
-        >
-          <n-form-item label="待办事项" path="content">
-            <n-input
-              v-model:value="todoInfo.content"
-              type="textarea"
-              :autosize="{ minRows: 1 }"
-              placeholder="待办事项内容"
-            />
-          </n-form-item>
-          <n-form-item label="重要程度" path="level">
-            <n-radio-group v-model:value="todoInfo.level" name="radiobuttongroup1">
-                <n-radio-button
-                  v-for="lev in store.levelOptions"
-                  :key="lev.value"
-                  :value="lev.value"
-                  :label="lev.label"
-                />
-              </n-radio-group>
-          </n-form-item>
-          <n-form-item label="事项分类" path="type">
-            <n-select v-model:value="todoInfo.type" multiple :options="store.typeOptions" />
-          </n-form-item>
-          <n-form-item label="相关附件" path="attachMents">
-            <n-upload
-              :custom-request="customRequest"
-              :file-list="todoInfo.attachMents"
-              :show-trigger="false"
-              list-type="image-card"
-              @preview="handlePreview"
-              :on-remove="handleRemove"
-            />
-            <n-button
-              type="info" size="small"
-              :disabled="isUploading"
-              @click="overHandleClick"
-              >上传</n-button
-            >
-          </n-form-item>
-          <n-form-item label="备注" path="memo">
-            <n-input
-              v-model:value="todoInfo.memo"
-              type="textarea"
-              :autosize="{ minRows: 3 }"
-              placeholder="备注"
-            />
-          </n-form-item>
-        </n-form>
-      </n-scrollbar>
-    </template>
+    title="添加待办事项">
+      <search-form
+        ref="formRef"
+        class="text-left"
+        :model="todoInfo"
+        :formItems="formItems"
+        :rules="rules"
+      >
+        <template #attachMents>
+          <n-upload
+            :custom-request="customRequest"
+            :file-list="todoInfo.attachMents"
+            :show-trigger="false"
+            list-type="image-card"
+            @preview="handlePreview"
+            :on-remove="handleRemove"
+          />
+          <n-button
+            type="info" size="small"
+            :disabled="isUploading"
+            @click="overHandleClick"
+            >上传</n-button
+          >
+        </template>
+      </search-form>
 
     <template #footer>
       <div class="w-full flex justify-end">
@@ -157,7 +120,7 @@
         >
       </div>
     </template>
-  </n-modal>
+  </search-modal>
 
 </template>
   
@@ -176,16 +139,12 @@
 
   import { Command } from '@tauri-apps/api/shell'
   import { os } from '../../common/global'
+
+  import { useTodoAddForm } from './useTodo'
+  const { todoInfo, rules, formItems } = useTodoAddForm()
+
   const store = useStore()
   const formRef = ref<FormInst>()
-
-  const rules = ref({
-    content: {
-      required: true,
-      message: '请输入待办事项内容',
-      trigger: 'blur'
-    }
-  })
 
   const searchTodoKey = ref('')
   let searchTodoTypes = ref<string[]>([])
@@ -210,6 +169,7 @@
       retArr = retArr.sort((v2, v1) => dayjs(v1.createdAt).valueOf() - dayjs(v2.createdAt).valueOf());
     } else {
       retArr = (retArr.filter(v => v.content.toLocaleLowerCase().indexOf(searchTodoKey.value.toLocaleLowerCase())!== -1)).sort((v2, v1) => getTimeStamp(v1.createdAt as string) - getTimeStamp(v2.createdAt as string))
+      console.log('retArr: ',retArr)
     }
     if (dateRange.value && dateRange.value[0]) {
       retArr = retArr.filter(v => dayjs(dayjs(dateRange.value[0]).format('YYYY-MM-DD') + ' 00:00:00').valueOf() < dayjs(v.createdAt).valueOf())
@@ -234,17 +194,6 @@
     return retArr.filter(v => !v.isCompleted).concat(retArr.filter(v => v.isCompleted))
   })
   
-  const todoInfo = reactive<todoInfoType>({
-    isShow: false,
-    id: '',
-    content: '',
-    level: ['4'],
-    type: [],
-    attachMents: [],
-    memo: '',
-    isCompleted: false
-  })
-
   const isCheckAll = ref<Boolean>(false)
   const checkedTodos = ref<Record<string, any>[]>([])
 
@@ -346,6 +295,7 @@
     todoInfo.updatedAt = new Date()
     todoInfo.attachMents = []
     todoInfo.memo = ''
+    console.log(todoInfo)
   }
 
   const handleDeleteTodo = () => {

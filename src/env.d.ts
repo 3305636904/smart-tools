@@ -48,4 +48,5 @@ declare global {
     updatedAt?: string | number | Date | undefined
     isCompleted: boolean
   }
+  
 }
