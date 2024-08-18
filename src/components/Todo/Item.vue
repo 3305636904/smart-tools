@@ -336,7 +336,7 @@
 </script>
   
 <style scoped>
-::v-deep .content-clz {
+:deep(.content-clz) {
   padding: 1em;
 }
 </style>

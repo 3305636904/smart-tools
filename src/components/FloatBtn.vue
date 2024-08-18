@@ -48,19 +48,41 @@
       </template>
       {{ store.fullscreen ? '退出全屏' : '全屏' }}
     </n-tooltip>
+    <n-tooltip placement="top-end" trigger="hover">
+      <template #trigger>
+        <n-button
+          class="mb-2"
+          circle
+          @click="showSetting"
+          size="large"
+        >
+          <template #icon>
+            <n-icon>
+              <IUilSetting />
+            </n-icon>
+          </template>
+        </n-button>
+      </template>
+      设置
+    </n-tooltip>
   </div>
+  <Settings ref="settingRef" />
 </template>
 <script lang="ts" setup>
 import { useStore } from '../store'
 
-
-
 const store = useStore()
+
+const settingRef = ref()
 const themeSwitch = () => {
   store.darkTheme = !store.darkTheme
   window.$loading.start()
   setTimeout(() => {
     window.$loading.finish()
   }, 100)
+}
+
+const showSetting = async () => {
+  settingRef?.value.showSetting()
 }
 </script>

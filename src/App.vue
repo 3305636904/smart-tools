@@ -1,22 +1,25 @@
 <template>
-  <naive-provider :class="['h-100vh', {'shadow-gray-600': store.darkTheme }]">
+  <naive-provider :class="['h-screen', {'shadow-gray-600': store.darkTheme }]">
     <transition
       :name="store.screenLocked ? 'fade-top' : 'fade-bottom'"
       mode="out-in"
       appear
     >
       <lock-screen v-if="store.screenLocked" />
-      <category-list v-else/>
+      <router-view v-else/>
     </transition>
   </naive-provider>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup name="App">
+
 import NaiveProvider from './components/NaiveProvider.vue'
 import { useStore } from './store'
-import CategoryList from './components/CategoryList.vue'
 import LockScreen from './components/LockScreen.vue'
+
+// import { invoke } from "@tauri-apps/api";
 const store = useStore()
+
 </script>
 
 <style>

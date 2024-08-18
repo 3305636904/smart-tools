@@ -9,7 +9,7 @@
       <div>
         <n-tooltip placement="left" trigger="hover">
           <template #trigger>
-            <span class="ml-2 mr-2 cursor-default" @click="isYearTimeShow = !isYearTimeShow">{{isYearTimeShow ? '今年': '今天' }}剩余： <span class="color-orange text-12">{{ isYearTimeShow ? leftDays : `${hour}:${minute}:${second}` }}</span>天</span>
+            <span class="ml-2 mr-2 cursor-default" @click="isYearTimeShow = !isYearTimeShow">{{isYearTimeShow ? '今年': '今天' }}剩余： <span class="color-orange text-12">{{ isYearTimeShow ? `${leftDays}` : `${hour}:${minute}:${second}` }}</span>{{ isYearTimeShow ? ` 天` : `` }}</span>
           </template>
           <span>{{ (isYearTimeShow && leftDays < 182) ? '虽已过半年，但切莫焦虑' : `珍惜每${!isYearTimeShow ? '一分': '天'}，切勿浪费时间` }}</span>
         </n-tooltip>
@@ -18,9 +18,9 @@
     <n-scrollbar ref="contentRef" style="height: calc(100% - 64px);"  @scroll="handleScroll">
       <n-layout-content class="overflow-hidden p-6 pr-10px">
         <n-collapse class="overflow-hidden" display-directive="show" :default-expanded-names="store.activeVal" @item-header-click="handleItemHeaderClick" accordion>
-          <n-collapse-item title="快捷网站" :name="1" display-directive="show">
+          <n-collapse-item title="快捷网站" :name="1" display-directive="show" v-if="store.showCateToolList.includes(1)" :disabled="store.showCateToolList.length === 1">
             <template #header-extra>
-              <span :class="['mr-4', 'rounded-8', 'p-2', 'pb-1', 'z-50', {'hover:bg-gray-700': store.darkTheme, 'hover:bg-gray-200': !store.darkTheme }]" @click.stop="()=>{}" v-if="store.activeVal === 1">
+              <span :class="['mr-4', 'rounded-8', 'p-2', 'pb-1', 'z-50', 'cursor-default', {'hover:bg-gray-700': store.darkTheme, 'hover:bg-gray-200': !store.darkTheme }]" @click.stop="()=>{}" v-if="store.activeVal === 1">
                 <n-tooltip placement="left" trigger="hover">
                   <template #trigger>
                     <n-icon class="mr-5" @click.stop="clearAllData">
@@ -74,9 +74,9 @@
               />
             </n-space>
           </n-collapse-item>
-          <n-collapse-item title="待办纪要" :name="2" display-directive="show">
+          <n-collapse-item title="待办纪要" :name="2" display-directive="show"  v-if="store.showCateToolList.includes(2)" :disabled="store.showCateToolList.length === 1">
             <template #header-extra>
-              <span :class="['mr-4', 'rounded-8', 'p-2', 'pb-1', 'z-50', {'hover:bg-gray-700': store.darkTheme, 'hover:bg-gray-200': !store.darkTheme }]" @click.stop="()=>{}" v-if="store.activeVal === 2">
+              <span :class="['mr-4', 'rounded-8', 'p-2', 'pb-1', 'z-50', 'cursor-default', {'hover:bg-gray-700': store.darkTheme, 'hover:bg-gray-200': !store.darkTheme }]" @click.stop="()=>{}" v-if="store.activeVal === 2">
                 <n-tooltip placement="left" trigger="hover">
                   <template #trigger>
                     <n-icon class="mr-5" @click.stop="switchListType">
@@ -128,8 +128,8 @@
         <template #trigger>
           <n-button
             circle
-            size="large"
-            class="fixed right-16 bottom-10" 
+            size="small"
+            class="fixed right-5 bottom-1" 
             @click="scrollToTop"
           >
             <ISystemUiconsPushUp/>

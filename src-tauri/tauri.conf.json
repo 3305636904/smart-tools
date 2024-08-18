@@ -101,6 +101,7 @@
     "windows": [
       {
         "label": "main",
+        "url": "index.html/#/",
         "fullscreen": false,
         "height": 600,
         "resizable": true,

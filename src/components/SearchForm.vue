@@ -22,7 +22,7 @@
       </template>
   
       <template v-else-if="v.type === 'textarea'">
-        <n-input type="textarea" 
+        <n-input
           v-model:value="props.model[v.path]" 
           :placeholder="`请输入${v.label}`" 
           v-bind="v">
@@ -36,7 +36,7 @@
         <n-radio-group v-model:value="props.model[v.path]" :name="v.path" :size="v.size || props.size" v-bind="v">
           <n-radio-button
             v-for="(item, index) in v.options"
-            :key="item.value + index"
+            :key="`${item.value}${index}`"
             :value="item.value"
             :disabled="item.disabled"
             :label="item.label"
@@ -68,8 +68,19 @@
 import { FormInst } from 'naive-ui'
 
 interface Props {
-  formItems: [],
-  model: {},
+  formItems: Array<{
+    label: string, path: string, type: string,
+    size?: string,
+    options?: Array<{
+      label: string,
+      value: string | number,
+      size?: string,
+      disabled?: boolean
+    }>
+  }>,
+  model: {
+    [key: string]: any
+  },
   rules: [],
   labelPlacement: string,
   labelWidth: string,
