@@ -50,8 +50,8 @@ export function useTime() {
 
 export function formatTimeTodayLast() {
   let timer: number // 定时器
-  const hour = ref<number | string>(0) // 小时
-  const minute = ref<number | string>(0) // 分钟
+  const hour = ref<number>(0) // 小时
+  const minute = ref<number>(0) // 分钟
   const second = ref(0) // 秒
 
   // 更新时间

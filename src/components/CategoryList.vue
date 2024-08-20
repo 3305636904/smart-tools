@@ -9,7 +9,7 @@
       <div>
         <n-tooltip placement="left" trigger="hover">
           <template #trigger>
-            <span class="ml-2 mr-2 cursor-default" @click="isYearTimeShow = !isYearTimeShow">{{isYearTimeShow ? '今年': '今天' }}剩余： <span class="color-orange text-12">{{ isYearTimeShow ? `${leftDays}` : `${hour}:${minute}:${second}` }}</span>{{ isYearTimeShow ? ` 天` : `` }}</span>
+            <span class="ml-2 mr-2 cursor-default" @click="isYearTimeShow = !isYearTimeShow">{{isYearTimeShow ? '今年': '今天' }}剩余时间： <span class="color-orange text-12">{{ isYearTimeShow ? `${leftDays}` : `${hour > 9 ? hour : `0${hour}`}:${minute > 9 ? minute : `0${minute}`}:${second > 9 ? second : `0${second}` }` }}</span>{{ isYearTimeShow ? ` 天` : `` }}</span>
           </template>
           <span>{{ (isYearTimeShow && leftDays < 182) ? '虽已过半年，但切莫焦虑' : `珍惜每${!isYearTimeShow ? '一分': '天'}，切勿浪费时间` }}</span>
         </n-tooltip>

@@ -40,7 +40,7 @@ declare global {
     isShow?: boolean
     id: string | number
     content: string
-    level: string[] | null
+    level: string | null
     type: string[] | string
     attachMents: attachMentsType[]
     memo?: string

@@ -48,7 +48,7 @@
       <n-checkbox size="small" v-if="!isEdit" v-show="props.isBatch" class="position-absolute left-0 top-1 w-2 h-2" :value="props.item" />
       <n-input ref="inputRef" type="textarea" :autosize="{ minRows: 1 }" v-if="isEdit" @blur="isEdit = false" @keydown.enter="keyDown" v-model:value="item.content" ></n-input>
       <p v-else class="m-0 w-full flex justify-start">
-        <n-ellipsis :class="['w-90%', 'flex-1', { 'pl-5' : !isEdit && props.isBatch }]" expand-trigger="click" line-clamp="1" :tooltip="false">
+        <n-ellipsis :class="['transition-width', 'transition-duration-1000', 'flex-1', { 'pl-5' : !isEdit && props.isBatch }]" expand-trigger="click" line-clamp="1" :tooltip="false">
           <span>{{ props.index }}. </span>
           <span :class="['mr-1.5', { 'color-gray-700': !store.darkTheme, 'color-gray-400': store.darkTheme, 'line-through': props.item.isCompleted }]">{{props.item.content}}</span>
         </n-ellipsis>
@@ -56,12 +56,12 @@
           <template #unchecked>待关闭</template>
           <template #checked>已关闭</template>
         </n-switch>
-        <span :class="['v-text-top', 'transition-all', 'transition-duration-800', { 'hidden' : !isEnter }]">
+        <span :class="{'hidden' : !isEnter }">
           <n-icon class="ml-3 mr-3" @click.stop="editItem">
-            <IMaterialSymbolsEditSquareOutlineRounded v-show="!isEdit" class="text-18px cursor-pointer hover:color-blue-400" />
+            <IMaterialSymbolsEditSquareOutlineRounded v-show="!isEdit" class="text-14px cursor-pointer hover:color-blue-400" />
           </n-icon>
           <n-icon @click.stop="removeItem">
-            <IMdiCloseCircleOutline v-show="!isEdit" class="text-18px cursor-pointer hover:color-red-500" />
+            <IMdiCloseCircleOutline v-show="!isEdit" class="text-14px cursor-pointer hover:color-red-500" />
           </n-icon>
         </span>
       </p>
@@ -104,7 +104,7 @@
           :on-remove="handleRemove"
         />
         <n-button
-          type="info" size="small"
+          type="primary" size="small"
           :disabled="isUploading"
           @click="overHandleClick"
           >上传</n-button
@@ -117,7 +117,7 @@
           >取消</n-button
         >
         <n-button
-          type="info" size="small"
+          type="primary" size="small"
           @click="handleEditTodoConfirm"
           >确定</n-button
         >

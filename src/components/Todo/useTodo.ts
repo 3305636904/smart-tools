@@ -7,7 +7,7 @@ export function useTodoAddForm() {
       isShow: false,
       id: '',
       content: '',
-      level: ['4'],
+      level: '4',
       type: [],
       attachMents: [],
       memo: '',

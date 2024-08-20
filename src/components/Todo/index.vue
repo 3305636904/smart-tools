@@ -100,7 +100,7 @@
             :on-remove="handleRemove"
           />
           <n-button
-            type="info" size="small"
+            type="primary" size="small"
             :disabled="isUploading"
             @click="overHandleClick"
             >上传</n-button
@@ -114,7 +114,7 @@
           >取消</n-button
         >
         <n-button
-          type="info" size="small"
+          type="primary" size="small"
           @click="handleAddTodoConfirm"
           >确定</n-button
         >
@@ -165,12 +165,6 @@
 
   const showTodoList = computed(() => {
     let retArr: todoInfoType[] = store.todoData
-    if (!searchTodoKey.value.trim()) {
-      retArr = retArr.sort((v2, v1) => dayjs(v1.createdAt).valueOf() - dayjs(v2.createdAt).valueOf());
-    } else {
-      retArr = (retArr.filter(v => v.content.toLocaleLowerCase().indexOf(searchTodoKey.value.toLocaleLowerCase())!== -1)).sort((v2, v1) => getTimeStamp(v1.createdAt as string) - getTimeStamp(v2.createdAt as string))
-      console.log('retArr: ',retArr)
-    }
     if (dateRange.value && dateRange.value[0]) {
       retArr = retArr.filter(v => dayjs(dayjs(dateRange.value[0]).format('YYYY-MM-DD') + ' 00:00:00').valueOf() < dayjs(v.createdAt).valueOf())
     }
@@ -186,12 +180,18 @@
     if (searchTodoTypes.value && searchTodoTypes.value.length > 0) {
       retArr = retArr.filter(v =>  searchTodoTypes.value.some(type => v.type.includes(type)))
     }
-    if ([6, 7].includes(dayofWeek)) {
-      retArr = retArr.filter(v => v.type.indexOf('3') !== -1).concat(retArr.filter(v => v.type.indexOf('3') == -1))
+    if (!searchTodoKey.value.trim()) {
+      retArr = retArr.sort((v2, v1) => dayjs(v1.updatedAt).valueOf() - dayjs(v2.updatedAt).valueOf());
     } else {
-      retArr = retArr.filter(v => v.type.indexOf('1') !== -1).concat(retArr.filter(v => v.type.indexOf('1') == -1))
+      retArr = (retArr.filter(v => v.content.toLocaleLowerCase().indexOf(searchTodoKey.value.toLocaleLowerCase())!== -1)).sort((v2, v1) => getTimeStamp(v1.createdAt as string) - getTimeStamp(v2.createdAt as string))
     }
-    return retArr.filter(v => !v.isCompleted).concat(retArr.filter(v => v.isCompleted))
+    // if ([6, 7].includes(dayofWeek)) {
+    //   retArr = retArr.filter(v => v.type.indexOf('3') !== -1).concat(retArr.filter(v => v.type.indexOf('3') == -1))
+    // } else {
+    //   retArr = retArr.filter(v => v.type.indexOf('1') !== -1).concat(retArr.filter(v => v.type.indexOf('1') == -1))
+    // }
+    return retArr.filter(v => !v.isCompleted).sort((v2, v1) => Number(v2.level) - Number(v1.level))
+      .concat(retArr.filter(v => v.isCompleted))
   })
   
   const isCheckAll = ref<Boolean>(false)
@@ -288,7 +288,7 @@
   const handleShowModal = () => {
     todoInfo.isShow = true
     todoInfo.content = ''
-    todoInfo.level = ['4']
+    todoInfo.level = '4'
     todoInfo.type = searchTodoTypes.value
     todoInfo.isCompleted = false
     todoInfo.createdAt = new Date()

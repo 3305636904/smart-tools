@@ -1,13 +1,15 @@
 <template>
   <naive-provider :class="['h-screen', {'shadow-gray-600': store.darkTheme }]">
-    <transition
-      :name="store.screenLocked ? 'fade-top' : 'fade-bottom'"
-      mode="out-in"
-      appear
-    >
-      <lock-screen v-if="store.screenLocked" />
-      <router-view v-else/>
-    </transition>
+    <lock-screen v-if="store.screenLocked" />
+    <router-view v-else v-slot="{Component}">
+      <transition
+        :name="store.screenLocked ? 'fade-top' : 'fade-bottom'"
+        mode="out-in"
+        appear
+      >
+        <component :is="Component" />
+      </transition>
+    </router-view>  
   </naive-provider>
 </template>
 
