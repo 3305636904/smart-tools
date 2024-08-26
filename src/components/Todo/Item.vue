@@ -195,7 +195,9 @@
     todoInfo.content = props.item.content
     todoInfo.level = props.item.level
     todoInfo.type = props.item.type
-    todoInfo.id = props.item.id
+    if (props.item.id != null) {
+      todoInfo.id = props.item.id
+    }
     todoInfo.isCompleted = props.item.isCompleted
     todoInfo.createdAt = props.item.createdAt
     todoInfo.updatedAt = props.item.updatedAt

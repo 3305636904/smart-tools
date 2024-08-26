@@ -19,8 +19,13 @@ import NaiveProvider from './components/NaiveProvider.vue'
 import { useStore } from './store'
 import LockScreen from './components/LockScreen.vue'
 
+import { useSettings } from './components/Settings/useSettings'
+const { changeThemeAuto } = useSettings()
+
 // import { invoke } from "@tauri-apps/api";
 const store = useStore()
+
+changeThemeAuto()
 
 </script>
 

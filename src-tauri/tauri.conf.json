@@ -28,7 +28,7 @@
 			},
       "http": {
         "all": true,
-        "scope": ["https://v1.hitokoto.cn/*"]
+        "scope": ["https://v1.hitokoto.cn/*", "http://**", "http://111.229.144.150/**", "http://127.0.0.1/**"]
       },
       "shell": {
         "all": false,
