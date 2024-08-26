@@ -38,7 +38,7 @@ declare global {
 
   type todoInfoType = {
     isShow?: boolean
-    id: string | number
+    id?: string | number
     content: string
     level: string | null
     type: string[] | string

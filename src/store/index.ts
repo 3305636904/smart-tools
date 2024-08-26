@@ -85,17 +85,17 @@ export const useStore = defineStore('global', () => {
     } catch (e) {}
 
   }
-  const getDarkTheme = () => {
-    const storageDarkTheme = window.localStorage.getItem('darkTheme')
-    darkTheme.value = storageDarkTheme === 'true' ? true : false
-  }
+  // const getDarkTheme = () => {
+    // const storageDarkTheme = window.localStorage.getItem('darkTheme')
+    // darkTheme.value = storageDarkTheme === 'true' ? true : false
+  // }
   saveWindowState(StateFlags.ALL)
   getData()
-  getDarkTheme()
+  // getDarkTheme()
   watchEffect(() => {
     window.localStorage.setItem('data', JSON.stringify(data.value))
     window.localStorage.setItem('dataVersion', 'v1') // 如果以后数据结构发生改变可以用这个进行自动化升级
-    window.localStorage.setItem('darkTheme', darkTheme.value ? 'true' : 'false')
+    // window.localStorage.setItem('darkTheme', darkTheme.value ? 'true' : 'false')
     // darkTheme.value ? WindowSetDarkTheme() : WindowSetLightTheme()
     // darkTheme.value
     //   ? WindowSetBackgroundColour(24, 24, 28, 1)

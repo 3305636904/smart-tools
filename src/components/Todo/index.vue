@@ -273,7 +273,7 @@
         content: todoInfo.content,
         level: todoInfo.level,
         type: todoInfo.type,
-        id: Date.now(), // 随机生成的 id
+        // id: Date.now(), // 随机生成的 id
         isCompleted: false, // 初始状态为 false，即未完成
         createdAt: new Date(), // 创建时间
         updatedAt: new Date(), // 更新时间
