@@ -78,6 +78,14 @@ export const useStore = defineStore('global', () => {
       } else {
         data.value = JSON.parse(window.localStorage.getItem('data') as string)
         todoData.value = JSON.parse(window.localStorage.getItem('todoData') as string)
+        todoData.value.forEach((item, i) => {
+          if (!item.id) {
+            item.id = Date.now() + Math.floor((Math.random() * 10000)) + i
+          }
+          if (item.updatedAt) {
+            item.updatedAt = new Date(item.updatedAt)
+          }
+        })
         showCateToolList.value = JSON.parse(window.localStorage.getItem('showCateToolList') as string)
         activeVal.value = JSON.parse(window.localStorage.getItem('activeVal') as string)
         isTodoList.value = JSON.parse(window.localStorage.getItem('isTodoList') as string)

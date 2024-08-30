@@ -165,6 +165,13 @@
 
   const showTodoList = computed(() => {
     let retArr: todoInfoType[] = store.todoData
+
+    if (!searchTodoKey.value.trim()) {
+      retArr = retArr.sort((v2, v1) => dayjs(v1.updatedAt).valueOf() - dayjs(v2.updatedAt).valueOf());
+    } else {
+      retArr = (retArr.filter(v => v.content.toLocaleLowerCase().indexOf(searchTodoKey.value.toLocaleLowerCase())!== -1)).sort((v2, v1) =>  dayjs(v1.updatedAt).valueOf() - dayjs(v2.updatedAt).valueOf())
+    }
+
     if (dateRange.value && dateRange.value[0]) {
       retArr = retArr.filter(v => dayjs(dayjs(dateRange.value[0]).format('YYYY-MM-DD') + ' 00:00:00').valueOf() < dayjs(v.createdAt).valueOf())
     }
@@ -180,18 +187,16 @@
     if (searchTodoTypes.value && searchTodoTypes.value.length > 0) {
       retArr = retArr.filter(v =>  searchTodoTypes.value.some(type => v.type.includes(type)))
     }
-    if (!searchTodoKey.value.trim()) {
-      retArr = retArr.sort((v2, v1) => dayjs(v1.updatedAt).valueOf() - dayjs(v2.updatedAt).valueOf());
-    } else {
-      retArr = (retArr.filter(v => v.content.toLocaleLowerCase().indexOf(searchTodoKey.value.toLocaleLowerCase())!== -1)).sort((v2, v1) => getTimeStamp(v1.createdAt as string) - getTimeStamp(v2.createdAt as string))
-    }
+
+    retArr = retArr.filter(v => !v.isCompleted).sort((v2, v1) => Number(v2.level) - Number(v1.level))
+      .concat(retArr.filter(v => v.isCompleted))
+    
     // if ([6, 7].includes(dayofWeek)) {
     //   retArr = retArr.filter(v => v.type.indexOf('3') !== -1).concat(retArr.filter(v => v.type.indexOf('3') == -1))
     // } else {
     //   retArr = retArr.filter(v => v.type.indexOf('1') !== -1).concat(retArr.filter(v => v.type.indexOf('1') == -1))
     // }
-    return retArr.filter(v => !v.isCompleted).sort((v2, v1) => Number(v2.level) - Number(v1.level))
-      .concat(retArr.filter(v => v.isCompleted))
+    return retArr
   })
   
   const isCheckAll = ref<Boolean>(false)
@@ -273,12 +278,13 @@
         content: todoInfo.content,
         level: todoInfo.level,
         type: todoInfo.type,
-        // id: Date.now(), // 随机生成的 id
+        id: Date.now(), // 随机生成的 id
         isCompleted: false, // 初始状态为 false，即未完成
         createdAt: new Date(), // 创建时间
         updatedAt: new Date(), // 更新时间
         attachMents: todoInfo.attachMents, // 附件信息
         memo: todoInfo.memo, // 备注
+        isRomote: false
       })
       todoInfo.isShow = false
       todoInfo.content = ''
@@ -295,7 +301,6 @@
     todoInfo.updatedAt = new Date()
     todoInfo.attachMents = []
     todoInfo.memo = ''
-    console.log(todoInfo)
   }
 
   const handleDeleteTodo = () => {

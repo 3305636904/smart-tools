@@ -85,6 +85,26 @@ export function formatTimeTodayLast() {
 }
 
 type NumStr = number | string 
+
+export function getTimeNowEachField(date: Date) {
+  let year: NumStr = date.getFullYear();
+  let month: NumStr = date.getMonth(); // getMonth() 返回的月份是从0开始的，所以需要+1
+  let day: NumStr = date.getDate();
+  let hour: NumStr = date.getHours();
+  let minute: NumStr = date.getMinutes();
+  let second: NumStr = date.getSeconds();
+  let milliseconds: NumStr = date.getMilliseconds();
+
+  return {
+    year,
+    month,
+    day,
+    hour,
+    minute,
+    second, milliseconds
+  }
+}
+
 export function formatTime(date: Date) {
   let year: NumStr = date.getFullYear();
   let month: NumStr = date.getMonth() + 1; // getMonth() 返回的月份是从0开始的，所以需要+1

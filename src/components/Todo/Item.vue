@@ -24,7 +24,7 @@
       </n-icon>
     </span>
     <section @dblclick="dbEditItem" @blur="isEdit = false">
-      <n-input ref="inputRef" type="textarea" :autosize="{ minRows: 1 }" v-if="isEdit" @blur="isEdit = false" @keydown.enter="keyDown" v-model:value="item.content" ></n-input>
+      <n-input ref="inputRef" type="textarea" :autosize="{ minRows: 1 }" v-if="isEdit" @blur="blurAfterEdit" @keydown.enter="keyDown" v-model:value="item.content" ></n-input>
       <n-ellipsis v-else expand-trigger="click" line-clamp="3" :tooltip="false">
         <span>{{ props.index }}. </span>
         <span :class="{ 'line-through': props.item.isCompleted }">{{props.item.content}}</span>
@@ -46,13 +46,13 @@
     </span>
     <div class="block w-full position-relative" @dblclick="dbEditItem" @blur="isEdit = false">
       <n-checkbox size="small" v-if="!isEdit" v-show="props.isBatch" class="position-absolute left-0 top-1 w-2 h-2" :value="props.item" />
-      <n-input ref="inputRef" type="textarea" :autosize="{ minRows: 1 }" v-if="isEdit" @blur="isEdit = false" @keydown.enter="keyDown" v-model:value="item.content" ></n-input>
+      <n-input ref="inputRef" type="textarea" :autosize="{ minRows: 1 }" v-if="isEdit" @blur="blurAfterEdit" @keydown.enter="keyDown" v-model:value="item.content" ></n-input>
       <p v-else class="m-0 w-full flex justify-start">
         <n-ellipsis :class="['transition-width', 'transition-duration-1000', 'flex-1', { 'pl-5' : !isEdit && props.isBatch }]" expand-trigger="click" line-clamp="1" :tooltip="false">
           <span>{{ props.index }}. </span>
           <span :class="['mr-1.5', { 'color-gray-700': !store.darkTheme, 'color-gray-400': store.darkTheme, 'line-through': props.item.isCompleted }]">{{props.item.content}}</span>
         </n-ellipsis>
-        <n-switch :round="false" :railStyle="switchStatusColor" class="v-text-top" size="small" v-model:value="props.item.isCompleted" >
+        <n-switch :round="false" :railStyle="switchStatusColor" class="v-text-top" size="small" v-model:value="props.item.isCompleted" @on-update:value="updateEditItemByTime">
           <template #unchecked>待关闭</template>
           <template #checked>已关闭</template>
         </n-switch>
@@ -161,6 +161,8 @@
   }
 
   function formatTime(val: any) {
+    console.log('--format: ', val)
+    if (!val) return ''
     return dayjs(val).format('YYYY-MM-DD HH:mm:ss')
   }
 
@@ -191,6 +193,7 @@
   
 
   function editItem() {
+    console.log('item: ', props.item)
     todoInfo.isShow = true
     todoInfo.content = props.item.content
     todoInfo.level = props.item.level
@@ -199,10 +202,32 @@
       todoInfo.id = props.item.id
     }
     todoInfo.isCompleted = props.item.isCompleted
-    todoInfo.createdAt = props.item.createdAt
+    if (props.item.CreatedAt) {
+      todoInfo.createdAt = props.item.CreatedAt
+    } else if (props.item.createdAt) {
+      todoInfo.createdAt = props.item.createdAt
+    } else {
+      todoInfo.createdAt = ''
+    }
     todoInfo.updatedAt = props.item.updatedAt
-    todoInfo.attachMents = props.item.attachMents
     todoInfo.memo = props.item.memo
+    todoInfo.isRomote = props.item.isRomote
+    if (todoInfo.isRomote && props.item.attachMents
+      && Array.isArray(props.item.attachMents) && props.item.attachMents.length > 0
+    ) {
+      todoInfo.attachMents = props.item.attachMents.map((v, i) => ({
+        status: 'finished', id: `${i}`, name: i, url: `${v}`
+      }))
+    }
+  }
+
+  function updateEditItemByTime () {
+    const editDataIndex = store.todoData.findIndex(v => v.id === props.item.id)
+      if (editDataIndex!== -1) {
+        props.item.updatedAt = new Date()
+        if (props.item.isRomote) props.item.isEdited = true
+        store.todoData[editDataIndex] = { ...store.todoData[editDataIndex], ...props.item }
+      }
   }
 
   function handleEditTodoConfirm(e: MouseEvent | KeyboardEvent) {
@@ -214,6 +239,9 @@
       const editDataIndex = store.todoData.findIndex(v => v.id === todoInfo.id)
       if (editDataIndex!== -1) {
         todoInfo.updatedAt = new Date()
+        if (todoInfo.isRomote) {
+          todoInfo.isEdited = true
+        }
         store.todoData[editDataIndex] = { ...store.todoData[editDataIndex], ...todoInfo }
       }
       todoInfo.isShow = false
@@ -249,6 +277,12 @@
     })
   }
 
+  function blurAfterEdit() {
+    isEdit.value = false
+    props.item.updatedAt = Date.now()
+    props.item.isEdited = true
+  }
+
   function keyDown(e: KeyboardEvent) {
     if (e.ctrlKey) {
       if (props.item.content.trim() !== '') {
@@ -282,7 +316,6 @@
           url: url
         } as attachMentsType
         todoInfo.attachMents.push(newTodoItem)
-        console.log('attachMents: ', todoInfo.attachMents)
         isUploading.value = false
         window.$message.success('上传成功')
       })

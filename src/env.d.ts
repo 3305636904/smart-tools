@@ -30,10 +30,33 @@ declare global {
     list: Item[]
   }
 
+  interface stringType {
+    url: string
+  }
+
   type attachMentsType = UploadFileInfo & {
     id: string
     name: T | undefined
     sourcePath?: string
+  }
+
+  type paramsTodoType = {
+    isShow?: boolean
+    ID?: string | number
+    id?: string | number
+    Content?: string
+    content: string
+    level: string | null
+    type: string[] | string
+    attachMents: string[] | undefined
+    memo?: string
+    CreatedAt?: string | number | Date | undefined
+    createdAt?: string | number | Date | undefined
+    UpdatedAt?: string | number | Date | undefined
+    updatedAt?: string | number | Date | undefined
+    isCompleted: boolean,
+    isRomote: boolean,
+    isEdited?: boolean,
   }
 
   type todoInfoType = {
@@ -44,9 +67,13 @@ declare global {
     type: string[] | string
     attachMents: attachMentsType[]
     memo?: string
+    CreatedAt?: string | number | Date | undefined
     createdAt?: string | number | Date | undefined
+    UpdatedAt?: string | number | Date | undefined
     updatedAt?: string | number | Date | undefined
-    isCompleted: boolean
+    isCompleted: boolean,
+    isRomote: boolean,
+    isEdited?: boolean
   }
   
 }

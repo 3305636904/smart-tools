@@ -17,7 +17,7 @@
     </n-layout-header>
     <n-scrollbar ref="contentRef" style="height: calc(100% - 64px);"  @scroll="handleScroll">
       <n-layout-content class="overflow-hidden p-6 pr-10px">
-        <n-collapse class="overflow-hidden" display-directive="show" :default-expanded-names="store.activeVal" @item-header-click="handleItemHeaderClick" accordion>
+        <n-collapse class="overflow-hidden" display-directive="show" :default-expanded-names="expandedNames" @item-header-click="handleItemHeaderClick" accordion>
           <n-collapse-item title="快捷网站" :name="1" display-directive="show" v-if="store.showCateToolList.includes(1)" :disabled="store.showCateToolList.length === 1">
             <template #header-extra>
               <span :class="['mr-4', 'rounded-8', 'p-2', 'pb-1', 'z-50', 'cursor-default', {'hover:bg-gray-700': store.darkTheme, 'hover:bg-gray-200': !store.darkTheme }]" @click.stop="()=>{}" v-if="store.activeVal === 1">
@@ -32,7 +32,7 @@
                 <n-tooltip placement="left" trigger="hover">
                   <template #trigger>
                     <n-icon class="mr-5">
-                      <IClarityExportLine v-show="store.activeVal === 1" class="text-20px" @click.stop="handleExport" />
+                      <ICarbonExport v-show="store.activeVal === 1" class="text-20px" @click.stop="handleExport" />
                     </n-icon>
                   </template>
                   导出快捷网站
@@ -40,7 +40,7 @@
                 <n-tooltip placement="left" trigger="hover">
                   <template #trigger>
                     <n-icon class="mr-5">
-                      <IClarityImportLine v-show="store.activeVal === 1" class="text-20px" @click.stop="handleImport"/>
+                      <IUilImport v-show="store.activeVal === 1" class="text-20px" @click.stop="handleImport"/>
                     </n-icon>
                   </template>
                   导入快捷网站
@@ -89,7 +89,8 @@
                 <n-tooltip placement="left" trigger="hover">
                   <template #trigger>
                     <n-icon class="mr-5" @click.stop="clearAllData">
-                      <i-carbon-clean class="text-18px" />
+                      <ICarbonClean class="text-18px" />
+                      <!-- import CarbonClean from '~icons/carbon/clean'; -->
                     </n-icon>
                   </template>
                   清除所有待办事项
@@ -97,7 +98,7 @@
                 <n-tooltip placement="left" trigger="hover">
                   <template #trigger>
                     <n-icon class="mr-5">
-                      <IClarityExportLine class="text-18px" @click.stop="handleExport" />
+                      <ICarbonExport class="text-18px" @click.stop="handleExport" />
                     </n-icon>
                   </template>
                   导出所有待办事项
@@ -105,7 +106,7 @@
                 <n-tooltip placement="left" trigger="hover">
                   <template #trigger>
                     <n-icon class="mr-5">
-                      <IClarityImportLine class="text-18px" @click.stop="handleImport"/>
+                      <IUilImport class="text-18px" @click.stop="handleImport"/>
                     </n-icon>
                   </template>
                   导入待办事项
@@ -159,8 +160,6 @@ import type { CollapseProps } from 'naive-ui'
 import { writeTextFile, readTextFile } from '@tauri-apps/api/fs'
 import { open, save } from '@tauri-apps/api/dialog'
 
-import dayjs from 'dayjs'
-
 import { formatTimeTodayLast } from '../hooks/useTime'
 
 const { hour, minute, second } = formatTimeTodayLast()
@@ -174,8 +173,11 @@ const checkedTodoOptions = ref<Record<string, any>[]>([])
 
 const isYearTimeShow = ref<Boolean>(false)
 
+const expandedNames = ref<number | null>()
+
 onMounted(() => {
   getLeftDays()
+  expandedNames.value = store.activeVal
 })
 
 const showTopButton = ref(false)
@@ -199,6 +201,13 @@ const handleItemHeaderClick: CollapseProps['onItemHeaderClick'] = ({ name, expan
   showTopButton.value = false
   store.activeVal = name
 }
+
+watchEffect(() => {
+  console.log('store.showCateToolList.length: ', store.showCateToolList.length, ' store.activeVal: ', store.activeVal)
+  if (store.showCateToolList.length > 0) {
+    expandedNames.value = store.activeVal
+  }
+})
 
 function switchListType() {
   store.isTodoList = !store.isTodoList
@@ -270,7 +279,12 @@ const handleImport = async () => {
       if (store.activeVal === 1) {
         store.data = JSON.parse(data)
       } else if (store.activeVal === 2) {
-        store.todoData = JSON.parse(data)
+        store.todoData = JSON.parse(data).map((v: paramsTodoType) => {
+          if (v.createdAt) v.createdAt = new Date(v.createdAt)
+          if (v.updatedAt) v.updatedAt = new Date(v.updatedAt)
+          else if (v.createdAt) v.updatedAt = new Date(v.createdAt)
+          return v
+        })
       }
       window.$notification.success({
         title: '导入成功',

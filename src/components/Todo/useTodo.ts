@@ -48,7 +48,8 @@ export function useTodoEditForm() {
       attachMents: [],
       memo: '',
       createdAt: '', // 创建时间
-      updatedAt: '' // 更新时间
+      updatedAt: '', // 更新时间
+      isRomote: false
     },
     rules: ref({
       content: {

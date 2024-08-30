@@ -21,7 +21,7 @@ export const useSettings = () => {
   const rules = ref({
     showCateToolList: {
       required: false,
-      message: '请选择默认展开的tab页',
+      message: '请选择默认展示的tab页',
       trigger: 'blur'
     },
     activeVal: {

@@ -40,9 +40,8 @@ export default defineConfig({
   clearScreen: false,
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
-      // '@': '/src'
-    },
+      '@': '/src'
+    }
   },
   // tauri expects a fixed port, fail if that port is not available
   server: {

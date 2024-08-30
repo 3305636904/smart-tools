@@ -12,10 +12,10 @@
     <n-card content-class="min-h-30">
       <template #header>
         <div class="w-full flex justify-items-center">
-          <n-tabs type="segment" v-model:value="activeTab" animated class="mb-4 w-50">
+          <n-tabs type="segment" v-model:value="activeTab" animated class="mb-4">
             <n-tab name="theme" tab="主题设置">主题设置</n-tab >
             <n-tab name="todoSetting" tab="待办选项设置">待办选项设置</n-tab >
-            <!-- <n-tab name="saveDate" tab="同步数据到服务器">同步数据到服务器</n-tab > -->
+            <n-tab name="saveDate" tab="同步数据到服务器">同步数据到服务器</n-tab >
           </n-tabs>
         </div>
       </template>
@@ -53,6 +53,11 @@ import { fetch, Body } from '@tauri-apps/api/http';
 
 import { useStore } from '../../store'
 import { useSettings } from './useSettings'
+import dayjs from 'dayjs';
+
+import { getTimeNowEachField } from '../../hooks/useTime'
+
+interface resType {code: number, data: any|{list: any}, msg: string}
 
 const store = useStore()
 
@@ -67,31 +72,88 @@ const showSetting = () => {
 }
 
 const saveToServer = () => {
-  console.log(store.todoData)
-  const toSaveData = store.todoData.filter(v => !v.id)
-  const toUpdateData = store.todoData.filter(v => v.id)
+  const completedData: paramsTodoType[] = store.todoData.filter(v => v.isCompleted)
+  .map((todo, i) => {
+    let returnTodo: any = todo
+    if (!todo.id) returnTodo.id = Date.now() + Math.floor(Math.random() * 10000) + i
+    if (todo.attachMents && Array.isArray(todo.attachMents) && todo.attachMents.length > 0) returnTodo.attachMents = todo.attachMents.map(v => {
+      if (typeof v == 'object' && Object.hasOwn(v, 'url')) return v.url
+      return v
+    })
+    // if (returnTodo.updatedAt) returnTodo.updatedAt = new Date(returnTodo.updatedAt).toString().split('(')[0]
+    delete returnTodo.UpdatedAt
+    delete returnTodo.ID
+    return returnTodo
+  })
+  const toSaveData = completedData.filter(v => !v.isRomote)
+  const toUpdateData = completedData.filter(v => v.isRomote && v.isEdited).map(returnTodo => {
+    if (returnTodo.updatedAt) {
+      // const timeNow = getTimeNowEachField(new Date(returnTodo.updatedAt))
+      returnTodo.updatedAt = dayjs(returnTodo.updatedAt).format('YYYY-MM-DDTHH:mm:ssZ')
+      // console.log('---: ', returnTodo.updatedAt)
+      // returnTodo.updatedAt = new Date(timeNow.year, timeNow.month, timeNow.day, timeNow.hour, timeNow.minute, timeNow.second).toISOString()
+      return returnTodo
+    }
+  })
+  // console.log(toSaveData, toUpdateData)
+  // return
   const saveUrl = `/bizTask/createBatchBizTask`
   const updateUrl = `/bizTask/updateBatchBizTask`
-  const async2Server = async (url: string, data: any[]) => {
-    const res = await fetch(`http://127.0.0.1:8888${url}`, {
-      method: 'POST',
-      body: Body.json({requestBizTaskList: data})
-    })
-    if (res.status === 200) {
-      const result = (res.data as {code: number, data: any, msg: string})
-      window.$notification.success({
-        title: result?.msg,
-        duration: 3000,
+  const async2Server = (url: string, data: any[]): Promise<resType> => {
+    return new Promise((resolve, reject) => {
+      fetch(`http://127.0.0.1:8888${url}`, {
+        method: 'POST',
+        body: Body.json({requestBizTaskList: data})
+      }).then(res => {
+        if (res.status === 200) {
+          const result = (res.data)
+          resolve(result as resType)
+        }else {
+          reject(res)
+        }
+      }).catch(err => {
+        reject(err)
       })
-    }
+    })
   }
   console.log(toSaveData.length, toUpdateData.length)
-  if (toSaveData.length > 0) {
-    async2Server(saveUrl, toSaveData)
-  }
-  if (toUpdateData.length > 0) {
-    async2Server(updateUrl, toSaveData)
-  }
+  console.log(toSaveData, toUpdateData)
+  Promise.all([async2Server(saveUrl, toSaveData), async2Server(updateUrl, toUpdateData)]).then(resArr => {
+    if (resArr && Array.isArray(resArr) && resArr.length > 0) {
+      window.$notification.success({
+        title: resArr.map(v => v?.msg).join(', '),
+        duration: 3000,
+      })
+      const getSysBizTaskListProm = (): Promise<{status: number, data: resType}> => fetch(`http://127.0.0.1:8888/bizTask/getSysBizTaskList`, {
+        method: 'POST',
+        body: Body.json({})
+      })
+      getSysBizTaskListProm().then(res => {
+        if (res.status === 200) {
+          const result = res.data
+          if (result.data?.list && result.data?.list.length > 0) {
+            console.log('list: ', result.data.list)
+            store.todoData = store.todoData.filter(v => !v.isCompleted).concat(result.data.list.map((v: paramsTodoType) => {
+              v.isRomote = true
+              if (v.ID) v.id = v.ID
+              if (v.Content) v.content = v.Content
+              if (v.CreatedAt) v.createdAt = v.CreatedAt
+              if (v.UpdatedAt) v.updatedAt = v.UpdatedAt
+              return v
+            }))
+          }
+        } else {
+          window.$notification.error({
+            title: '同步数据失败',
+            duration: 3000,
+          })
+        }
+      })
+    }
+  }).catch(err => {
+    console.error(err)
+  })
+  
 }
 
 defineExpose({ showSetting })
