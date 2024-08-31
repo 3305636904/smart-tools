@@ -17,8 +17,6 @@ declare module '@vue/runtime-core' {
     ICarbonClean: typeof import('~icons/carbon/clean')['default']
     ICarbonExport: typeof import('~icons/carbon/export')['default']
     IClarityExportLine: typeof import('~icons/clarity/export-line')['default']
-    IClarityImpoIUilImportrtLine: typeof import('~icons/clarity/impo-i-uil-importrt-line')['default']
-    IClarityImportLine: typeof import('~icons/clarity/import-line')['default']
     IGgMenuGridR: typeof import('~icons/gg/menu-grid-r')['default']
     IGridiconsAddOutline: typeof import('~icons/gridicons/add-outline')['default']
     ILineMdMoon: typeof import('~icons/line-md/moon')['default']

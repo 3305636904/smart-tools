@@ -55,8 +55,6 @@ import { useStore } from '../../store'
 import { useSettings } from './useSettings'
 import dayjs from 'dayjs';
 
-import { getTimeNowEachField } from '../../hooks/useTime'
-
 interface resType {code: number, data: any|{list: any}, msg: string}
 
 const store = useStore()
@@ -80,28 +78,32 @@ const saveToServer = () => {
       if (typeof v == 'object' && Object.hasOwn(v, 'url')) return v.url
       return v
     })
+    if (todo.type && !Array.isArray(todo.type)) {
+      returnTodo.type = [todo.type]
+    }
     // if (returnTodo.updatedAt) returnTodo.updatedAt = new Date(returnTodo.updatedAt).toString().split('(')[0]
     delete returnTodo.UpdatedAt
     delete returnTodo.ID
     return returnTodo
   })
-  const toSaveData = completedData.filter(v => !v.isRomote)
-  const toUpdateData = completedData.filter(v => v.isRomote && v.isEdited).map(returnTodo => {
+  let toSaveData: paramsTodoType[] = completedData.filter(v => !v.isRomote)
+  let toUpdateData: paramsTodoType[] = completedData.filter(v => v.isRomote && v.isEdited).map(returnTodo => {
     if (returnTodo.updatedAt) {
-      // const timeNow = getTimeNowEachField(new Date(returnTodo.updatedAt))
       returnTodo.updatedAt = dayjs(returnTodo.updatedAt).format('YYYY-MM-DDTHH:mm:ssZ')
-      // console.log('---: ', returnTodo.updatedAt)
-      // returnTodo.updatedAt = new Date(timeNow.year, timeNow.month, timeNow.day, timeNow.hour, timeNow.minute, timeNow.second).toISOString()
-      return returnTodo
     }
+    return returnTodo
   })
+  let toDelDataIds  = store.delRemoteTodoData.map(v => v.id)
   // console.log(toSaveData, toUpdateData)
   // return
+  const { VITE_APP_API_URL } = import.meta.env
+  console.log('VITE_APP_API_URL: ', VITE_APP_API_URL)
   const saveUrl = `/bizTask/createBatchBizTask`
   const updateUrl = `/bizTask/updateBatchBizTask`
+  const deleteUrl = `/bizTask/delBatchBizTask`
   const async2Server = (url: string, data: any[]): Promise<resType> => {
     return new Promise((resolve, reject) => {
-      fetch(`http://127.0.0.1:8888${url}`, {
+      fetch(`${VITE_APP_API_URL}${url}`, {
         method: 'POST',
         body: Body.json({requestBizTaskList: data})
       }).then(res => {
@@ -116,18 +118,52 @@ const saveToServer = () => {
       })
     })
   }
+  const asyncDeleteServer = (url: string, data: any[]): Promise<resType> => {
+    return new Promise((resolve, reject) => {
+      fetch(`${VITE_APP_API_URL}${url}`, {
+        method: 'POST',
+        body: Body.json({ids: data})
+      }).then(res => {
+        if (res.status === 200) {
+          const result = (res.data)
+          resolve(result as resType)
+        }else {
+          reject(res)
+        }
+      }).catch(err => {
+        reject(err)
+      })
+    })
+  }
   console.log(toSaveData.length, toUpdateData.length)
   console.log(toSaveData, toUpdateData)
-  Promise.all([async2Server(saveUrl, toSaveData), async2Server(updateUrl, toUpdateData)]).then(resArr => {
+  const promiseList = []
+  if (toSaveData.length > 0) {
+    promiseList.push(async2Server(saveUrl, toSaveData))
+  }
+  if (toUpdateData.length > 0) {
+    promiseList.push(async2Server(updateUrl, toUpdateData))
+  }
+  if (toDelDataIds.length > 0) {
+    promiseList.push(asyncDeleteServer(deleteUrl, toDelDataIds))
+  }
+  let nRef
+  Promise.all(promiseList).then(resArr => {
     if (resArr && Array.isArray(resArr) && resArr.length > 0) {
-      window.$notification.success({
-        title: resArr.map(v => v?.msg).join(', '),
-        duration: 3000,
+      // nRef = window.$notification.create({
+      //   title: resArr.map(v => v?.msg).join(', '),
+      //   onClose: () => nRef = null
+      // })
+      nRef = window.$notification.success({
+        title: '操作成功。',
+        content: resArr.map(v => v?.msg).join(', '),
+        onClose: () => nRef = null
       })
       const getSysBizTaskListProm = (): Promise<{status: number, data: resType}> => fetch(`http://127.0.0.1:8888/bizTask/getSysBizTaskList`, {
         method: 'POST',
         body: Body.json({})
       })
+      store.delRemoteTodoData = []
       getSysBizTaskListProm().then(res => {
         if (res.status === 200) {
           const result = res.data

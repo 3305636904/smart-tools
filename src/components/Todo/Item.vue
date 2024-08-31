@@ -255,6 +255,10 @@
       positiveText: '确定',
       negativeText: '不确定',
       onPositiveClick: () => {
+        if (props.item.isRomote && props.item.id) {
+          store.delRemoteTodoData.push(props.item)
+        }
+        store.delRemoteTodoData.push(props.item)
         if (props.item.id) {
           const index = store.todoData.findIndex((v) => v.id === props.item.id)
           store.todoData.splice(index, 1)

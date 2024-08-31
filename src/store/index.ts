@@ -26,6 +26,8 @@ export const useStore = defineStore('global', () => {
   const todoData = ref<todoInfoType[]>([])
   const isTodoList = ref(<Boolean>false)
 
+  const delRemoteTodoData = ref<todoInfoType[]>([])
+
   const levelOptions = ref([
     { label: '重要或紧急', value: '1'},
     { label: '重要不紧急', value: '2'},
@@ -131,6 +133,8 @@ export const useStore = defineStore('global', () => {
     searchModal,
     data,
     todoData,
+
+    delRemoteTodoData,
     screenLocked,
     fullscreen,
     getData,

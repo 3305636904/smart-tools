@@ -11,7 +11,8 @@ export function useTodoAddForm() {
       type: [],
       attachMents: [],
       memo: '',
-      isCompleted: false
+      isCompleted: false,
+      isRomote: false
     },
     rules: ref({
       content: {

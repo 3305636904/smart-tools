@@ -283,6 +283,7 @@ const handleImport = async () => {
           if (v.createdAt) v.createdAt = new Date(v.createdAt)
           if (v.updatedAt) v.updatedAt = new Date(v.updatedAt)
           else if (v.createdAt) v.updatedAt = new Date(v.createdAt)
+          // v.isRomote = false
           return v
         })
       }
