@@ -103,17 +103,23 @@ const saveToServer = () => {
   const deleteUrl = `/bizTask/delBatchBizTask`
   const async2Server = (url: string, data: any[]): Promise<resType> => {
     return new Promise((resolve, reject) => {
+      console.log('ur: ', `${VITE_APP_API_URL}${url}`)
       fetch(`${VITE_APP_API_URL}${url}`, {
         method: 'POST',
         body: Body.json({requestBizTaskList: data})
       }).then(res => {
         if (res.status === 200) {
-          const result = (res.data)
-          resolve(result as resType)
+          const result = (res.data  as resType)
+          if (result.code !== 0) {
+            reject(result)
+          }
+          resolve(result)
         }else {
+          console.error(res)
           reject(res)
         }
       }).catch(err => {
+        console.error(err)
         reject(err)
       })
     })
@@ -138,6 +144,10 @@ const saveToServer = () => {
   console.log(toSaveData.length, toUpdateData.length)
   console.log(toSaveData, toUpdateData)
   const promiseList = []
+  if (toSaveData.length === 0 && toUpdateData.length === 0) {
+    window.$message.info(`当前数据已经是最新状态，无需同步。`)
+    return
+  }
   if (toSaveData.length > 0) {
     promiseList.push(async2Server(saveUrl, toSaveData))
   }
@@ -159,7 +169,7 @@ const saveToServer = () => {
         content: resArr.map(v => v?.msg).join(', '),
         onClose: () => nRef = null
       })
-      const getSysBizTaskListProm = (): Promise<{status: number, data: resType}> => fetch(`http://127.0.0.1:8888/bizTask/getSysBizTaskList`, {
+      const getSysBizTaskListProm = (): Promise<{status: number, data: resType}> => fetch(`${VITE_APP_API_URL}/bizTask/getSysBizTaskList`, {
         method: 'POST',
         body: Body.json({})
       })
@@ -188,6 +198,11 @@ const saveToServer = () => {
     }
   }).catch(err => {
     console.error(err)
+    nRef = window.$notification.error({
+      title: '操作失败。',
+      content: err,
+      onClose: () => nRef = null
+    })
   })
   
 }

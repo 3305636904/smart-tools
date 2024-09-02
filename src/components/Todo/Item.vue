@@ -11,7 +11,7 @@
         <span :class="['text-size-12px', 'color-red', 'p-1', {'bg-gray-700': store.darkTheme, 'bg-gray-400': !store.darkTheme}]">{{ spendDuration }}</span>
       </n-popover>
     </span>
-    <n-switch :round="false" :railStyle="switchStatusColor" class="v-base mr-1.5" size="small" v-model:value="props.item.isCompleted" >
+    <n-switch :round="false" :railStyle="switchStatusColor" class="v-base mr-1.5" size="small" v-model:value="props.item.isCompleted" @on-update:value="updateEditItemByTime">
       <template #unchecked>待关闭</template>
       <template #checked>已关闭</template>
     </n-switch>
