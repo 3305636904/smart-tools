@@ -12,7 +12,7 @@ export const routes : Array<RouteRecordRaw> = [
   // },
   {
     path: "/",
-    component: () => import('../components/CategoryList.vue'),
+    component: () => import("../components/CategoryList.vue"),
     meta: {
       title: '主界面'
     }

@@ -101,12 +101,22 @@
     "windows": [
       {
         "label": "main",
-        "url": "index.html/#/",
         "fullscreen": false,
         "height": 600,
         "resizable": true,
         "title": "smart-tool",
-        "width": 800
+        "width": 800,
+        "visible": false
+      },
+      {
+        "width": 500,
+        "height": 300,
+        "decorations": false,
+        "resizable": true,
+        "transparent": true,
+        "url": "loading.html",
+        "label": "loading",
+        "title": "smart-tool-loading"
       }
     ]
   }
