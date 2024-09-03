@@ -41,6 +41,13 @@ fn show_settings(window: tauri::Window) {
     setting_window.set_focus().unwrap();
 }
 
+#[cfg(debug_assertions)]
+fn open_devtools(app: &mut tauri::Window) {
+    let window = app.get_window("main").unwrap();
+    window.open_devtools();
+}
+
+
 // 页面加载
 #[tauri::command]
 fn close_loadingscreen(window: tauri::Window) {
@@ -48,14 +55,20 @@ fn close_loadingscreen(window: tauri::Window) {
     if let Some(loadingscreen) = window.get_window("loading") {
         loadingscreen.close().unwrap();
     }
+    
+    let window = window.get_window("main").unwrap();
     // 展示主视图
-    window.get_window("main").unwrap().show().unwrap();
-    window.open_devtools();
+    window.show().unwrap();
+    
+    #[cfg(debug_assertions)]
+    {
+        window.open_devtools();
+    }
 }
 
 fn main() {
     tauri::Builder::default()
-        .setup(|app| {
+        .setup(|_app: &mut tauri::App| {
             // 在开发环境中启动时打开控制台：https://tauri.app/v1/guides/debugging/application/#opening-devtools-programmatically
             // #[cfg(debug_assertions)]
             // {
