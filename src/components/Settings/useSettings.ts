@@ -136,17 +136,17 @@ export const useSettings = () => {
     postPromise(getBizUser, {userId: userForm.value.uid, nickName: userForm.value.nickName}).then(res => {
       if (res.code === 0) {
         window.$message.success(`登录成功。：${res.msg}`)
-        userForm.value = { uid: '', nickName: '' }
         store.loginBizUser = userForm.value.uid
         localStorage.setItem('biz-user', JSON.stringify(store.loginBizUser))
         loading.value = false
+        userForm.value = { uid: '', nickName: '' }
         getSysBizTaskListFn()
       }
     }).catch(err => {
       console.error(err, err.msg)
       nRef = window.$notification.error({
-        title: '登录失败。',
-        content: err.msg,
+        title: '登录失败!',
+        content: JSON.stringify(err),
         onClose: () => nRef = null
       })
       loading.value = false
@@ -167,8 +167,8 @@ export const useSettings = () => {
     }).catch(err => {
       console.error(err)
       nRef = window.$notification.error({
-        title: '操作失败。',
-        content: err.msg,
+        title: '操作失败!',
+        content: JSON.stringify(err),
         onClose: () => nRef = null
       })
       loading.value = false
