@@ -35,7 +35,7 @@
         <n-button type="primary" v-if="store.loginBizUser" size="small" :disabled="loading" @click="saveToServer">确定同步</n-button>
         <n-button class="ml-3" type="warning" v-if="store.loginBizUser" size="small" :disabled="loading" @click="logout">退出用户</n-button>
         <div class="w-60%" v-else>
-          <n-tabs type="segment" v-model:value="activeSync" animated>
+          <n-tabs type="segment" v-model:value="activeSync" @update:value="handleUpdateActiveSync" animated>
             <n-tab-pane name="login" tab="登录">
               <search-form class="text-left" :formItems="userFormItems" :model="userForm" :rules="userRules" >
                   <template #operation>
@@ -91,7 +91,7 @@ const {
   selectedTheme, themeOptions, modalTitle,
   model, formItems, rules, loading,
   userFormItems, userForm, userRules,
-  handleSettingConfirm, changeThemeAuto,
+  handleSettingConfirm, changeThemeAuto, handleUpdateActiveSync,
   postPromise, userLogin, createNewUser, getSysBizTaskListFn
 } = useSettings()
 
@@ -161,11 +161,11 @@ const saveToServer = () => {
       store.delRemoteTodoData = []
       getSysBizTaskListFn()
     }
-  }).catch(err => {
-    console.error(err)
+  }).catch(errArr => {
+    console.error(errArr)
     nRef = window.$notification.error({
       title: '操作失败。',
-      content: err?.msg,
+      content: errArr,
       onClose: () => nRef = null
     })
   })

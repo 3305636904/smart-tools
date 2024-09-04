@@ -280,12 +280,13 @@ const handleImport = async () => {
         store.data = JSON.parse(data)
       } else if (store.activeVal === 2) {
         const loadJsonData = (isNew = false) => {
-          store.todoData = JSON.parse(data).map((v: paramsTodoType) => {
+          const newId = Date.now() +  Math.floor(Math.random() * 1000)
+          store.todoData = JSON.parse(data).map((v: paramsTodoType, index: number) => {
             if (v.createdAt) v.createdAt = new Date(v.createdAt)
             if (v.updatedAt) v.updatedAt = new Date(v.updatedAt)
             else if (v.createdAt) v.updatedAt = new Date(v.createdAt)
             if (isNew) {
-              v.id = new Date().getTime() + Math.floor(Math.random() * 10000)
+              v.id = newId + index
               v.isRomote = false
             }
             return v

@@ -130,18 +130,13 @@ export const useSettings = () => {
     })
   }
 
-  // const dialog = useDialog()
   let nRef
-
   const userLogin = () => {
     loading.value = true
     postPromise(getBizUser, {userId: userForm.value.uid, nickName: userForm.value.nickName}).then(res => {
       if (res.code === 0) {
-        nRef = window.$notification.success({
-          title: '操作成功。',
-          content: res.msg,
-          onClose: () => nRef = null
-        })
+        window.$message.success(`登录成功。：${res.msg}`)
+        userForm.value = { uid: '', nickName: '' }
         store.loginBizUser = userForm.value.uid
         localStorage.setItem('biz-user', JSON.stringify(store.loginBizUser))
         loading.value = false
@@ -150,7 +145,7 @@ export const useSettings = () => {
     }).catch(err => {
       console.error(err, err.msg)
       nRef = window.$notification.error({
-        title: '操作失败。',
+        title: '登录失败。',
         content: err.msg,
         onClose: () => nRef = null
       })
@@ -164,14 +159,11 @@ export const useSettings = () => {
     postPromise(createBizUser,  {userId: userForm.value.uid, nickName: userForm.value.nickName})
     .then(res => {
       if (res.code === 0) {
-        nRef = window.$notification.success({
-          title: '注册成功。',
-          // content: res.msg,
-          // onClose: () => nRef = null
-        })
+        window.$message.success(`注册成功：${res.msg}`)
+        loading.value = false
+        activeSync.value = 'login'
+        userForm.value = { uid: '', nickName: '' }
       }
-      loading.value = true
-      activeSync.value = 'login'
     }).catch(err => {
       console.error(err)
       nRef = window.$notification.error({
@@ -181,6 +173,11 @@ export const useSettings = () => {
       })
       loading.value = false
     })
+  }
+
+  const handleUpdateActiveSync = (val: string) => {
+    userForm.value = { uid: '', nickName: '' }
+    activeSync.value = val
   }
 
   themeInit()
@@ -197,9 +194,11 @@ export const useSettings = () => {
     modalTitle,
     model, rules, formItems,
     userFormItems, userForm, userRules,
+
     handleSettingConfirm,
     isDaytime,
     changeThemeAuto,
+    handleUpdateActiveSync,
     userLogin, createNewUser,
     getSysBizTaskListFn
   }
