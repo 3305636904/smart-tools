@@ -1,4 +1,7 @@
 import { useStore } from '../../store'
+import { postPromise } from '../../hooks/useRequest'
+
+// import { useDialog } from 'naive-ui'
 
 export const useSettings = () => {
   const store = useStore()
@@ -10,6 +13,10 @@ export const useSettings = () => {
   ])
 
   const activeTab = ref('theme')
+
+  const activeSync = ref('login')
+
+  const loading = ref(false)
 
   let selectedTheme = ref< 1 | 2 | 3>()
   
@@ -38,6 +45,23 @@ export const useSettings = () => {
       { label: '快捷网站', value: 1 }, { label: '待办纪要', value: 2 },
     ] },
   ])
+
+  const userFormItems = ref([
+    { type: `input`, label: `昵称`, path: `nickName` },
+    { type: `input`, label: `用户标识`, path: `uid` },
+    { type: `custom`, label: ` `, path: `operation` },
+  ])
+  const userForm = ref({
+    nickName: '',
+    uid: ''
+  })
+  const userRules = ref({
+    uid: {
+      required: true,
+      message: '请输入用户标识',
+      trigger: 'blur'
+    }
+  })
 
   const handleSettingConfirm = () => {
     if (activeTab.value === 'theme') {
@@ -77,17 +101,106 @@ export const useSettings = () => {
     }
   }
 
+  const createBizUser = `/bizTaskNoAuth/createBizUser`
+  const getBizUser = `/bizTaskNoAuth/getBizUser`
+  const getSysBizTaskList = `/bizTask/getSysBizTaskList`
+
+  const getSysBizTaskListFn  = (cb = () => {}) => {
+    loading.value = true
+    postPromise(getSysBizTaskList, {}, { 'biz-user': store.loginBizUser || '' }).then(result => {
+      console.log('list: ', result.data.list)
+      store.todoData = store.todoData.filter(v => !v.isCompleted).concat(result.data.list.map((v: paramsTodoType) => {
+        v.isRomote = true
+        if (v.ID) v.id = v.ID
+        if (v.Content) v.content = v.Content
+        if (v.CreatedAt) v.createdAt = v.CreatedAt
+        if (v.UpdatedAt) v.updatedAt = v.UpdatedAt
+        return v
+      }))
+      cb()
+      loading.value = false
+    }).catch(err => {
+      console.error(err)
+      window.$notification.error({
+        title: '同步数据失败',
+        content: err.msg,
+        duration: 3000,
+      })
+      loading.value = false
+    })
+  }
+
+  // const dialog = useDialog()
+  let nRef
+
+  const userLogin = () => {
+    loading.value = true
+    postPromise(getBizUser, {userId: userForm.value.uid, nickName: userForm.value.nickName}).then(res => {
+      if (res.code === 0) {
+        nRef = window.$notification.success({
+          title: '操作成功。',
+          content: res.msg,
+          onClose: () => nRef = null
+        })
+        store.loginBizUser = userForm.value.uid
+        localStorage.setItem('biz-user', JSON.stringify(store.loginBizUser))
+        loading.value = false
+        getSysBizTaskListFn()
+      }
+    }).catch(err => {
+      console.error(err, err.msg)
+      nRef = window.$notification.error({
+        title: '操作失败。',
+        content: err.msg,
+        onClose: () => nRef = null
+      })
+      loading.value = false
+    })
+  }
+
+  const createNewUser = () => {
+    loading.value = true
+    console.log('userForm.value: ', userForm.value)
+    postPromise(createBizUser,  {userId: userForm.value.uid, nickName: userForm.value.nickName})
+    .then(res => {
+      if (res.code === 0) {
+        nRef = window.$notification.success({
+          title: '注册成功。',
+          // content: res.msg,
+          // onClose: () => nRef = null
+        })
+      }
+      loading.value = true
+      activeSync.value = 'login'
+    }).catch(err => {
+      console.error(err)
+      nRef = window.$notification.error({
+        title: '操作失败。',
+        content: err.msg,
+        onClose: () => nRef = null
+      })
+      loading.value = false
+    })
+  }
+
   themeInit()
 
 
   return {
+    postPromise,
+    
+    loading,
     activeTab,
+    activeSync,
     selectedTheme,
     themeOptions,
     modalTitle,
     model, rules, formItems,
+    userFormItems, userForm, userRules,
     handleSettingConfirm,
     isDaytime,
-    changeThemeAuto
+    changeThemeAuto,
+    userLogin, createNewUser,
+    getSysBizTaskListFn
   }
 }

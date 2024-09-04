@@ -279,18 +279,40 @@ const handleImport = async () => {
       if (store.activeVal === 1) {
         store.data = JSON.parse(data)
       } else if (store.activeVal === 2) {
-        store.todoData = JSON.parse(data).map((v: paramsTodoType) => {
-          if (v.createdAt) v.createdAt = new Date(v.createdAt)
-          if (v.updatedAt) v.updatedAt = new Date(v.updatedAt)
-          else if (v.createdAt) v.updatedAt = new Date(v.createdAt)
-          // v.isRomote = false
-          return v
+        const loadJsonData = (isNew = false) => {
+          store.todoData = JSON.parse(data).map((v: paramsTodoType) => {
+            if (v.createdAt) v.createdAt = new Date(v.createdAt)
+            if (v.updatedAt) v.updatedAt = new Date(v.updatedAt)
+            else if (v.createdAt) v.updatedAt = new Date(v.createdAt)
+            if (isNew) {
+              v.id = new Date().getTime() + Math.floor(Math.random() * 10000)
+              v.isRomote = false
+            }
+            return v
+          })
+        }
+        window.$dialog.warning({
+          title: '是否标识为新数据？',
+          content: '此操作将会标识当前数据为新产生的数据，是否继续？',
+          positiveText: '是',
+          negativeText: '不标识为新数据',
+          onPositiveClick: () => {
+            loadJsonData(true)
+            window.$notification.success({
+              title: '导入成功',
+              duration: 3000,
+            })
+          },
+          onNegativeClick: () => {
+            loadJsonData(false)
+            window.$notification.success({
+              title: '导入成功',
+              duration: 3000,
+            })
+          }
         })
       }
-      window.$notification.success({
-        title: '导入成功',
-        duration: 3000,
-      })
+      
     } catch (e) {
       window.$notification.error({
         title: '数据异常',

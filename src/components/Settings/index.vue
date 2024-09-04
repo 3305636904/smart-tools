@@ -31,14 +31,40 @@
         </n-radio-button>
       </n-radio-group>
       <SearchForm v-else-if="activeTab === 'todoSetting'" ref="formRef" :model="model" :formItems="formItems" :rules="rules" />
-      <n-button v-else-if="activeTab === 'saveDate'" type="primary" size="small" @click="saveToServer">确定同步</n-button>
+      <div v-else-if="activeTab === 'saveDate'" class="w-full">
+        <n-button type="primary" v-if="store.loginBizUser" size="small" :disabled="loading" @click="saveToServer">确定同步</n-button>
+        <n-button class="ml-3" type="warning" v-if="store.loginBizUser" size="small" :disabled="loading" @click="logout">退出用户</n-button>
+        <div class="w-60%" v-else>
+          <n-tabs type="segment" v-model:value="activeSync" animated>
+            <n-tab-pane name="login" tab="登录">
+              <search-form class="text-left" :formItems="userFormItems" :model="userForm" :rules="userRules" >
+                  <template #operation>
+                    <div class="v-base text-right">
+                      <n-button type="primary" size="small" :disabled="loading" @click="userLogin()">登录</n-button>
+                    </div>
+                  </template>
+              </search-form>
+            </n-tab-pane >
+            <n-tab-pane name="regist" tab="注册">
+              <search-form class="text-left" :formItems="userFormItems" :model="userForm" :rules="userRules" >
+                  <template #operation>
+                    <div class="v-base text-right">
+                      <n-button type="primary" size="small" :disabled="loading" @click="createNewUser()">创建新用户</n-button>
+                    </div>
+                  </template>
+              </search-form>
+            </n-tab-pane >
+          </n-tabs>
+          
+        </div>
+      </div>
     </n-card>
     <template #footer>
       <div class="w-full flex justify-end">
         <n-button class="mr04" @click="model.isShow = false" size="small"
           >取消</n-button
         >
-        <n-button
+        <n-button v-show="['theme', 'todoSetting'].includes(activeTab)"
           type="primary" size="small"
           @click="handleSettingConfirm"
           >确定</n-button
@@ -49,17 +75,26 @@
 </template>
 
 <script setup lang="ts" name="settings">
-import { fetch, Body } from '@tauri-apps/api/http';
+// import { fetch, Body } from '@tauri-apps/api/http';
 
 import { useStore } from '../../store'
 import { useSettings } from './useSettings'
+
 import dayjs from 'dayjs';
 
-interface resType {code: number, data: any|{list: any}, msg: string}
+// interface resType {code: number, data: any|{list: any}, msg: string}
 
 const store = useStore()
 
-const { activeTab, selectedTheme, themeOptions, modalTitle, model, formItems, rules, handleSettingConfirm, changeThemeAuto } = useSettings()
+const { 
+  activeTab, activeSync,
+  selectedTheme, themeOptions, modalTitle,
+  model, formItems, rules, loading,
+  userFormItems, userForm, userRules,
+  handleSettingConfirm, changeThemeAuto,
+  postPromise, userLogin, createNewUser, getSysBizTaskListFn
+} = useSettings()
+
 
 const showSetting = () => {
   model.isShow = !model.isShow
@@ -70,6 +105,7 @@ const showSetting = () => {
 }
 
 const saveToServer = () => {
+
   const completedData: paramsTodoType[] = store.todoData.filter(v => v.isCompleted)
   .map((todo, i) => {
     let returnTodo: any = todo
@@ -81,7 +117,6 @@ const saveToServer = () => {
     if (todo.type && !Array.isArray(todo.type)) {
       returnTodo.type = [todo.type]
     }
-    // if (returnTodo.updatedAt) returnTodo.updatedAt = new Date(returnTodo.updatedAt).toString().split('(')[0]
     delete returnTodo.UpdatedAt
     delete returnTodo.ID
     return returnTodo
@@ -93,118 +128,53 @@ const saveToServer = () => {
     }
     return returnTodo
   })
-  let toDelDataIds  = store.delRemoteTodoData.map(v => v.id)
-  // console.log(toSaveData, toUpdateData)
-  // return
-  const { VITE_APP_API_URL } = import.meta.env
-  console.log('VITE_APP_API_URL: ', VITE_APP_API_URL)
+  let toDelDataIds  = store.delRemoteTodoData
   const saveUrl = `/bizTask/createBatchBizTask`
   const updateUrl = `/bizTask/updateBatchBizTask`
   const deleteUrl = `/bizTask/delBatchBizTask`
-  const async2Server = (url: string, data: any[]): Promise<resType> => {
-    return new Promise((resolve, reject) => {
-      console.log('ur: ', `${VITE_APP_API_URL}${url}`)
-      fetch(`${VITE_APP_API_URL}${url}`, {
-        method: 'POST',
-        body: Body.json({requestBizTaskList: data})
-      }).then(res => {
-        if (res.status === 200) {
-          const result = (res.data  as resType)
-          if (result.code !== 0) {
-            reject(result)
-          }
-          resolve(result)
-        }else {
-          console.error(res)
-          reject(res)
-        }
-      }).catch(err => {
-        console.error(err)
-        reject(err)
-      })
-    })
-  }
-  const asyncDeleteServer = (url: string, data: any[]): Promise<resType> => {
-    return new Promise((resolve, reject) => {
-      fetch(`${VITE_APP_API_URL}${url}`, {
-        method: 'POST',
-        body: Body.json({ids: data})
-      }).then(res => {
-        if (res.status === 200) {
-          const result = (res.data)
-          resolve(result as resType)
-        }else {
-          reject(res)
-        }
-      }).catch(err => {
-        reject(err)
-      })
-    })
-  }
-  console.log(toSaveData.length, toUpdateData.length)
-  console.log(toSaveData, toUpdateData)
+
+  console.log(toSaveData.length, toUpdateData.length, toDelDataIds.length)
+  console.log(toSaveData, toUpdateData, toDelDataIds)
   const promiseList = []
-  if (toSaveData.length === 0 && toUpdateData.length === 0) {
-    window.$message.info(`当前数据已经是最新状态，无需同步。`)
+  if (toSaveData.length === 0 && toUpdateData.length === 0 && toDelDataIds.length === 0) {
+    getSysBizTaskListFn()
+    window.$message.info(`当前数据已经是最新状态。`)
     return
   }
   if (toSaveData.length > 0) {
-    promiseList.push(async2Server(saveUrl, toSaveData))
+    promiseList.push(postPromise(saveUrl, { requestBizTaskList: toSaveData}, { 'biz-user': store.loginBizUser || '' }))
   }
   if (toUpdateData.length > 0) {
-    promiseList.push(async2Server(updateUrl, toUpdateData))
+    promiseList.push(postPromise(updateUrl, {requestBizTaskList: toUpdateData}, { 'biz-user': store.loginBizUser || '' }))
   }
   if (toDelDataIds.length > 0) {
-    promiseList.push(asyncDeleteServer(deleteUrl, toDelDataIds))
+    promiseList.push(postPromise(deleteUrl, { ids: toDelDataIds }, { 'biz-user': store.loginBizUser || '' }))
   }
   let nRef
   Promise.all(promiseList).then(resArr => {
     if (resArr && Array.isArray(resArr) && resArr.length > 0) {
-      // nRef = window.$notification.create({
-      //   title: resArr.map(v => v?.msg).join(', '),
-      //   onClose: () => nRef = null
-      // })
       nRef = window.$notification.success({
         title: '操作成功。',
         content: resArr.map(v => v?.msg).join(', '),
         onClose: () => nRef = null
       })
-      const getSysBizTaskListProm = (): Promise<{status: number, data: resType}> => fetch(`${VITE_APP_API_URL}/bizTask/getSysBizTaskList`, {
-        method: 'POST',
-        body: Body.json({})
-      })
       store.delRemoteTodoData = []
-      getSysBizTaskListProm().then(res => {
-        if (res.status === 200) {
-          const result = res.data
-          if (result.data?.list && result.data?.list.length > 0) {
-            console.log('list: ', result.data.list)
-            store.todoData = store.todoData.filter(v => !v.isCompleted).concat(result.data.list.map((v: paramsTodoType) => {
-              v.isRomote = true
-              if (v.ID) v.id = v.ID
-              if (v.Content) v.content = v.Content
-              if (v.CreatedAt) v.createdAt = v.CreatedAt
-              if (v.UpdatedAt) v.updatedAt = v.UpdatedAt
-              return v
-            }))
-          }
-        } else {
-          window.$notification.error({
-            title: '同步数据失败',
-            duration: 3000,
-          })
-        }
-      })
+      getSysBizTaskListFn()
     }
   }).catch(err => {
     console.error(err)
     nRef = window.$notification.error({
       title: '操作失败。',
-      content: err,
+      content: err?.msg,
       onClose: () => nRef = null
     })
   })
   
+}
+
+const logout = () => {
+  store.loginBizUser = ''
+  localStorage.removeItem('biz-user')
 }
 
 defineExpose({ showSetting })

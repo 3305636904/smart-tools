@@ -75,5 +75,7 @@ declare global {
     isRomote: boolean,
     isEdited?: boolean
   }
+
+  interface resType {code: number, data: any|{list: any}, msg: string}
   
 }

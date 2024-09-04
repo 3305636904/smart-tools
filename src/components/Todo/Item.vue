@@ -1,5 +1,5 @@
 <template>
-  <n-card v-if="!props.isList" content-class="content-clz" :class="['w-20vw', 'text-left', 'p-0', 'relative', 'overflow-hidden', {'color-gray-500': props.item.isCompleted }]"
+  <n-card v-if="!props.isList" content-class="content-clz" :class="['w-20vw', 'text-left', 'p-0', 'relative', 'overflow-hidden', {'color-gray-500': props.item.isCompleted, 'bg-green-100': store.lastOperatedItemId === props.item.id }]"
   @mouseenter="() => (isEnter = true)" @mouseleave="() => (isEnter = false)"
   :bordered="!props.item.isCompleted" :content-style="isEdit ? `padding: 0;` : ''" hoverable>
     <n-checkbox size="small" v-show="props.isBatch" class="absolute top-1 left-3.5 w-2px h-2px" :value="props.item" />
@@ -31,8 +31,9 @@
       </n-ellipsis>
     </section>
   </n-card>
+  <!-- 'border-b-emerald',  -->
   <n-p v-else 
-    :class="['text-left', 'p-1', 'pt-2', 'pos-relative', 'overflow-hidden', 'border-b-emerald', 'b-rounded-1.5', {'hover:bg-dark': store.darkTheme, 'hover:bg-gray-200': !store.darkTheme}]"
+    :class="['text-left', 'p-1', 'pt-2', 'pos-relative', 'overflow-hidden', 'b-rounded-1.5', {'hover:bg-dark': store.darkTheme, 'hover:bg-gray-200': !store.darkTheme,  'bg-green-100': store.lastOperatedItemId === props.item.id}]"
     style="width: calc(100% - 15px);"
     @mouseenter="() => (isEnter = true)" @mouseleave="() => (isEnter = false)">
     <!--  -->
@@ -193,7 +194,7 @@
   
 
   function editItem() {
-    console.log('item: ', props.item)
+    // console.log('item: ', props.item)
     todoInfo.isShow = true
     todoInfo.content = props.item.content
     todoInfo.level = props.item.level
@@ -227,6 +228,7 @@
         props.item.updatedAt = new Date()
         if (props.item.isRomote) props.item.isEdited = true
         store.todoData[editDataIndex] = { ...store.todoData[editDataIndex], ...props.item }
+        store.lastOperatedItemId = (props.item.id as string)
       }
   }
 
@@ -237,6 +239,7 @@
         console.log('err: ', err)
       }
       const editDataIndex = store.todoData.findIndex(v => v.id === todoInfo.id)
+      store.lastOperatedItemId = (todoInfo.id as string)
       if (editDataIndex!== -1) {
         todoInfo.updatedAt = new Date()
         if (todoInfo.isRomote) {
@@ -244,6 +247,7 @@
         }
         store.todoData[editDataIndex] = { ...store.todoData[editDataIndex], ...todoInfo }
       }
+      
       todoInfo.isShow = false
     })
   }
@@ -255,10 +259,9 @@
       positiveText: '确定',
       negativeText: '不确定',
       onPositiveClick: () => {
-        if (props.item.isRomote && props.item.id) {
-          store.delRemoteTodoData.push(props.item)
+        if (props.item.isRomote && props.item.isCompleted && props.item.id) {
+          store.delRemoteTodoData.push(props.item.id as string)
         }
-        store.delRemoteTodoData.push(props.item)
         if (props.item.id) {
           const index = store.todoData.findIndex((v) => v.id === props.item.id)
           store.todoData.splice(index, 1)
@@ -285,6 +288,7 @@
     isEdit.value = false
     props.item.updatedAt = Date.now()
     props.item.isEdited = true
+    store.lastOperatedItemId = (props.item.id as string)
   }
 
   function keyDown(e: KeyboardEvent) {

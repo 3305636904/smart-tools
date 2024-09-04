@@ -18,7 +18,6 @@ export const useStore = defineStore('global', () => {
   const darkTheme = ref(false)
   const data = ref<Category[]>([])
 
-
   const cateToolList = ref<Record<string, any>>({ 1: `快捷网站`, 2: `待办纪要` })
   const showCateToolList = ref<Array<number>>([1, 2])
   const activeVal = ref(<number| null>2)
@@ -26,7 +25,11 @@ export const useStore = defineStore('global', () => {
   const todoData = ref<todoInfoType[]>([])
   const isTodoList = ref(<Boolean>false)
 
-  const delRemoteTodoData = ref<todoInfoType[]>([])
+  const lastOperatedItemId = ref<string>('')
+
+  const loginBizUser = ref<string>('')
+
+  const delRemoteTodoData = ref<string[]>([])
 
   const levelOptions = ref([
     { label: '重要或紧急', value: '1'},
@@ -91,6 +94,7 @@ export const useStore = defineStore('global', () => {
         showCateToolList.value = JSON.parse(window.localStorage.getItem('showCateToolList') as string)
         activeVal.value = JSON.parse(window.localStorage.getItem('activeVal') as string)
         isTodoList.value = JSON.parse(window.localStorage.getItem('isTodoList') as string)
+        loginBizUser.value = JSON.parse(window.localStorage.getItem('biz-user') as string)
       }
     } catch (e) {}
 
@@ -134,6 +138,8 @@ export const useStore = defineStore('global', () => {
     data,
     todoData,
 
+    lastOperatedItemId,
+
     delRemoteTodoData,
     screenLocked,
     fullscreen,
@@ -145,6 +151,7 @@ export const useStore = defineStore('global', () => {
     cateToolList,
     showCateToolList,
     activeVal,
-    isTodoList
+    isTodoList,
+    loginBizUser,
   }
 })
