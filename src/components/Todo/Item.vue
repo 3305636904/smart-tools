@@ -1,5 +1,10 @@
 <template>
-  <n-card v-if="!props.isList" content-class="content-clz" :class="['w-20vw', 'text-left', 'p-0', 'relative', 'overflow-hidden', {'color-gray-500': props.item.isCompleted, 'bg-green-100': store.lastOperatedItemId === props.item.id }]"
+  <n-card v-if="!props.isList" content-class="content-clz" :class="['w-20vw', 'text-left', 'p-0', 'relative', 'overflow-hidden', 
+  {
+    'color-gray-500': props.item.isCompleted, 
+    'bg-green-100': !store.darkTheme && store.lastOperatedItemId === props.item.id,
+    'bg-green-900': store.darkTheme && store.lastOperatedItemId === props.item.id
+  }]"
   @mouseenter="() => (isEnter = true)" @mouseleave="() => (isEnter = false)"
   :bordered="!props.item.isCompleted" :content-style="isEdit ? `padding: 0;` : ''" hoverable>
     <n-checkbox size="small" v-show="props.isBatch" class="absolute top-1 left-3.5 w-2px h-2px" :value="props.item" />
@@ -33,7 +38,13 @@
   </n-card>
   <!-- 'border-b-emerald',  -->
   <n-p v-else 
-    :class="['text-left', 'p-1', 'pt-2', 'pos-relative', 'overflow-hidden', 'b-rounded-1.5', {'hover:bg-dark': store.darkTheme, 'hover:bg-gray-200': !store.darkTheme,  'bg-green-100': store.lastOperatedItemId === props.item.id}]"
+    :class="['text-left', 'p-1', 'pt-2', 'pos-relative', 'overflow-hidden', 'b-rounded-1.5', 
+    {
+      'hover:bg-dark': store.darkTheme, 
+      'hover:bg-gray-200': !store.darkTheme,  
+      'bg-green-100': !store.darkTheme && store.lastOperatedItemId === props.item.id,
+      'bg-green-900': store.darkTheme && store.lastOperatedItemId === props.item.id
+    }]"
     style="width: calc(100% - 15px);"
     @mouseenter="() => (isEnter = true)" @mouseleave="() => (isEnter = false)">
     <!--  -->
@@ -241,7 +252,9 @@
       const editDataIndex = store.todoData.findIndex(v => v.id === todoInfo.id)
       store.lastOperatedItemId = (todoInfo.id as string)
       if (editDataIndex!== -1) {
-        todoInfo.updatedAt = new Date()
+        if (!todoInfo.isCompleted) {
+          todoInfo.updatedAt = new Date()
+        }
         if (todoInfo.isRomote) {
           todoInfo.isEdited = true
         }
