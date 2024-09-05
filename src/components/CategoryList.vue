@@ -280,17 +280,34 @@ const handleImport = async () => {
         store.data = JSON.parse(data)
       } else if (store.activeVal === 2) {
         const loadJsonData = (isNew = false) => {
-          const newId = Date.now() +  Math.floor(Math.random() * 1000)
-          store.todoData = JSON.parse(data).map((v: paramsTodoType, index: number) => {
-            if (v.createdAt) v.createdAt = new Date(v.createdAt)
-            if (v.updatedAt) v.updatedAt = new Date(v.updatedAt)
-            else if (v.createdAt) v.updatedAt = new Date(v.createdAt)
-            if (isNew) {
+          if (isNew) {
+            const newId = Date.now() +  Math.floor(Math.random() * 1000)
+            const newTodoData = JSON.parse(data).map((v: paramsTodoType, index: number) => {
+              if (v.createdAt) v.createdAt = new Date(v.createdAt)
+              if (v.updatedAt) v.updatedAt = new Date(v.updatedAt)
+              else if (v.createdAt) v.updatedAt = new Date(v.createdAt)
               v.id = newId + index
               v.isRomote = false
-            }
-            return v
-          })
+              return v
+            })
+            store.todoData = newTodoData
+          } else {
+            const notCompltedData = JSON.parse(data).filter((v: paramsTodoType) => !v.isCompleted)
+            let compltedData: paramsTodoType[] = JSON.parse(data).filter((v: paramsTodoType) => v.isCompleted)
+            JSON.parse(data).forEach((v: paramsTodoType, index: number) => {
+              const existIndex = store.todoData.findIndex(todoItem => todoItem.id === v.id && (todoItem.content !== v.content || todoItem.memo !== v.memo))
+              if (existIndex != -1) {
+                const tempData: paramsTodoType = v
+                if (v.updatedAt) {
+                  tempData.updatedAt = new Date(v.updatedAt)
+                }
+                tempData.memo = v.memo
+                tempData.content = v.content
+                compltedData.splice(existIndex, 1, tempData)
+              }
+            })
+            store.todoData = notCompltedData.concat(compltedData)
+          }
         }
         window.$dialog.warning({
           title: '是否标识为新数据？',
