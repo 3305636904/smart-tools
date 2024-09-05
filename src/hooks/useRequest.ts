@@ -4,7 +4,7 @@ const { VITE_APP_API_URL } = import.meta.env
 
 export const postPromise = (url: string, data: any = {}, headers: any = {}): Promise<resType> => {
   return new Promise((resolve, reject) => {
-    console.log('ur: ', `${VITE_APP_API_URL}${url}`)
+    // console.log('ur: ', `${VITE_APP_API_URL}${url}`)
     fetch(`${VITE_APP_API_URL}${url}`, {
       method: 'POST',
       // body: Body.json({requestBizTaskList: data}),
@@ -19,11 +19,11 @@ export const postPromise = (url: string, data: any = {}, headers: any = {}): Pro
         resolve(result)
       }else {
         // console.error(res)
-        reject(res)
+        reject(res.data as resType)
       }
     }).catch(err => {
       // console.error(err)
-      reject(err)
+      reject(err as resType)
     })
   })
 }

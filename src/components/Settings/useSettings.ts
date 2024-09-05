@@ -107,7 +107,7 @@ export const useSettings = () => {
 
   const getSysBizTaskListFn  = (cb = () => {}) => {
     loading.value = true
-    postPromise(getSysBizTaskList, {}, { 'biz-user': store.loginBizUser || '' }).then(result => {
+    postPromise(getSysBizTaskList, null, { 'biz-user': store.loginBizUser }).then(result => {
       console.log('list: ', result.data.list)
       store.todoData = store.todoData.filter(v => !v.isCompleted).concat(result.data.list.map((v: paramsTodoType) => {
         v.isRomote = true
@@ -119,11 +119,11 @@ export const useSettings = () => {
       }))
       cb()
       loading.value = false
-    }).catch(err => {
+    }).catch((err: resType[]) => {
       console.error(err)
       window.$notification.error({
         title: '同步数据失败',
-        content: err.msg,
+        content: err.map(v => v.msg).join('\n'),
         duration: 3000,
       })
       loading.value = false
@@ -136,17 +136,17 @@ export const useSettings = () => {
     postPromise(getBizUser, {userId: userForm.value.uid, nickName: userForm.value.nickName}).then(res => {
       if (res.code === 0) {
         window.$message.success(`登录成功。：${res.msg}`)
-        store.loginBizUser = userForm.value.uid
-        localStorage.setItem('biz-user', JSON.stringify(store.loginBizUser))
         loading.value = false
+        store.loginBizUser = userForm.value.uid
         userForm.value = { uid: '', nickName: '' }
+        localStorage.setItem('biz-user', JSON.stringify(store.loginBizUser))
         getSysBizTaskListFn()
       }
-    }).catch(err => {
-      console.error(err, err.msg)
+    }).catch((err: resType[]) => {
+      console.error(err)
       nRef = window.$notification.error({
         title: '登录失败!',
-        content: JSON.stringify(err),
+        content: '',
         onClose: () => nRef = null
       })
       loading.value = false
@@ -164,11 +164,11 @@ export const useSettings = () => {
         activeSync.value = 'login'
         userForm.value = { uid: '', nickName: '' }
       }
-    }).catch(err => {
+    }).catch((err: resType[]) => {
       console.error(err)
       nRef = window.$notification.error({
         title: '操作失败!',
-        content: JSON.stringify(err),
+        content: err.map(v => v.msg).join('\n'),
         onClose: () => nRef = null
       })
       loading.value = false

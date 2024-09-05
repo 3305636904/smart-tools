@@ -109,7 +109,11 @@ const saveToServer = () => {
   const completedData: paramsTodoType[] = store.todoData.filter(v => v.isCompleted)
   .map((todo, i) => {
     let returnTodo: any = todo
-    if (!todo.id) returnTodo.id = Date.now() + Math.floor(Math.random() * 10000) + i
+    if (!todo.id) {
+      const newId = Date.now() + (Math.floor(Math.random() * 10000) + i)
+      returnTodo.ID = newId
+      returnTodo.id = newId
+    }
     if (todo.attachMents && Array.isArray(todo.attachMents) && todo.attachMents.length > 0) returnTodo.attachMents = todo.attachMents.map(v => {
       if (typeof v == 'object' && Object.hasOwn(v, 'url')) return v.url
       return v
@@ -118,7 +122,6 @@ const saveToServer = () => {
       returnTodo.type = [todo.type]
     }
     delete returnTodo.UpdatedAt
-    delete returnTodo.ID
     return returnTodo
   })
   let toSaveData: paramsTodoType[] = completedData.filter(v => !v.isRomote)
