@@ -105,10 +105,9 @@ export const useSettings = () => {
   const getBizUser = `/bizTaskNoAuth/getBizUser`
   const getSysBizTaskList = `/bizTask/getSysBizTaskList`
 
-  const getSysBizTaskListFn  = (cb = () => {}) => {
+  const getSysBizTaskListFn  = (cb = (res: resType) => {}) => {
     loading.value = true
     postPromise(getSysBizTaskList, null, { 'biz-user': store.loginBizUser }).then(result => {
-      console.log('list: ', result.data.list)
       store.todoData = store.todoData.filter(v => !v.isCompleted).concat(result.data.list.map((v: paramsTodoType) => {
         v.isRomote = true
         if (v.ID) v.id = v.ID
@@ -117,7 +116,7 @@ export const useSettings = () => {
         if (v.UpdatedAt) v.updatedAt = v.UpdatedAt
         return v
       }))
-      cb()
+      cb(result)
       loading.value = false
     }).catch((err: resType[]) => {
       console.error(err)
@@ -138,15 +137,25 @@ export const useSettings = () => {
         window.$message.success(`登录成功。：${res.msg}`)
         loading.value = false
         store.loginBizUser = userForm.value.uid
-        userForm.value = { uid: '', nickName: '' }
         localStorage.setItem('biz-user', JSON.stringify(store.loginBizUser))
-        getSysBizTaskListFn()
+        userForm.value = { uid: '', nickName: '' }
+        const t = setTimeout(() => {
+          getSysBizTaskListFn((res) => {
+            if (res.code === 0) {
+              window.$message.success(res.msg)
+            } else {
+              window.$message.error(res.msg)
+            }
+          })
+          clearTimeout(t)
+        }, 500)
       }
-    }).catch((err: resType[]) => {
+    }).catch((err: any) => {
       console.error(err)
+      const errorMsg = err && Array.isArray(err) ? err.map(v => v.msg) : err.msg
       nRef = window.$notification.error({
         title: '登录失败!',
-        content: '',
+        content: errorMsg,
         onClose: () => nRef = null
       })
       loading.value = false
@@ -164,11 +173,12 @@ export const useSettings = () => {
         activeSync.value = 'login'
         userForm.value = { uid: '', nickName: '' }
       }
-    }).catch((err: resType[]) => {
+    }).catch((err: any) => {
       console.error(err)
+      const errorMsg = err && Array.isArray(err) ? err.map(v => v.msg) : err.msg;
       nRef = window.$notification.error({
         title: '操作失败!',
-        content: err.map(v => v.msg).join('\n'),
+        content: errorMsg,
         onClose: () => nRef = null
       })
       loading.value = false

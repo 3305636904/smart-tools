@@ -164,11 +164,12 @@ const saveToServer = () => {
       store.delRemoteTodoData = []
       getSysBizTaskListFn()
     }
-  }).catch(errArr => {
-    console.error(errArr)
+  }).catch(err => {
+    console.error(err)
+    const errorMsg = err && Array.isArray(err) ? err.map(v => v.msg) : err.msg;
     nRef = window.$notification.error({
       title: '操作失败。',
-      content: errArr,
+      content: errorMsg,
       onClose: () => nRef = null
     })
   })
