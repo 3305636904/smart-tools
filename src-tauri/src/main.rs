@@ -4,6 +4,7 @@
 )]
 
 use std::env;
+use std::process::Command;
 use tauri::{
     Window, Manager
 };
@@ -66,6 +67,23 @@ fn close_loadingscreen(window: tauri::Window) {
     }
 }
 
+// ping来检查网络连接
+#[tauri::command]
+fn check_network() -> String {
+    let output = Command::new("ping")
+        .arg("-c")
+        .arg("1")
+        .arg("google.com")
+        .output()
+        .expect("failed to execute process");
+
+    if output.status.success() {
+        return "online".to_string();
+    } else {
+        return "offline".to_string();
+    }
+}
+
 fn main() {
     tauri::Builder::default()
         .setup(|_app: &mut tauri::App| {
@@ -87,7 +105,7 @@ fn main() {
         // .on_system_tray_event(tray::handler)
         // 自定义剪切板插件
         // .plugin(clipboard::init())
-        .invoke_handler(tauri::generate_handler![close_loadingscreen])
+        .invoke_handler(tauri::generate_handler![close_loadingscreen, check_network])
         // 让 app 保持在后台运行：https://tauri.app/v1/guides/features/system-tray/#preventing-the-app-from-closing
         // .on_window_event(|event| match event.event() {
         //     WindowEvent::CloseRequested { api, .. } => {

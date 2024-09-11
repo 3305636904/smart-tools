@@ -1,5 +1,16 @@
 import { useStore } from '../../store'
 
+import { setToken, removeToken, getToken } from '../../utils/auth'
+
+import { axiosServie,   VITE_APP_API_URL
+} from '../../hooks/useRequest'
+const { service } = axiosServie()
+
+export {
+  VITE_APP_API_URL,
+  service
+}
+
 export function useTodoAddForm() {
   const store = useStore()
   const addTodInfo = reactive({
@@ -21,16 +32,17 @@ export function useTodoAddForm() {
         trigger: 'blur'
       }
     }),
-    formItems: ref([
-      { type: `textarea`, label: `待办事项`, path: `content`, autosize: { minRows: 1 } },
-      { type: `radioGroup`, label: `重要程度`, path: `level`, options: store.levelOptions },
-      { type: `select`, label: `事项分类`, path: `type`, options: store.typeOptions, multiple: true },
-      { type: `custom`, label: `相关附件`, path: `attachMents` },
-      { label: `备注`, path: `memo`, type: 'textarea', autosize: { minRows: 3 } },
+    formItems: ref<any[]>([
+      { span: 9, type: `textarea`, label: `待办事项`, path: `content`, autosize: { minRows: 1 } },
+      { span: 9, type: `radioGroup`, label: `重要程度`, path: `level`, options: store.levelOptions },
+      { span: 9, type: `select`, label: `事项分类`, path: `type`, options: store.typeOptions, multiple: true },
+      // { span: 9, type: `custom`, label: `相关附件`, path: `attachMents` },
+      { span: 9, label: `备注`, path: `memo`, type: 'textarea', autosize: { minRows: 3 } },
     ])
   })
 
   return {
+    getToken,
     todoInfo: addTodInfo.todoInfo,
     rules: addTodInfo.rules,
     formItems: addTodInfo.formItems,
@@ -64,20 +76,21 @@ export function useTodoEditForm() {
         trigger: 'blur'
       }
     }),
-    formItems: ref([
-      { label: `待办事项`, path: `content`, type: 'textarea', autosize: { minRows: 1 } },
-      { label: `重要程度`, path: `level`, type: 'radioGroup', options: store.levelOptions },
-      { label: `事项分类`, path: `type`, type: 'select', multiple: true, options: store.typeOptions },
-      { label: `创建时间`, path: `createdAt`, type: 'custom' },
-      { label: `上次修改时间`, path: `updatedAt`, type: 'custom' },
-      { label: `是否完成`, path: `isCompleted`, type: 'switch' },
-      { label: `相关附件`, path: `attachMents`, type: 'custom' },
-      { label: `备注`, path: `memo`, type: 'textarea', autosize: { minRows: 3 } },
-      { label: `已花费时间`, path: `spendDuration`, type: 'custom' },
+    formItems: ref<any[]>([
+      { span: 9, label: `待办事项`, path: `content`, type: 'textarea', autosize: { minRows: 1 } },
+      { span: 9, label: `重要程度`, path: `level`, type: 'radioGroup', options: store.levelOptions },
+      { span: 9, label: `事项分类`, path: `type`, type: 'select', multiple: true, options: store.typeOptions },
+      { span: 4, label: `创建时间`, path: `createdAt`, type: 'custom' },
+      { span: 4, label: `上次修改时间`, path: `updatedAt`, type: 'custom' },
+      { span: 9, label: `是否完成`, path: `isCompleted`, type: 'switch' },
+      // { span: 9, label: `相关附件`, path: `attachMents`, type: 'custom' },
+      { span: 9, label: `备注`, path: `memo`, type: 'textarea', autosize: { minRows: 3 } },
+      { span: 9, label: `已花费时间`, path: `spendDuration`, type: 'custom' },
     ])
   })
 
   return {
+    getToken,
     todoInfo: addTodInfo.todoInfo,
     rules: addTodInfo.rules,
     formItems: addTodInfo.formItems,

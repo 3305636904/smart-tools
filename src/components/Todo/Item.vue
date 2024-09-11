@@ -99,28 +99,23 @@
       :formItems="formItems"
     >
       <template #createdAt>
-        <n-p>{{ formatTime(todoInfo.createdAt)  }}</n-p>
+        <n-p class="font-bold">{{ formatTime(todoInfo.createdAt)  }}</n-p>
       </template>
       <template #updatedAt>
-        <n-p>{{ formatTime(todoInfo.updatedAt)  }}</n-p>
+        <n-p class="font-bold color-green-400">{{ formatTime(todoInfo.updatedAt)  }}</n-p>
       </template>
       <template #spendDuration>
         <n-p class="color-red">{{ spendDuration }}</n-p>
       </template>
       <template #attachMents>
         <n-upload
-          :file-list="todoInfo.attachMents"
-          :show-trigger="false"
+          :custom-request="customRequest"
+          :default-file-list="todoInfo.attachMents"
+          show-trigger
           list-type="image-card"
           @preview="handlePreview"
           :on-remove="handleRemove"
         />
-        <n-button
-          type="primary" size="small"
-          :disabled="isUploading"
-          @click="overHandleClick"
-          >上传</n-button
-        >
       </template>
     </search-form>
     <template #footer>
@@ -143,7 +138,7 @@
   let isEdit = ref(false)
   const inputRef = ref<InputInst | null>()
   import { formatTimeDifference } from '../../hooks/useTime'
-  import { FormInst, InputInst } from 'naive-ui'
+  import { UploadCustomRequestOptions, FormInst, InputInst } from 'naive-ui'
   import type { UploadFileInfo } from 'naive-ui'
   import dayjs from 'dayjs'
 
@@ -156,10 +151,14 @@
 
   const emits = defineEmits(['changeCheckOptions'])
 
+  import { postPromise, VITE_APP_API_URL } from '../../hooks/useRequest'
+  const fileUploadUrl = `/bizTask/upload`
+  const uploadedFileList = ref<any[]>([])
+
   const isUploading = ref(false)
 
-  import { useTodoEditForm } from './useTodo'
-  const { todoInfo, rules, formItems } = useTodoEditForm()
+  import { useTodoEditForm, service } from './useTodo'
+  const { todoInfo, rules, formItems, getToken } = useTodoEditForm()
 
   const formRef = ref<FormInst>()
 
@@ -173,7 +172,6 @@
   }
 
   function formatTime(val: any) {
-    console.log('--format: ', val)
     if (!val) return ''
     return dayjs(val).format('YYYY-MM-DD HH:mm:ss')
   }
@@ -194,6 +192,15 @@
     emits('changeCheckOptions', checkedTodoData)
   }
 
+  watchEffect(() => {
+    if (store.loginBizUser) {
+      formItems.splice(6, 0, { span: 9, label: `相关附件`, path: `attachMents`, type: 'custom' })
+    } else {
+      const index = formItems.findIndex(v => v.path === 'attachMents')
+      formItems.splice(index, 1)
+    }
+  })
+
   const spendDuration = computed(() => {
     const {days, hours, minutes, seconds} = formatTimeDifference((props.item.isCompleted ? new Date(props.item.updatedAt as number).getTime() : new Date().getTime()) - new Date(props.item.createdAt as number).getTime())
     const day = days ? days + '天' : ''
@@ -205,7 +212,7 @@
   
 
   function editItem() {
-    // console.log('item: ', props.item)
+    console.log('edit item: ', props.item)
     todoInfo.isShow = true
     todoInfo.content = props.item.content
     todoInfo.level = props.item.level
@@ -224,12 +231,30 @@
     todoInfo.updatedAt = props.item.updatedAt
     todoInfo.memo = props.item.memo
     todoInfo.isRomote = props.item.isRomote
-    if (todoInfo.isRomote && props.item.attachMents
+    uploadedFileList.value = []
+    if (props.item.attachMents
       && Array.isArray(props.item.attachMents) && props.item.attachMents.length > 0
     ) {
-      todoInfo.attachMents = props.item.attachMents.map((v, i) => ({
-        status: 'finished', id: `${i}`, name: i, url: `${v}`
-      }))
+      todoInfo.attachMents = props.item.attachMents.map((v, i) => {
+        const isReshowIndex = `${v}`.indexOf(VITE_APP_API_URL) as number
+        let path = `${VITE_APP_API_URL}/${v}`
+        if (isReshowIndex != -1) {
+          uploadedFileList.value.push(v)
+          path = `${v}`
+        }
+
+        return {
+          status: 'finished', id: `${i}`, name: v, url: path, sourcePath: path
+        }
+      })
+      uploadedFileList.value = todoInfo.attachMents.map(v => {
+        const isReshowIndex = v.url?.indexOf(VITE_APP_API_URL) as number
+        if (isReshowIndex != -1) {
+          v.url = v.url?.substring(isReshowIndex, v.url.length)
+        }
+        return v
+      })
+      console.log('todoInfo.attachMents: ', todoInfo.attachMents)
     }
   }
 
@@ -257,6 +282,9 @@
         }
         if (todoInfo.isRomote) {
           todoInfo.isEdited = true
+        }
+        if (uploadedFileList.value && uploadedFileList.value.length > 0) {
+          todoInfo.attachMents = uploadedFileList.value.map(v => v.url)
         }
         store.todoData[editDataIndex] = { ...store.todoData[editDataIndex], ...todoInfo }
       }
@@ -347,6 +375,25 @@
     }
   }
 
+  const customRequest = (options: UploadCustomRequestOptions) => {
+    if (options.file.file) {
+      const file = (options.file.file as File)
+      const formData = new FormData()
+      formData.append('file', file, options.file.name)
+      const fileUploadUrlFn = (): Promise<resType> => {
+        return service({ url: fileUploadUrl, method: 'post', data: formData})
+      }
+      fileUploadUrlFn().then(res => {
+        if (res.code === 0) {
+          const retFileInfo = res.data.file
+          if (retFileInfo) {
+            uploadedFileList.value.push(retFileInfo)
+          }
+        }
+      })
+    }
+  }
+
   const handlePreview = (file: UploadFileInfo) => {
     console.log('file: ', file, 'os: ', os)
     if (os === 'Windows_NT') {
@@ -371,11 +418,8 @@
         negativeText: '取消',
         onPositiveClick: () => {
           const file = options.file as UploadFileInfo
-          const fileList = options.fileList as Array<UploadFileInfo>
-          const targetIndex = todoInfo.attachMents.findIndex(v => v.id = file.id)
-          todoInfo.attachMents.splice(targetIndex, 1)
-          options.fileList = todoInfo.attachMents
-          console.log(2, todoInfo.attachMents)
+          
+          uploadedFileList.value.splice(options.index, 1)
           return true
         }
       })

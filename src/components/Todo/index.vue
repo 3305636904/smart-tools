@@ -92,19 +92,13 @@
       >
         <template #attachMents>
           <n-upload
-            :custom-request="customRequest"
-            :file-list="todoInfo.attachMents"
-            :show-trigger="false"
+            action="#"
+            :custom-request="customRequest" show-trigger
+            :default-file-list="todoInfo.attachMents"
+            @preview="handlePreview" :on-remove="handleRemove"
             list-type="image-card"
-            @preview="handlePreview"
-            :on-remove="handleRemove"
-          />
-          <n-button
-            type="primary" size="small"
-            :disabled="isUploading"
-            @click="overHandleClick"
-            >上传</n-button
           >
+          </n-upload>
         </template>
       </search-form>
 
@@ -132,7 +126,7 @@
 
   import dayjs from 'dayjs'
   import TodoItem from './Item.vue'
-  import { FormInst, UploadCustomRequestOptions, useDialog } from 'naive-ui'
+  import { formDark, FormInst, UploadCustomRequestOptions, useDialog } from 'naive-ui'
   import type { UploadFileInfo } from 'naive-ui'
   import { useStore } from '../../store'
   import { formatTimeNormal, formatTimeDifference } from '../../hooks/useTime'
@@ -140,8 +134,13 @@
   import { Command } from '@tauri-apps/api/shell'
   import { os } from '../../common/global'
 
-  import { useTodoAddForm } from './useTodo'
-  const { todoInfo, rules, formItems } = useTodoAddForm()
+  import Cookies from 'js-cookie'
+
+  import { useTodoAddForm, service } from './useTodo'
+  const { todoInfo, rules, formItems, getToken } = useTodoAddForm()
+
+  import { postPromise, generateFileInfo, Body, fetch } from '../../hooks/useRequest'
+  const fileUploadUrl = `/bizTask/upload`
 
   const store = useStore()
   const formRef = ref<FormInst>()
@@ -153,6 +152,15 @@
   function getTimeStamp(date: string) {
     return new Date(date).getTime()
   }
+
+  watchEffect(() => {
+    if (store.loginBizUser) {
+      formItems.splice(3, 0, { span: 9, label: `相关附件`, path: `attachMents`, type: 'custom' })
+    } else {
+      const index = formItems.findIndex(v => v.path === 'attachMents')
+      formItems.splice(index, 1)
+    }
+  })
 
   const isUploading = ref(false)
 
@@ -204,6 +212,8 @@
 
   const hiddenCondition = ref<Boolean>(true)
   const isBatch = ref<Boolean>(false)
+
+  const uploadedFileList = ref<any[]>([])
 
   watch(checkedTodos, (vals, oldVals) => {
     if (vals) {
@@ -274,7 +284,18 @@
     e.preventDefault()
     formRef.value?.validate(err => {
       if (err) return
-      store.todoData.push({
+      
+      let attachMents: attachMentsType[] = []
+      if (uploadedFileList.value && uploadedFileList.value.length > 0) {
+        console.log('uploadedFileList.value: ', )
+        uploadedFileList.value.forEach((v: any, i) => {
+          let name = ``
+          const fileInfo = v.file
+          // if (fileInfo.name) name = fileInfo.name
+          attachMents.push({ id: `${i}`, name, status: 'finished', url: fileInfo.url })
+        })
+      }
+      let curTodoInfo = {
         content: todoInfo.content,
         level: todoInfo.level,
         type: todoInfo.type,
@@ -282,10 +303,11 @@
         isCompleted: false, // 初始状态为 false，即未完成
         createdAt: new Date(), // 创建时间
         updatedAt: new Date(), // 更新时间
-        attachMents: todoInfo.attachMents, // 附件信息
+        attachMents, // 附件信息
         memo: todoInfo.memo, // 备注
         isRomote: false
-      })
+      }
+      store.todoData.push(curTodoInfo)
       todoInfo.isShow = false
       todoInfo.content = ''
     })
@@ -301,6 +323,8 @@
     todoInfo.updatedAt = new Date()
     todoInfo.attachMents = []
     todoInfo.memo = ''
+
+    uploadedFileList.value = []
   }
 
   const handleDeleteTodo = () => {
@@ -330,9 +354,32 @@
     })
   }
 
-  const customRequest = (options: UploadCustomRequestOptions) => {
-    const file = options.file.file
-    const fileType = options.file.name.split('.')[1]
+  const customRequest = async ({
+    file,
+    data,
+    headers,
+    withCredentials,
+    action,
+    onFinish,
+    onError,
+    onProgress
+  }: UploadCustomRequestOptions) => {
+    let nRef
+    if (file && file.file && file.type) {
+      let formData = new FormData()
+      formData.append('file', file.file, file.name)
+      const fileUploadUrlFn = (): Promise<resType> => {
+        return service({ url: fileUploadUrl, method: 'post', data: formData})
+      }
+      fileUploadUrlFn().then(res => {
+        if (res.code !== 0) {
+          window.$message.error(res.msg)
+          return
+        }
+        const retFileInfo = res.data
+        uploadedFileList.value.push(retFileInfo)
+      })
+    }
   }
 
   const handlePreview = (file: UploadFileInfo) => {

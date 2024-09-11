@@ -32,15 +32,15 @@
       </n-radio-group>
       <SearchForm v-else-if="activeTab === 'todoSetting'" ref="formRef" :model="model" :formItems="formItems" :rules="rules" />
       <div v-else-if="activeTab === 'saveDate'" class="w-full">
-        <n-button type="primary" v-if="store.loginBizUser" size="small" :disabled="loading" @click="saveToServer">确定同步</n-button>
-        <n-button class="ml-3" type="warning" v-if="store.loginBizUser" size="small" :disabled="loading" @click="logout">退出用户</n-button>
+        <n-button type="primary" v-if="store.loginBizUser" size="small" :loading="loading" @click="saveToServer">确定同步</n-button>
+        <n-button class="ml-3" type="warning" v-if="store.loginBizUser" size="small" :loading="loading" @click="logout">退出用户</n-button>
         <div class="w-60%" v-else>
           <n-tabs type="segment" v-model:value="activeSync" @update:value="handleUpdateActiveSync" animated>
             <n-tab-pane name="login" tab="登录">
               <search-form class="text-left" :formItems="userFormItems" :model="userForm" :rules="userRules" >
                   <template #operation>
                     <div class="v-base text-right">
-                      <n-button type="primary" size="small" :disabled="loading" @click="userLogin()">登录</n-button>
+                      <n-button type="primary" size="small" :loading="loading" @click="userLogin()">登录</n-button>
                     </div>
                   </template>
               </search-form>
@@ -49,13 +49,12 @@
               <search-form class="text-left" :formItems="userFormItems" :model="userForm" :rules="userRules" >
                   <template #operation>
                     <div class="v-base text-right">
-                      <n-button type="primary" size="small" :disabled="loading" @click="createNewUser()">创建新用户</n-button>
+                      <n-button type="primary" size="small" :loading="loading" @click="createNewUser()">创建新用户</n-button>
                     </div>
                   </template>
               </search-form>
             </n-tab-pane >
           </n-tabs>
-          
         </div>
       </div>
     </n-card>
@@ -76,6 +75,7 @@
 
 <script setup lang="ts" name="settings">
 // import { fetch, Body } from '@tauri-apps/api/http';
+import { getToken } from '../../utils/auth'
 
 import { useStore } from '../../store'
 import { useSettings } from './useSettings'
@@ -91,10 +91,13 @@ const {
   selectedTheme, themeOptions, modalTitle,
   model, formItems, rules, loading,
   userFormItems, userForm, userRules,
-  handleSettingConfirm, changeThemeAuto, handleUpdateActiveSync,
+  handleSettingConfirm, changeThemeAuto, handleUpdateActiveSync, logout,
   postPromise, userLogin, createNewUser, getSysBizTaskListFn
 } = useSettings()
 
+const isLogin = computed(() => {
+  return getToken()
+})
 
 const showSetting = () => {
   model.isShow = !model.isShow
@@ -176,10 +179,7 @@ const saveToServer = () => {
   
 }
 
-const logout = () => {
-  store.loginBizUser = ''
-  localStorage.removeItem('biz-user')
-}
+
 
 defineExpose({ showSetting })
 </script>

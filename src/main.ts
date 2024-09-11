@@ -7,11 +7,12 @@ import './style.css'
 import 'uno.css'
 
 import { invoke } from "@tauri-apps/api";
+invoke("close_loadingscreen")
 
 const app = createApp(App)
 app.use(store)
 app.use(router)
 app.mount('#app')
-invoke("close_loadingscreen")
+
 
 setOS()

@@ -1,5 +1,6 @@
 import { useStore } from '../../store'
 import { postPromise } from '../../hooks/useRequest'
+import { setToken, removeToken, getToken } from '../../utils/auth'
 
 // import { useDialog } from 'naive-ui'
 
@@ -118,11 +119,11 @@ export const useSettings = () => {
       }))
       cb(result)
       loading.value = false
-    }).catch((err: resType[]) => {
+    }).catch((err: any) => {
       console.error(err)
       window.$notification.error({
         title: '同步数据失败',
-        content: err.map(v => v.msg).join('\n'),
+        content: err,
         duration: 3000,
       })
       loading.value = false
@@ -131,14 +132,18 @@ export const useSettings = () => {
 
   let nRef
   const userLogin = () => {
+    if (!userForm.value.uid) {
+      window.$message.warning('请输入用户标识')
+      return
+    }
     loading.value = true
     postPromise(getBizUser, {userId: userForm.value.uid, nickName: userForm.value.nickName}).then(res => {
       if (res.code === 0) {
         window.$message.success(`登录成功。：${res.msg}`)
         loading.value = false
-        store.loginBizUser = userForm.value.uid
         localStorage.setItem('biz-user', JSON.stringify(store.loginBizUser))
-        userForm.value = { uid: '', nickName: '' }
+        setToken(userForm.value.uid)
+        store.loginBizUser = userForm.value.uid
         const t = setTimeout(() => {
           getSysBizTaskListFn((res) => {
             if (res.code === 0) {
@@ -163,8 +168,11 @@ export const useSettings = () => {
   }
 
   const createNewUser = () => {
+    if (!userForm.value.uid) {
+      window.$message.warning('请输入用户标识')
+      return
+    }
     loading.value = true
-    console.log('userForm.value: ', userForm.value)
     postPromise(createBizUser,  {userId: userForm.value.uid, nickName: userForm.value.nickName})
     .then(res => {
       if (res.code === 0) {
@@ -183,6 +191,12 @@ export const useSettings = () => {
       })
       loading.value = false
     })
+  }
+
+  const logout = () => {
+    store.loginBizUser = ''
+    removeToken()
+    localStorage.removeItem('biz-user')
   }
 
   const handleUpdateActiveSync = (val: string) => {
@@ -209,7 +223,7 @@ export const useSettings = () => {
     isDaytime,
     changeThemeAuto,
     handleUpdateActiveSync,
-    userLogin, createNewUser,
+    userLogin, createNewUser, logout,
     getSysBizTaskListFn
   }
 }
