@@ -107,7 +107,7 @@
     "updater": {
       "active": true,
       "endpoints": [
-        "http://111.229.144.150/web/download/update.json"
+        "https://gitee.com/brokenheart/smart-tools/raw/dev/update.json"
       ],
       "dialog": true,
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDYzNzlCMzY0QjQ1RDFDQjAKUldTd0hGMjBaTE41WThMS1JrVGhjRDZnQ3hmUExFNEwrR1pML21NUGYxa25zTURCZngwUGdnNHEK"
