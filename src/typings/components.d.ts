@@ -91,5 +91,6 @@ declare module '@vue/runtime-core' {
     SearchModal: typeof import('./../components/SearchModal.vue')['default']
     Settings: typeof import('./../components/Settings/index.vue')['default']
     Todo: typeof import('./../components/Todo/index.vue')['default']
+    Update: typeof import('./../components/Update/index.vue')['default']
   }
 }

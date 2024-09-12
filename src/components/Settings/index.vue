@@ -108,7 +108,9 @@ const showSetting = () => {
 }
 
 const saveToServer = () => {
-
+  /**
+   * 1、只同步已完成的数据，没有id的时候会重新生成id
+   */
   const completedData: paramsTodoType[] = store.todoData.filter(v => v.isCompleted)
   .map((todo, i) => {
     let returnTodo: any = todo
@@ -127,9 +129,13 @@ const saveToServer = () => {
     delete returnTodo.UpdatedAt
     return returnTodo
   })
+  /**
+   * 2、根据isRomote标识区分数据是否已经在服务器，isEdited标识是否修改过
+   */
   let toSaveData: paramsTodoType[] = completedData.filter(v => !v.isRomote)
   let toUpdateData: paramsTodoType[] = completedData.filter(v => v.isRomote && v.isEdited).map(returnTodo => {
     if (returnTodo.updatedAt) {
+      // 兼容时间格式 需要是 ISO 8601 格式
       returnTodo.updatedAt = dayjs(returnTodo.updatedAt).format('YYYY-MM-DDTHH:mm:ssZ')
     }
     return returnTodo

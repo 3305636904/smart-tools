@@ -1,11 +1,12 @@
 {
   "name": "smart-tool",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
+    "publish": "pnpm tauri build && node ./publish.js",
     "preview": "vite preview",
     "tauri": "tauri"
   },

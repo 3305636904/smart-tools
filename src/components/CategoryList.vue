@@ -142,7 +142,7 @@
     <cate-modal />
     <item-modal />
     <float-btn />
-
+    <update />
   </n-layout>
 </template>
 
@@ -155,6 +155,8 @@ import CateModal from './CateModal.vue'
 import ItemModal from './ItemModal.vue'
 import FloatBtn from './FloatBtn.vue'
 import TodoList from './Todo/index.vue'
+
+import Update from './Update/index.vue'
 import type { CollapseProps } from 'naive-ui'
 
 import { writeTextFile, readTextFile } from '@tauri-apps/api/fs'
