@@ -78,7 +78,7 @@
 import { getToken } from '../../utils/auth'
 
 import { useStore } from '../../store'
-import { useSettings } from './useSettings'
+import { useSettings, service } from './useSettings'
 
 import dayjs from 'dayjs';
 
@@ -92,7 +92,7 @@ const {
   model, formItems, rules, loading,
   userFormItems, userForm, userRules,
   handleSettingConfirm, changeThemeAuto, handleUpdateActiveSync, logout,
-  postPromise, userLogin, createNewUser, getSysBizTaskListFn
+  fetchPostPromise, userLogin, createNewUser, getSysBizTaskListFn
 } = useSettings()
 
 const isLogin = computed(() => {
@@ -107,11 +107,11 @@ const showSetting = () => {
   }
 }
 
-const saveToServer = () => {
+const enSureSave2Server = () => {
   /**
    * 1、只同步已完成的数据，没有id的时候会重新生成id
    */
-  const completedData: paramsTodoType[] = store.todoData.filter(v => v.isCompleted)
+   const completedData: paramsTodoType[] = store.todoData.filter(v => v.isCompleted)
   .map((todo, i) => {
     let returnTodo: any = todo
     if (!todo.id) {
@@ -154,13 +154,16 @@ const saveToServer = () => {
     return
   }
   if (toSaveData.length > 0) {
-    promiseList.push(postPromise(saveUrl, { requestBizTaskList: toSaveData}, { 'biz-user': store.loginBizUser || '' }))
+    // promiseList.push(fetchPostPromise(saveUrl, { requestBizTaskList: toSaveData}, { 'biz-user': store.loginBizUser || '' }))
+    promiseList.push(service({ url: saveUrl, method: 'POST', data: {requestBizTaskList: toSaveData} }) as Promise<resType>)
   }
   if (toUpdateData.length > 0) {
-    promiseList.push(postPromise(updateUrl, {requestBizTaskList: toUpdateData}, { 'biz-user': store.loginBizUser || '' }))
+    // promiseList.push(fetchPostPromise(updateUrl, {requestBizTaskList: toUpdateData}, { 'biz-user': store.loginBizUser || '' }))
+    promiseList.push(service({ url: updateUrl, method: 'POST', data: {requestBizTaskList: toUpdateData} }) as Promise<resType>)
   }
   if (toDelDataIds.length > 0) {
-    promiseList.push(postPromise(deleteUrl, { ids: toDelDataIds }, { 'biz-user': store.loginBizUser || '' }))
+    // promiseList.push(fetchPostPromise(deleteUrl, { ids: toDelDataIds }, { 'biz-user': store.loginBizUser || '' }))
+    promiseList.push(service({ url: updateUrl, method: 'POST', data: {ids: toDelDataIds} }) as Promise<resType>)
   }
   let nRef
   Promise.all(promiseList).then(resArr => {
@@ -181,6 +184,20 @@ const saveToServer = () => {
       content: errorMsg,
       onClose: () => nRef = null
     })
+  })
+}
+
+const saveToServer = () => {
+  window.$dialog.warning({
+    title: `温馨提示`,
+    content: `为防止因为网络等原因导致数据丢失，请先备份数据，再进行同步操作。`,
+    positiveText: '去备份',
+    negativeText: '直接同步',
+    onPositiveClick: () => {
+    },
+    onNegativeClick: () => {
+      enSureSave2Server()
+    }
   })
   
 }

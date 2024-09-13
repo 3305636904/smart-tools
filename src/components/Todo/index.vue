@@ -139,7 +139,7 @@
   import { useTodoAddForm, service } from './useTodo'
   const { todoInfo, rules, formItems, getToken } = useTodoAddForm()
 
-  import { postPromise, generateFileInfo, Body, fetch } from '../../hooks/useRequest'
+  import { fetchPostPromise, generateFileInfo, Body, fetch } from '../../hooks/useRequest'
   const fileUploadUrl = `/bizTask/upload`
 
   const store = useStore()
@@ -369,7 +369,7 @@
       let formData = new FormData()
       formData.append('file', file.file, file.name)
       const fileUploadUrlFn = (): Promise<resType> => {
-        return service({ url: fileUploadUrl, method: 'post', data: formData})
+        return service({ url: fileUploadUrl, method: 'post', data: formData })
       }
       fileUploadUrlFn().then(res => {
         if (res.code !== 0) {
@@ -436,11 +436,31 @@
     }
   }
 
+  function expotExcelCallback(cb = (params: Record<string, any>) => {}) {
+    let params: Record<string, any> = {
+      content: searchTodoKey.value,
+      type: searchTodoTypes.value,
+      updateStartTime: '',
+      updateEndTime: ''
+    }
+    if (endDateRange.value && Array.isArray(endDateRange.value) && endDateRange.value.length > 0) {
+       // 兼容时间格式 需要是 ISO 8601 格式
+      params.updateStartTime = dayjs(endDateRange.value[0]).format('YYYY-MM-DDTHH:mm:ssZ')
+      params.updateEndTime = dayjs(endDateRange.value[1]).format('YYYY-MM-DDTHH:mm:ssZ')
+    } else {
+      delete params.updateStartTime
+      delete params.updateEndTime
+    }
+    cb(params)
+  }
+
   const emits = defineEmits(['update:checkedOptions'])
 
   defineExpose({
     handleShowModal,
-    handleDeleteTodo
+    handleDeleteTodo,
+
+    expotExcelCallback
   })
 
 </script>

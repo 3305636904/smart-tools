@@ -77,5 +77,14 @@ declare global {
   }
 
   interface resType {code: number, data: any|{list: any}, msg: string}
+
+  // 定义响应类型接口
+  interface resBlobType {
+    data: Blob;
+    status: number;
+    statusText: string;
+    headers: any;
+    config: any;
+  }
   
 }

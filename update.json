@@ -1,11 +1,11 @@
 {
-  "version": "0.0.1",
+  "version": "0.0.2",
   "notes": "smart-tool",
-  "pub_date": "2024-09-13T00:17:38+08:00",
+  "pub_date": "2024-09-14T00:05:10+08:00",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVTd0hGMjBaTE41WSsrbnFCNllWdWFMdmg0MngyK0RGM2M2ZWNGS3dDQmpMT1c0RDduZjdidkFOWTh4azhuUEtPdGhsenc0NlNaSmVvMkV6Q3ptb2ZhdUI2QjhIbXJ3a0FnPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzI2MTU3ODU4CWZpbGU6c21hcnQtdG9vbF8wLjAuMV94NjRfemgtQ04ubXNpLnppcAp0WmVtMWRHNHZHSXRnRUV3VTFWTnJPYTRVK0FFR0UzOWF2blFxNW5nMGxGWUFlZVlQS1lzTlF1UEEvRUJuYS9SRTQ1Y3VNTUJvdlNlRlF1N0YwcEZDUT09Cg==",
-      "url": "http://111.229.144.150/web/download/smart-tool_0.0.1_x64_zh-CN.msi.zip"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVTd0hGMjBaTE41WTBpWHpjVUFrNlFZOFZIR016clA5cDVUcTgydW8yZUhtTnVZOVBQNmN5dk1hZjdpUGFSR1BiNE9UOXE3WGh4UlJsL2dsQk1qNjNUc2NlZnIwMHJUTWd3PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzI2MjQzNTEwCWZpbGU6c21hcnQtdG9vbF8wLjAuMl94NjRfemgtQ04ubXNpLnppcApGYzJiejJrVlYzWVhwV3U5bG5yZWsxWENXVEx1VzIzUmdOM1pyRFNEekt2YzQwTTMzbmo3VDBaT2Z2bEtGOXVodVdkYi9SYlNWbGJtbDBvSXIyUFBDUT09Cg==",
+      "url": "http://111.229.144.150/web/download/smart-tool_0.0.2_x64_zh-CN.msi.zip"
     }
   }
 }

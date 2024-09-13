@@ -151,7 +151,7 @@
 
   const emits = defineEmits(['changeCheckOptions'])
 
-  import { postPromise, VITE_APP_API_URL } from '../../hooks/useRequest'
+  import { fetchPostPromise, VITE_APP_API_URL } from '../../hooks/useRequest'
   const fileUploadUrl = `/bizTask/upload`
   const uploadedFileList = ref<any[]>([])
 

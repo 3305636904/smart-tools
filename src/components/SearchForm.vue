@@ -90,9 +90,6 @@ const props = withDefaults(defineProps<Props>(), {
   ['require-mark-placement']: "right-hanging",
 })
 
-console.log('props searchForm: ', props)
-
-
 const gridCollapsedRows = computed(() => {
   return Math.ceil(props.formItems.length / 4)
 })

@@ -19,6 +19,7 @@ declare module '@vue/runtime-core' {
     IClarityExportLine: typeof import('~icons/clarity/export-line')['default']
     IGgMenuGridR: typeof import('~icons/gg/menu-grid-r')['default']
     IGridiconsAddOutline: typeof import('~icons/gridicons/add-outline')['default']
+    IIconParkOutlineExcel: typeof import('~icons/icon-park-outline/excel')['default']
     ILineMdMoon: typeof import('~icons/line-md/moon')['default']
     ILineMdSunnyOutlineLoop: typeof import('~icons/line-md/sunny-outline-loop')['default']
     IMaterialSymbolsBottomPanelCloseOutlineSharp: typeof import('~icons/material-symbols/bottom-panel-close-outline-sharp')['default']

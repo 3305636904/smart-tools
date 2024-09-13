@@ -2,12 +2,10 @@ import { useStore } from '../../store'
 
 import { setToken, removeToken, getToken } from '../../utils/auth'
 
-import { axiosServie,   VITE_APP_API_URL
-} from '../../hooks/useRequest'
+import { axiosServie} from '../../hooks/useRequest'
 const { service } = axiosServie()
 
 export {
-  VITE_APP_API_URL,
   service
 }
 

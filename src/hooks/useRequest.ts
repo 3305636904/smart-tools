@@ -10,10 +10,12 @@ import { getToken } from '../utils/auth'
 
 import { tansParams } from '../utils/index'
 
-const { VITE_APP_API_URL } = import.meta.env
+const { VITE_APP_API_URL, VITE_APP_BASE_API } = import.meta.env
 
 export {
-  VITE_APP_API_URL
+  getToken,
+  VITE_APP_API_URL,
+  VITE_APP_BASE_API
 }
 
 export {
@@ -29,7 +31,7 @@ export const generateFileInfo = (arrayBuffer: ArrayBuffer, mime: string, fileNam
   };
 };
 
-export const postPromise = (url: string, data: any, headers: any = {}): Promise<resType> => {
+export const fetchPostPromise = (url: string, data: any, headers: any = {}): Promise<resType> => {
   return new Promise((resolve, reject) => {
     let t:any
     let body: any = Body.json(data)
