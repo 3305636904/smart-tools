@@ -219,7 +219,6 @@ const handleItemHeaderClick: CollapseProps['onItemHeaderClick'] = ({ name, expan
 }
 
 watchEffect(() => {
-  console.log('store.showCateToolList.length: ', store.showCateToolList.length, ' store.activeVal: ', store.activeVal)
   if (store.showCateToolList.length > 0) {
     expandedNames.value = store.activeVal
   }

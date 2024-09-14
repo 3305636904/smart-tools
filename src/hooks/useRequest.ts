@@ -72,6 +72,7 @@ export const fetchPostPromise = (url: string, data: any, headers: any = {}): Pro
   })
 }
 
+// const { MODE } = import.meta.env
 export const axiosServie = () => {
   // Axios.defaults.headers['Content-Type'] = 'application/json;charset=utf-8'
   // 创建axios实例

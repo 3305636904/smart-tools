@@ -89,8 +89,6 @@ export const useSettings = () => {
   function isDaytime() {
     const now = new Date();
     const hour = now.getHours();
-
-    console.log('hour: ', hour)
   
     // 假设白天是6:00到18:00（小时制的6到18）
     return hour >= 6 && hour < 18;
