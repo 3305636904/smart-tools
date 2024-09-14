@@ -171,12 +171,12 @@ import { writeTextFile, readTextFile } from '@tauri-apps/api/fs'
 import { open, save } from '@tauri-apps/api/dialog'
 
 import { formatTimeTodayLast } from '../hooks/useTime'
-import { axiosServie, getToken } from '../hooks/useRequest'
-const { service } = axiosServie()
+import { getToken } from '../hooks/useRequest'
+// const { service } = axiosServie()
 
 const { VITE_APP_BASE_API } = import.meta.env
 
-import axios from 'axios';
+// import axios from 'axios';
 
 const { hour, minute, second } = formatTimeTodayLast()
 
@@ -363,41 +363,45 @@ const handleImport = async () => {
 
 const handleExportExcel = () => {
   const exportExcelUrl = `/bizTask/exportBizTaskExcel`
-  
-  todoRef.value?.expotExcelCallback((params: Record<string, any>) => {
-    // 发起 POST 请求，期望返回 Blob 类型
-    const getBlobData = async (): Promise<resBlobType> => {
-      try {
-        const response = await axios.post<Blob>(`${VITE_APP_BASE_API}${exportExcelUrl}`, params, {
-          headers: { 'biz-user': getToken() },
-          responseType: 'blob', // 设置响应类型为 blob
-        });
-        return {
-          data: response.data,
-          status: response.status,
-          statusText: response.statusText,
-          headers: response.headers,
-          config: response.config,
-        };
-      } catch (error) {
-        // 错误处理
-        console.error(error);
-        throw error;
-      }
-    } 
-    getBlobData().then(result => {
-      // const result = (res as any) as Blob
-      console.log(result)
-      console.log(result.data instanceof Blob)
-      let blob = new Blob([result.data])
-      let link = window.URL.createObjectURL(blob)
-      let a = document.createElement('a')
-      a.download = '待办报表.xlsx'
-      a.href = link
-      a.click()
-      
-    })
+
+  window.$notification.info({
+    title: '开发调整中'
   })
+  // TODO: 附件下载
+  // todoRef.value?.expotExcelCallback((params: Record<string, any>) => {
+    // 发起 POST 请求，期望返回 Blob 类型
+    // const getBlobData = async (): Promise<resBlobType> => {
+      // try {
+      //   const response = await axios.post<Blob>(`${VITE_APP_BASE_API}${exportExcelUrl}`, params, {
+      //     headers: { 'biz-user': getToken() },
+      //     responseType: 'blob', // 设置响应类型为 blob
+      //   });
+      //   return {
+      //     data: response.data,
+      //     status: response.status,
+      //     statusText: response.statusText,
+      //     headers: response.headers,
+      //     config: response.config,
+      //   };
+      // } catch (error) {
+      //   // 错误处理
+      //   console.error(error);
+      //   throw error;
+      // }
+    // } 
+    // getBlobData().then(result => {
+    //   // const result = (res as any) as Blob
+    //   console.log(result)
+    //   console.log(result.data instanceof Blob)
+    //   let blob = new Blob([result.data])
+    //   let link = window.URL.createObjectURL(blob)
+    //   let a = document.createElement('a')
+    //   a.download = '待办报表.xlsx'
+    //   a.href = link
+    //   a.click()
+      
+    // })
+  // })
 }
 
 const handleAddCate = () => {

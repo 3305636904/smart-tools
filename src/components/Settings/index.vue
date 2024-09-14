@@ -154,16 +154,16 @@ const enSureSave2Server = () => {
     return
   }
   if (toSaveData.length > 0) {
-    // promiseList.push(fetchPostPromise(saveUrl, { requestBizTaskList: toSaveData}, { 'biz-user': store.loginBizUser || '' }))
-    promiseList.push(service({ url: saveUrl, method: 'POST', data: {requestBizTaskList: toSaveData} }) as Promise<resType>)
+    promiseList.push(fetchPostPromise(saveUrl, { requestBizTaskList: toSaveData}, { 'biz-user': store.loginBizUser || '' }))
+    // promiseList.push(service({ url: saveUrl, method: 'POST', data: {requestBizTaskList: toSaveData} }) as Promise<resType>)
   }
   if (toUpdateData.length > 0) {
-    // promiseList.push(fetchPostPromise(updateUrl, {requestBizTaskList: toUpdateData}, { 'biz-user': store.loginBizUser || '' }))
-    promiseList.push(service({ url: updateUrl, method: 'POST', data: {requestBizTaskList: toUpdateData} }) as Promise<resType>)
+    promiseList.push(fetchPostPromise(updateUrl, {requestBizTaskList: toUpdateData}, { 'biz-user': store.loginBizUser || '' }))
+    // promiseList.push(service({ url: updateUrl, method: 'POST', data: {requestBizTaskList: toUpdateData} }) as Promise<resType>)
   }
   if (toDelDataIds.length > 0) {
-    // promiseList.push(fetchPostPromise(deleteUrl, { ids: toDelDataIds }, { 'biz-user': store.loginBizUser || '' }))
-    promiseList.push(service({ url: updateUrl, method: 'POST', data: {ids: toDelDataIds} }) as Promise<resType>)
+    promiseList.push(fetchPostPromise(deleteUrl, { ids: toDelDataIds }, { 'biz-user': store.loginBizUser || '' }))
+    // promiseList.push(service({ url: updateUrl, method: 'POST', data: {ids: toDelDataIds} }) as Promise<resType>)
   }
   let nRef
   Promise.all(promiseList).then(resArr => {

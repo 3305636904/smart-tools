@@ -151,13 +151,16 @@
 
   const emits = defineEmits(['changeCheckOptions'])
 
-  import { fetchPostPromise, VITE_APP_API_URL } from '../../hooks/useRequest'
+  
+  import { fetchPostPromise } from '../../hooks/useRequest'
+  
+  const { VITE_APP_API_URL } = import.meta.env
   const fileUploadUrl = `/bizTask/upload`
   const uploadedFileList = ref<any[]>([])
 
   const isUploading = ref(false)
 
-  import { useTodoEditForm, service } from './useTodo'
+  import { useTodoEditForm } from './useTodo'
   const { todoInfo, rules, formItems, getToken } = useTodoEditForm()
 
   const formRef = ref<FormInst>()
@@ -380,17 +383,22 @@
       const file = (options.file.file as File)
       const formData = new FormData()
       formData.append('file', file, options.file.name)
-      const fileUploadUrlFn = (): Promise<resType> => {
-        return service({ url: fileUploadUrl, method: 'post', data: formData})
-      }
-      fileUploadUrlFn().then(res => {
-        if (res.code === 0) {
-          const retFileInfo = res.data.file
-          if (retFileInfo) {
-            uploadedFileList.value.push(retFileInfo)
-          }
-        }
+      window.$notification.info({
+        title: '开发调整中'
       })
+      return false
+      // TODO: 使用 fetch重写
+      // const fileUploadUrlFn = (): Promise<resType> => {
+      //   return service({ url: fileUploadUrl, method: 'post', data: formData})
+      // }
+      // fileUploadUrlFn().then(res => {
+      //   if (res.code === 0) {
+      //     const retFileInfo = res.data.file
+      //     if (retFileInfo) {
+      //       uploadedFileList.value.push(retFileInfo)
+      //     }
+      //   }
+      // })
     }
   }
 

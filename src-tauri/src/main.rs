@@ -20,8 +20,8 @@ fn greet(name: &str) -> String {
     format!("Hello, {}! You've been greeted from Rust!", name)
 }
 
-pub const AUTO_LAUNCH_ARG: &str = "--auto-launch";
-pub static SETTINGS_WINDOW_LABEL: &str = "settings";
+// pub const AUTO_LAUNCH_ARG: &str = "--auto-launch";
+// pub static SETTINGS_WINDOW_LABEL: &str = "settings";
 
 #[tauri::command]
 fn close_settings(window: tauri::Window) {
@@ -30,17 +30,17 @@ fn close_settings(window: tauri::Window) {
         settings.close().unwrap();
     }
     // 展示主视图
-    window.get_window("main").unwrap().show().unwrap();
+    let main_window = window.get_window("main").unwrap().show().unwrap();
 }
 
-#[tauri::command]
-fn show_settings(window: tauri::Window) {
-    print!("show window");
-    let setting_window = window.get_window("settings").unwrap();
-    setting_window.show().unwrap();
-    setting_window.unminimize().unwrap();
-    setting_window.set_focus().unwrap();
-}
+// #[tauri::command]
+// fn show_settings(window: tauri::Window) {
+//     print!("show window");
+//     let setting_window = window.get_window("settings").unwrap();
+//     setting_window.show().unwrap();
+//     setting_window.unminimize().unwrap();
+//     setting_window.set_focus().unwrap();
+// }
 
 #[cfg(debug_assertions)]
 fn open_devtools(app: &mut tauri::Window) {

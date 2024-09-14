@@ -121,7 +121,6 @@
 <script lang="ts" setup>
   import { open, save } from '@tauri-apps/api/dialog'
   import { writeTextFile, readTextFile } from '@tauri-apps/api/fs'
-  import { invoke } from "@tauri-apps/api";
   import { convertFileSrc } from '@tauri-apps/api/tauri'
 
   import dayjs from 'dayjs'
@@ -134,9 +133,7 @@
   import { Command } from '@tauri-apps/api/shell'
   import { os } from '../../common/global'
 
-  import Cookies from 'js-cookie'
-
-  import { useTodoAddForm, service } from './useTodo'
+  import { useTodoAddForm } from './useTodo'
   const { todoInfo, rules, formItems, getToken } = useTodoAddForm()
 
   import { fetchPostPromise, generateFileInfo, Body, fetch } from '../../hooks/useRequest'
@@ -152,15 +149,6 @@
   function getTimeStamp(date: string) {
     return new Date(date).getTime()
   }
-
-  watchEffect(() => {
-    if (store.loginBizUser) {
-      formItems.splice(3, 0, { span: 9, label: `相关附件`, path: `attachMents`, type: 'custom' })
-    } else {
-      const index = formItems.findIndex(v => v.path === 'attachMents')
-      formItems.splice(index, 1)
-    }
-  })
 
   const isUploading = ref(false)
 
@@ -314,6 +302,14 @@
   }
 
   const handleShowModal = () => {
+    if (store.loginBizUser) {
+      formItems.splice(3, 0, { span: 9, label: `相关附件`, path: `attachMents`, type: 'custom' })
+    } else {
+      const index = formItems.findIndex(v => v.path === 'attachMents')
+      if (index > -1) {
+        formItems.splice(index, 1)
+      }
+    }
     todoInfo.isShow = true
     todoInfo.content = ''
     todoInfo.level = '4'
@@ -368,17 +364,21 @@
     if (file && file.file && file.type) {
       let formData = new FormData()
       formData.append('file', file.file, file.name)
-      const fileUploadUrlFn = (): Promise<resType> => {
-        return service({ url: fileUploadUrl, method: 'post', data: formData })
-      }
-      fileUploadUrlFn().then(res => {
-        if (res.code !== 0) {
-          window.$message.error(res.msg)
-          return
-        }
-        const retFileInfo = res.data
-        uploadedFileList.value.push(retFileInfo)
+      window.$notification.info({
+        title: '开发调整中'
       })
+      return false
+      // const fileUploadUrlFn = (): Promise<resType> => {
+      //   return service({ url: fileUploadUrl, method: 'post', data: formData })
+      // }
+      // fileUploadUrlFn().then(res => {
+      //   if (res.code !== 0) {
+      //     window.$message.error(res.msg)
+      //     return
+      //   }
+      //   const retFileInfo = res.data
+      //   uploadedFileList.value.push(retFileInfo)
+      // })
     }
   }
 
