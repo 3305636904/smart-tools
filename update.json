@@ -1,10 +1,10 @@
 {
   "version": "0.0.2",
   "notes": "smart-tool",
-  "pub_date": "2024-09-14T08:47:57+08:00",
+  "pub_date": "2024-09-14T09:35:43+08:00",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVTd0hGMjBaTE41WTNMUi81NWhUa2txdXhtK2xNemEzU0RxKzB1bnh0VUdwSDdDTS9hWSt3SklsanorNVpCNVpON2VPejV2L0NOYThBWkEvelNGU2dRWFJablVhdThxdmdZPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzI2Mjc0ODc3CWZpbGU6c21hcnQtdG9vbF8wLjAuMl94NjRfemgtQ04ubXNpLnppcAptMTFVNW9SU1BEZ3BRTzR6OWM5alYrM2lXemZXaThmd0U0Z1MzV3pGVTJ4UGU4RGc1YklvbzdpNnJMR25pRHhMcjBIUkNBUG1iNjU3M3I0eHVNdXRCdz09Cg==",
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVTd0hGMjBaTE41WS9QTS94U3RQeGIybm44YmpOaEdJMWJhL3Z5ZExtZkFHdGV3NERqWGJFZE5RVUplZ3ZnOC9ZRlN4OGtWVEpPMnZlcGZ6akpSZ2RZU04zY1loc2xHS1FFPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzI2Mjc3NzQzCWZpbGU6c21hcnQtdG9vbF8wLjAuMl94NjRfemgtQ04ubXNpLnppcApLTGUyMVBTNGRHNm5VZlhMaUw0NWIxTFBjVHZ5KzNKc0xkV0tuWVhYemlCaVVUMTVVa3hJaFp6SEs5azc3Ni92MDV2cVRlcVdocW1OWk1Jb1ZhenZBdz09Cg==",
       "url": "http://111.229.144.150/web/download/smart-tool_0.0.2_x64_zh-CN.msi.zip"
     }
   }
