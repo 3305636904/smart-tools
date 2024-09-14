@@ -78,7 +78,7 @@
 import { getToken } from '../../utils/auth'
 
 import { useStore } from '../../store'
-import { useSettings, service } from './useSettings'
+import { useSettings } from './useSettings'
 
 import dayjs from 'dayjs';
 
