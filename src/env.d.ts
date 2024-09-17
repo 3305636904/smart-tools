@@ -81,10 +81,10 @@ declare global {
   // 定义响应类型接口
   interface resBlobType {
     data: Blob;
-    status: number;
-    statusText: string;
-    headers: any;
-    config: any;
+    status?: number;
+    statusText?: string;
+    headers?: any;
+    config?: any;
   }
   
 }

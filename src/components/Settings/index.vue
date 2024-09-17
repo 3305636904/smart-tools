@@ -78,7 +78,7 @@
 import { getToken } from '../../utils/auth'
 
 import { useStore } from '../../store'
-import { useSettings } from './useSettings'
+import { useSettings, Body } from './useSettings'
 
 import dayjs from 'dayjs';
 
@@ -154,15 +154,18 @@ const enSureSave2Server = () => {
     return
   }
   if (toSaveData.length > 0) {
-    promiseList.push(fetchPostPromise(saveUrl, { requestBizTaskList: toSaveData}, { 'biz-user': store.loginBizUser || '' }))
+    const params = { requestBizTaskList: toSaveData}
+    promiseList.push(fetchPostPromise(saveUrl, params, { 'biz-user': store.loginBizUser || '' }))
     // promiseList.push(service({ url: saveUrl, method: 'POST', data: {requestBizTaskList: toSaveData} }) as Promise<resType>)
   }
   if (toUpdateData.length > 0) {
-    promiseList.push(fetchPostPromise(updateUrl, {requestBizTaskList: toUpdateData}, { 'biz-user': store.loginBizUser || '' }))
+    const params = {requestBizTaskList: toUpdateData}
+    promiseList.push(fetchPostPromise(updateUrl, params, { 'biz-user': store.loginBizUser || '' }))
     // promiseList.push(service({ url: updateUrl, method: 'POST', data: {requestBizTaskList: toUpdateData} }) as Promise<resType>)
   }
   if (toDelDataIds.length > 0) {
-    promiseList.push(fetchPostPromise(deleteUrl, { ids: toDelDataIds }, { 'biz-user': store.loginBizUser || '' }))
+    const params = { ids: toDelDataIds }
+    promiseList.push(fetchPostPromise(deleteUrl, params, { 'biz-user': store.loginBizUser || '' }))
     // promiseList.push(service({ url: updateUrl, method: 'POST', data: {ids: toDelDataIds} }) as Promise<resType>)
   }
   let nRef

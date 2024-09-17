@@ -128,7 +128,7 @@
   import { formDark, FormInst, UploadCustomRequestOptions, useDialog } from 'naive-ui'
   import type { UploadFileInfo } from 'naive-ui'
   import { useStore } from '../../store'
-  import { formatTimeNormal, formatTimeDifference } from '../../hooks/useTime'
+  import { formatTimeNormal, formatTimeDifference, toRFC3339 } from '../../hooks/useTime'
 
   import { Command } from '@tauri-apps/api/shell'
   import { os } from '../../common/global'

@@ -2,15 +2,11 @@ import { fetch, Body } from '@tauri-apps/api/http';
 
 import { getToken } from '../utils/auth'
 
-import { tansParams } from '../utils/index'
-
 const {  VITE_APP_API_URL } = import.meta.env
-
 export {
   getToken,
   VITE_APP_API_URL
 }
-
 export {
   fetch,
   Body,
@@ -28,11 +24,9 @@ export const fetchPostPromise = (url: string, data: any, headers: any = {}): Pro
   return new Promise((resolve, reject) => {
     let t:any
     let body: any = Body.json(data)
-    if (headers.isFile) {
-      body = data
-      // console.log('body: ', body?.get('file'))
-    }
-    // console.log('url: ', `${VITE_APP_API_URL}${url}`)
+    // if (headers.isFile) {
+    //   body = data
+    // }
     fetch(`${VITE_APP_API_URL}${url}`, {
       method: 'POST',
       // body: Body.json({requestBizTaskList: data}),
@@ -40,27 +34,17 @@ export const fetchPostPromise = (url: string, data: any, headers: any = {}): Pro
       body
     }).then(res => {
       if (res.status === 200) {
+        console.log(res)
         const result = (res.data  as resType)
         if (result.code !== 0) {
-          t = setTimeout(() => {
-            clearTimeout(t)
-            reject(result)
-          }, 800)
+          reject(result)
         }
         resolve(result)
       }else {
-        t = setTimeout(() => {
-          clearTimeout(t)
-          console.error(res)
-          reject(res.data as resType)
-        }, 800)
+        reject(res.data as resType)
       }
     }).catch(err => {
-      t = setTimeout(() => {
-        console.error(err)
-        clearTimeout(t)
-        reject(err as resType)
-      }, 800)
+      reject(err as resType)
     })
   })
 }

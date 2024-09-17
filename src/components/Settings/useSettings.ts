@@ -1,5 +1,5 @@
 import { useStore } from '../../store'
-import { fetchPostPromise } from '../../hooks/useRequest'
+import { fetchPostPromise, Body } from '../../hooks/useRequest'
 import { setToken, removeToken, getToken } from '../../utils/auth'
 
 // import {  VITE_APP_API_URL} from '../../hooks/useRequest'
@@ -7,9 +7,9 @@ import { setToken, removeToken, getToken } from '../../utils/auth'
 
 // import { useDialog } from 'naive-ui'
 
-// export {
-//   service
-// }
+export {
+  Body
+}
 
 export const useSettings = () => {
   const store = useStore()
@@ -144,7 +144,8 @@ export const useSettings = () => {
       return
     }
     loading.value = true
-    fetchPostPromise(getBizUser, {userId: userForm.value.uid, nickName: userForm.value.nickName}).then(res => {
+    const params = {userId: userForm.value.uid, nickName: userForm.value.nickName}
+    fetchPostPromise(getBizUser, params).then(res => {
     // const loginFn = (): Promise<resType> => service({ url: getBizUser, method: 'post', data: {userId: userForm.value.uid, nickName: userForm.value.nickName} })
     // loginFn().then(res => {
       if (res.code === 0) {
@@ -165,7 +166,6 @@ export const useSettings = () => {
         }, 500)
       }
     }).catch((err: any) => {
-      console.error(err)
       const errorMsg = err && Array.isArray(err) ? err.map(v => v.msg) : err.msg
       nRef = window.$notification.error({
         title: '登录失败!',
@@ -184,7 +184,8 @@ export const useSettings = () => {
     loading.value = true
     // const registFn = (): Promise<resType> => service({ url: getBizUser, method: 'post', data: {userId: userForm.value.uid, nickName: userForm.value.nickName} })
     // registFn()
-    fetchPostPromise(createBizUser,  {userId: userForm.value.uid, nickName: userForm.value.nickName})
+    const params = {userId: userForm.value.uid, nickName: userForm.value.nickName}
+    fetchPostPromise(createBizUser, params)
     .then(res => {
       if (res.code === 0) {
         window.$message.success(`注册成功：${res.msg}`)
