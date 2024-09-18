@@ -33,8 +33,8 @@ import delIcon from '~icons/line-md/close-circle'
 import leftIcon from '~icons/line-md/chevron-small-left'
 import leftDoubleIcon from '~icons/line-md/chevron-small-double-left'
 import { getCateItemIndex } from '../utils'
-import { Command } from '@tauri-apps/api/shell'
-import { os } from '../common/global'
+// import { Command } from '@tauri-apps/api/shell'
+// import { os } from '../common/global'
 const props = defineProps<{
   item: Item
   cate: string
@@ -51,45 +51,45 @@ const handleContextMenu = (e: MouseEvent) => {
 }
 const handleOpen = (value: string) => {
   const splitValue = value.split(' ')
-  if (splitValue.length > 1) {
-    const output = Command.sidecar(splitValue[0], [
-      ...splitValue.slice(1),
-    ]).execute()
-  } else if (splitValue[0].startsWith('http')) {
-    open(splitValue[0])
-  } else {
-    if (os === 'Darwin') {
-      // macos打开
-      const command = new Command('bash', ['-c', 'open', splitValue[0]])
-      command.on('close', (data) => {
-        if (data.code) {
-          window.$message.success('打开成功')
-        }
-      })
-      command.on('error', (error) => window.$message.error(error.toString()))
-      command.execute()
-    } else if (os === 'Linux') {
-      // linux打开
-      const command = new Command('bash', ['-c', 'xdg-open', splitValue[0]])
-      command.on('close', (data) => {
-        if (data.code) {
-          window.$message.success('打开成功')
-        }
-      })
-      command.on('error', (error) => window.$message.error(error.toString()))
-      command.execute()
-    } else {
-      // windows打开
-      const command = new Command('cmd', ['/C', 'start', splitValue[0]])
-      command.on('close', (data) => {
-        if (data.code) {
-          window.$message.success('打开成功')
-        }
-      })
-      command.on('error', (error) => window.$message.error(error.toString()))
-      command.execute()
-    }
-  }
+  // if (splitValue.length > 1) {
+  //   const output = Command.sidecar(splitValue[0], [
+  //     ...splitValue.slice(1),
+  //   ]).execute()
+  // } else if (splitValue[0].startsWith('http')) {
+  //   open(splitValue[0])
+  // } else {
+  //   if (os === 'Darwin') {
+  //     // macos打开
+  //     const command = new Command('bash', ['-c', 'open', splitValue[0]])
+  //     command.on('close', (data) => {
+  //       if (data.code) {
+  //         window.$message.success('打开成功')
+  //       }
+  //     })
+  //     command.on('error', (error) => window.$message.error(error.toString()))
+  //     command.execute()
+  //   } else if (os === 'Linux') {
+  //     // linux打开
+  //     const command = new Command('bash', ['-c', 'xdg-open', splitValue[0]])
+  //     command.on('close', (data) => {
+  //       if (data.code) {
+  //         window.$message.success('打开成功')
+  //       }
+  //     })
+  //     command.on('error', (error) => window.$message.error(error.toString()))
+  //     command.execute()
+  //   } else {
+  //     // windows打开
+  //     const command = new Command('cmd', ['/C', 'start', splitValue[0]])
+  //     command.on('close', (data) => {
+  //       if (data.code) {
+  //         window.$message.success('打开成功')
+  //       }
+  //     })
+  //     command.on('error', (error) => window.$message.error(error.toString()))
+  //     command.execute()
+  //   }
+  // }
 }
 const isTop = () => {
   const indexs = getCateItemIndex(props.cate, props.item.label)

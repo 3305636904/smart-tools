@@ -14,7 +14,7 @@
         <div class="w-full flex justify-items-center">
           <n-tabs type="segment" v-model:value="activeTab" animated class="mb-4">
             <n-tab name="theme" tab="主题设置">主题设置</n-tab >
-            <n-tab name="todoSetting" tab="待办选项设置">待办选项设置</n-tab >
+            <!-- <n-tab name="todoSetting" tab="待办选项设置">待办选项设置</n-tab > -->
             <n-tab name="saveDate" tab="同步数据到服务器">同步数据到服务器</n-tab >
           </n-tabs>
         </div>
@@ -78,7 +78,7 @@
 import { getToken } from '../../utils/auth'
 
 import { useStore } from '../../store'
-import { useSettings, Body } from './useSettings'
+import { useSettings } from './useSettings'
 
 import dayjs from 'dayjs';
 
@@ -92,7 +92,7 @@ const {
   model, formItems, rules, loading,
   userFormItems, userForm, userRules,
   handleSettingConfirm, changeThemeAuto, handleUpdateActiveSync, logout,
-  fetchPostPromise, userLogin, createNewUser, getSysBizTaskListFn
+  userLogin, createNewUser, getSysBizTaskListFn
 } = useSettings()
 
 const isLogin = computed(() => {
@@ -108,6 +108,7 @@ const showSetting = () => {
 }
 
 const enSureSave2Server = () => {
+  console.log('store: ', store)
   /**
    * 1、只同步已完成的数据，没有id的时候会重新生成id
    */

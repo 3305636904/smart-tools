@@ -30,65 +30,65 @@
 
 <script lang="ts" setup>
 
-import {
-  checkUpdate as tauriCheckUpdate,
-  installUpdate,
-  onUpdaterEvent
-} from '@tauri-apps/api/updater'
-import { getVersion } from '@tauri-apps/api/app'
-import { relaunch } from '@tauri-apps/api/process'
+// import {
+//   checkUpdate as tauriCheckUpdate,
+//   installUpdate,
+//   onUpdaterEvent
+// } from '@tauri-apps/api/updater'
+// import { getVersion } from '@tauri-apps/api/app'
+// import { relaunch } from '@tauri-apps/api/process'
 
 const visible = ref<boolean>(false)
 const isDownload = ref<boolean>(false)
 const updateManifest = ref<any>({})
 
 const checkUpdate = async () => {
-  try {
-    const updateInfo = await tauriCheckUpdate()
-    console.log('updateInfo: ', updateInfo)
+  // try {
+  //   const updateInfo = await tauriCheckUpdate()
+  //   console.log('updateInfo: ', updateInfo)
 
-    if (!updateInfo.shouldUpdate) return
+  //   if (!updateInfo.shouldUpdate) return
 
-    updateManifest.value = {
-      ...updateInfo?.manifest,
-      currentVersion: await getVersion()
-    }
+  //   updateManifest.value = {
+  //     ...updateInfo?.manifest,
+  //     currentVersion: await getVersion()
+  //   }
 
-    visible.value = true
+  //   visible.value = true
 
-    return true
-  } catch (error) {
-    console.error(error)
-    window.$message.success(`当前已是最新版本`)
-  }
+  //   return true
+  // } catch (error) {
+  //   console.error(error)
+  //   window.$message.success(`当前已是最新版本`)
+  // }
 }
 
-const unlisten = async () => await onUpdaterEvent(({ error, status }) => {
-  switch (status) {
-    case 'DONE':
-      window.$message.success(`更新成功`, {
-        duration: 5000, closable: true
-      })
-      visible.value = false
-      relaunch()
-      break
+// const unlisten = async () => await onUpdaterEvent(({ error, status }) => {
+//   switch (status) {
+//     case 'DONE':
+//       window.$message.success(`更新成功`, {
+//         duration: 5000, closable: true
+//       })
+//       visible.value = false
+//       relaunch()
+//       break
 
-    case 'ERROR':
-      window.$message.error(`网络似乎出了问题，请检查你的网络设置`, {
-        duration: 5000, closable: true
-      })
-      break
-  }
-})
+//     case 'ERROR':
+//       window.$message.error(`网络似乎出了问题，请检查你的网络设置`, {
+//         duration: 5000, closable: true
+//       })
+//       break
+//   }
+// })
 
 
 const updateConfirm = async () => {
   isDownload.value = true
 
   // Install the update. This will also restart the app on Windows!
-  await installUpdate()
+  // await installUpdate()
 
-  unlisten()
+  // unlisten()
 }
 
 checkUpdate()

@@ -1,15 +1,16 @@
 import { useStore } from '../../store'
-import { fetchPostPromise, Body } from '../../hooks/useRequest'
+// import { fetchPostPromise, Body } from '../../hooks/useRequest'
+import { axiosServie } from '../../hooks/useRequest'
 import { setToken, removeToken, getToken } from '../../utils/auth'
 
 // import {  VITE_APP_API_URL} from '../../hooks/useRequest'
-// const { service } = axiosServie()
+const { service } = axiosServie()
 
 // import { useDialog } from 'naive-ui'
 
-export {
-  Body
-}
+// export {
+//   Body
+// }
 
 export const useSettings = () => {
   const store = useStore()
@@ -113,9 +114,10 @@ export const useSettings = () => {
 
   const getSysBizTaskListFn  = (cb = (res: resType) => {}) => {
     loading.value = true
-    // const getBizTaskFn = (): Promise<resType> => service({ url: getSysBizTaskList, method: 'post', data: { 'biz-user': store.loginBizUser } })
-    // getBizTaskFn().then(result => {
-    fetchPostPromise(getSysBizTaskList, null, { 'biz-user': store.loginBizUser }).then(result => {
+    const getBizTaskFn = (): Promise<resType> => service({ url: getSysBizTaskList, method: 'post', data: { 'biz-user': store.loginBizUser } })
+    getBizTaskFn().then(result => {
+    // fetchPostPromise(getSysBizTaskList, null, { 'biz-user': store.loginBizUser }).then(result => {
+      console.log('todoData: ', store.todoData)
       store.todoData = store.todoData.filter(v => !v.isCompleted).concat(result.data.list.map((v: paramsTodoType) => {
         v.isRomote = true
         if (v.ID) v.id = v.ID
@@ -145,9 +147,9 @@ export const useSettings = () => {
     }
     loading.value = true
     const params = {userId: userForm.value.uid, nickName: userForm.value.nickName}
-    fetchPostPromise(getBizUser, params).then(res => {
-    // const loginFn = (): Promise<resType> => service({ url: getBizUser, method: 'post', data: {userId: userForm.value.uid, nickName: userForm.value.nickName} })
-    // loginFn().then(res => {
+    // fetchPostPromise(getBizUser, params).then(res => {
+    const loginFn = (): Promise<resType> => service({ url: getBizUser, method: 'post', data: {userId: userForm.value.uid, nickName: userForm.value.nickName} })
+    loginFn().then(res => {
       if (res.code === 0) {
         window.$message.success(`登录成功。：${res.msg}`)
         loading.value = false
@@ -182,10 +184,10 @@ export const useSettings = () => {
       return
     }
     loading.value = true
-    // const registFn = (): Promise<resType> => service({ url: getBizUser, method: 'post', data: {userId: userForm.value.uid, nickName: userForm.value.nickName} })
-    // registFn()
-    const params = {userId: userForm.value.uid, nickName: userForm.value.nickName}
-    fetchPostPromise(createBizUser, params)
+    const registFn = (): Promise<resType> => service({ url: getBizUser, method: 'post', data: {userId: userForm.value.uid, nickName: userForm.value.nickName} })
+    // const params = {userId: userForm.value.uid, nickName: userForm.value.nickName}
+    registFn()
+    // fetchPostPromise(createBizUser, params)
     .then(res => {
       if (res.code === 0) {
         window.$message.success(`注册成功：${res.msg}`)
@@ -220,7 +222,7 @@ export const useSettings = () => {
 
 
   return {
-    fetchPostPromise,
+    // fetchPostPromise,
     
     loading,
     activeTab,

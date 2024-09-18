@@ -1,7 +1,7 @@
 import { createPinia, defineStore } from 'pinia'
 import { ref, watchEffect } from 'vue'
-import { saveWindowState, StateFlags } from 'tauri-plugin-window-state-api'
-import { appWindow } from '@tauri-apps/api/window';
+// import { saveWindowState, StateFlags } from 'tauri-plugin-window-state-api'
+// import { appWindow } from '@tauri-apps/api/window';
 // import jsonData from './data.json'
 
 // import {
@@ -103,7 +103,7 @@ export const useStore = defineStore('global', () => {
     // const storageDarkTheme = window.localStorage.getItem('darkTheme')
     // darkTheme.value = storageDarkTheme === 'true' ? true : false
   // }
-  saveWindowState(StateFlags.ALL)
+  // saveWindowState(StateFlags.ALL)
   getData()
   // getDarkTheme()
   watchEffect(() => {
@@ -114,18 +114,18 @@ export const useStore = defineStore('global', () => {
     // darkTheme.value
     //   ? WindowSetBackgroundColour(24, 24, 28, 1)
     //   : WindowSetBackgroundColour(255, 255, 255, 1)
-    appWindow.setFullscreen(fullscreen.value)
+    // appWindow.setFullscreen(fullscreen.value)
     // fullscreen.value ? WindowFullscreen() : WindowUnfullscreen()
   })
 
   watchEffect(() => {
-    window.localStorage.setItem('todoData', JSON.stringify(todoData.value)) // 如果以后数据结构发生改变可以用这个进行自动化升级
+    window.localStorage.setItem('todoData', JSON.stringify(todoData.value || [])) // 如果以后数据结构发生改变可以用这个进行自动化升级
   })
   watchEffect(() => {
     window.localStorage.setItem('activeVal', JSON.stringify(activeVal.value)) // 如果以后数据结构发生改变可以用这个进行自动化升级
   })
   watchEffect(() => {
-    window.localStorage.setItem('showCateToolList', JSON.stringify(showCateToolList.value)) // 如果以后数据结构发生改变可以用这个进行自动化升级
+    window.localStorage.setItem('showCateToolList', JSON.stringify(showCateToolList.value || [])) // 如果以后数据结构发生改变可以用这个进行自动化升级
   })
   watchEffect(() => {
     window.localStorage.setItem('isTodoList', JSON.stringify(isTodoList.value)) // 如果以后数据结构发生改变可以用这个进行自动化升级

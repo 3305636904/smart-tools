@@ -18,7 +18,7 @@
     <n-scrollbar ref="contentRef" style="height: calc(100% - 64px);"  @scroll="handleScroll">
       <n-layout-content class="overflow-hidden p-6 pr-10px">
         <n-collapse class="overflow-hidden" display-directive="show" :default-expanded-names="expandedNames" @item-header-click="handleItemHeaderClick" accordion>
-          <n-collapse-item title="快捷网站" :name="1" display-directive="show" v-if="store.showCateToolList.includes(1)" :disabled="store.showCateToolList.length === 1">
+          <!-- <n-collapse-item title="快捷网站" :name="1" display-directive="show" v-if="store.showCateToolList.includes(1)" :disabled="store.showCateToolList.length === 1">
             <template #header-extra>
               <span :class="['mr-4', 'rounded-8', 'p-2', 'pb-1', 'z-50', 'cursor-default', {'hover:bg-gray-700': store.darkTheme, 'hover:bg-gray-200': !store.darkTheme }]" @click.stop="()=>{}" v-if="store.activeVal === 1">
                 <n-tooltip placement="left" trigger="hover">
@@ -73,8 +73,8 @@
                 :cate="item"
               />
             </n-space>
-          </n-collapse-item>
-          <n-collapse-item title="待办纪要" :name="2" display-directive="show"  v-if="store.showCateToolList.includes(2)" :disabled="store.showCateToolList.length === 1">
+          </n-collapse-item> -->
+          <n-collapse-item title="待办纪要" :name="2" display-directive="show"  v-if="store.showCateToolList.includes(2)" disabled>
             <template #header-extra>
               <span :class="['mr-4', 'rounded-8', 'p-2', 'pb-1', 'z-50', 'cursor-default', {'hover:bg-gray-700': store.darkTheme, 'hover:bg-gray-200': !store.darkTheme }]" @click.stop="()=>{}" v-if="store.activeVal === 2">
                 <n-tooltip placement="left" trigger="hover">
@@ -167,12 +167,12 @@ import TodoList from './Todo/index.vue'
 import Update from './Update/index.vue'
 import type { CollapseProps } from 'naive-ui'
 
-import { writeTextFile, readTextFile } from '@tauri-apps/api/fs'
-import { open, save } from '@tauri-apps/api/dialog'
+// import { writeTextFile, readTextFile } from '@tauri-apps/api/fs'
+// import { open, save } from '@tauri-apps/api/dialog'
 
 import { formatTimeTodayLast } from '../hooks/useTime'
 import { fetchPostPromise, getToken } from '../hooks/useRequest'
-import { Body, fetch } from '@tauri-apps/api/http'
+// import { Body, fetch } from '@tauri-apps/api/http'
 // const { service } = axiosServie()
 
 const { VITE_APP_BASE_API } = import.meta.env
@@ -194,7 +194,8 @@ const expandedNames = ref<number | null>()
 
 onMounted(() => {
   getLeftDays()
-  expandedNames.value = store.activeVal
+  // expandedNames.value = store.activeVal
+  expandedNames.value = 2
 })
 
 const showTopButton = ref(false)
@@ -254,112 +255,112 @@ const clearAllData = () => {
 }
 
 const handleExport = async (data: string) => {
-  const selete = await save({
-    filters: [
-      {
-        name: 'backup',
-        extensions: ['json'],
-      },
-    ],
-  })
-  let exportData = store.activeVal === 1 ? store.data : store.todoData
+  // const selete = await save({
+  //   filters: [
+  //     {
+  //       name: 'backup',
+  //       extensions: ['json'],
+  //     },
+  //   ],
+  // })
+  // let exportData = store.activeVal === 1 ? store.data : store.todoData
   // if (store.activeVal === 2) {
   //   exportData = checkedTodoOptions.value
   // }
-  if (selete) {
-    await writeTextFile(selete, JSON.stringify(exportData))
-    window.$notification.success({
-      title: '导出成功',
-      duration: 3000,
-    })
-  } else {
-    window.$notification.info({
-      title: '取消导出',
-      duration: 3000,
-    })
-  }
+  // if (selete) {
+  //   await writeTextFile(selete, JSON.stringify(exportData))
+  //   window.$notification.success({
+  //     title: '导出成功',
+  //     duration: 3000,
+  //   })
+  // } else {
+  //   window.$notification.info({
+  //     title: '取消导出',
+  //     duration: 3000,
+  //   })
+  // }
 }
 const handleImport = async () => {
-  const selete = await open({
-    filters: [
-      {
-        name: 'backup',
-        extensions: ['json'],
-      },
-    ],
-  })
-  if (selete) {
-    try {
-      const data = await readTextFile(selete as string)
-      console.log('import: ', data)
-      if (store.activeVal === 1) {
-        store.data = JSON.parse(data)
-      } else if (store.activeVal === 2) {
-        const loadJsonData = (isNew = false) => {
-          if (isNew) {
-            const newId = Date.now() +  Math.floor(Math.random() * 1000)
-            const newTodoData = JSON.parse(data).map((v: paramsTodoType, index: number) => {
-              if (v.createdAt) v.createdAt = new Date(v.createdAt)
-              if (v.updatedAt) v.updatedAt = new Date(v.updatedAt)
-              else if (v.createdAt) v.updatedAt = new Date(v.createdAt)
-              v.id = newId + index
-              v.isRomote = false
-              return v
-            })
-            store.todoData = newTodoData
-          } else {
-            const notCompltedData = JSON.parse(data).filter((v: paramsTodoType) => !v.isCompleted)
-            let compltedData: paramsTodoType[] = JSON.parse(data).filter((v: paramsTodoType) => v.isCompleted)
-            JSON.parse(data).forEach((v: paramsTodoType, index: number) => {
-              const existIndex = store.todoData.findIndex(todoItem => todoItem.id === v.id && (todoItem.content !== v.content || todoItem.memo !== v.memo))
-              if (existIndex != -1) {
-                const tempData: paramsTodoType = v
-                if (v.updatedAt) {
-                  tempData.updatedAt = new Date(v.updatedAt)
-                }
-                tempData.memo = v.memo
-                tempData.content = v.content
-                compltedData.splice(existIndex, 1, tempData)
-              }
-            })
-            store.todoData = notCompltedData.concat(compltedData)
-          }
-        }
-        window.$dialog.warning({
-          title: '是否标识为新数据？',
-          content: '此操作将会标识当前数据为新产生的数据，是否继续？',
-          positiveText: '是',
-          negativeText: '不标识为新数据',
-          onPositiveClick: () => {
-            loadJsonData(true)
-            window.$notification.success({
-              title: '导入成功',
-              duration: 3000,
-            })
-          },
-          onNegativeClick: () => {
-            loadJsonData(false)
-            window.$notification.success({
-              title: '导入成功',
-              duration: 3000,
-            })
-          }
-        })
-      }
+  // const selete = await open({
+  //   filters: [
+  //     {
+  //       name: 'backup',
+  //       extensions: ['json'],
+  //     },
+  //   ],
+  // })
+  // if (selete) {
+  //   try {
+  //     const data = await readTextFile(selete as string)
+  //     console.log('import: ', data)
+  //     if (store.activeVal === 1) {
+  //       store.data = JSON.parse(data)
+  //     } else if (store.activeVal === 2) {
+  //       const loadJsonData = (isNew = false) => {
+  //         if (isNew) {
+  //           const newId = Date.now() +  Math.floor(Math.random() * 1000)
+  //           const newTodoData = JSON.parse(data).map((v: paramsTodoType, index: number) => {
+  //             if (v.createdAt) v.createdAt = new Date(v.createdAt)
+  //             if (v.updatedAt) v.updatedAt = new Date(v.updatedAt)
+  //             else if (v.createdAt) v.updatedAt = new Date(v.createdAt)
+  //             v.id = newId + index
+  //             v.isRomote = false
+  //             return v
+  //           })
+  //           store.todoData = newTodoData
+  //         } else {
+  //           const notCompltedData = JSON.parse(data).filter((v: paramsTodoType) => !v.isCompleted)
+  //           let compltedData: paramsTodoType[] = JSON.parse(data).filter((v: paramsTodoType) => v.isCompleted)
+  //           JSON.parse(data).forEach((v: paramsTodoType, index: number) => {
+  //             const existIndex = store.todoData.findIndex(todoItem => todoItem.id === v.id && (todoItem.content !== v.content || todoItem.memo !== v.memo))
+  //             if (existIndex != -1) {
+  //               const tempData: paramsTodoType = v
+  //               if (v.updatedAt) {
+  //                 tempData.updatedAt = new Date(v.updatedAt)
+  //               }
+  //               tempData.memo = v.memo
+  //               tempData.content = v.content
+  //               compltedData.splice(existIndex, 1, tempData)
+  //             }
+  //           })
+  //           store.todoData = notCompltedData.concat(compltedData)
+  //         }
+  //       }
+  //       window.$dialog.warning({
+  //         title: '是否标识为新数据？',
+  //         content: '此操作将会标识当前数据为新产生的数据，是否继续？',
+  //         positiveText: '是',
+  //         negativeText: '不标识为新数据',
+  //         onPositiveClick: () => {
+  //           loadJsonData(true)
+  //           window.$notification.success({
+  //             title: '导入成功',
+  //             duration: 3000,
+  //           })
+  //         },
+  //         onNegativeClick: () => {
+  //           loadJsonData(false)
+  //           window.$notification.success({
+  //             title: '导入成功',
+  //             duration: 3000,
+  //           })
+  //         }
+  //       })
+  //     }
       
-    } catch (e) {
-      window.$notification.error({
-        title: '数据异常',
-        content: '原因：' + e,
-      })
-    }
-    return 
-  } else {
-    window.$notification.info({
-      title: '取消导入',
-      duration: 3000,
-    })
-  }
+  //   } catch (e) {
+  //     window.$notification.error({
+  //       title: '数据异常',
+  //       content: '原因：' + e,
+  //     })
+  //   }
+  //   return 
+  // } else {
+  //   window.$notification.info({
+  //     title: '取消导入',
+  //     duration: 3000,
+  //   })
+  // }
 }
 
 const {  VITE_APP_API_URL } = import.meta.env

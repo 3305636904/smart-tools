@@ -1,0 +1,22 @@
+{
+	"name": "AceGain",
+  "pluginName": "utools-plugin-demo",
+  "description": "utools插件开发模板",
+  "author": "zhiPeng",
+  "version": "0.0.1",
+	"main": "index.html",
+  "preload": "preload.js",
+	"logo": "appicon.png",
+	"development": {
+		"main": "http://127.0.0.1:1420",
+		"preload": "preload.js"
+	},
+	"features": [
+		{
+			"code": "tools",
+			"explain": "工具助手",
+			"cmds": ["tool", "助手"],
+			"icon": "appicon.png"
+		}
+	]
+}

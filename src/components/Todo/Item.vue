@@ -134,7 +134,7 @@
 </template>
   
 <script lang="ts" setup name="todoItem">
-  import { open } from '@tauri-apps/api/dialog'
+
   let isEdit = ref(false)
   const inputRef = ref<InputInst | null>()
   import { formatTimeDifference } from '../../hooks/useTime'
@@ -142,17 +142,16 @@
   import type { UploadFileInfo } from 'naive-ui'
   import dayjs from 'dayjs'
 
-  import { convertFileSrc } from '@tauri-apps/api/tauri'
-  import { Command } from '@tauri-apps/api/shell'
-  import { os } from '../../common/global'
+  // import { open } from '@tauri-apps/api/dialog'
+  // import { convertFileSrc } from '@tauri-apps/api/tauri'
+  // import { Command } from '@tauri-apps/api/shell'
+  // import { os } from '../../common/global'
 
   import { useStore } from '../../store'
   const store = useStore()
 
   const emits = defineEmits(['changeCheckOptions'])
-
   
-  import { fetchPostPromise } from '../../hooks/useRequest'
   
   const { VITE_APP_API_URL } = import.meta.env
   const fileUploadUrl = `/bizTask/upload`
@@ -348,34 +347,34 @@
   }
 
   async function overHandleClick() {
-    const selected = await open({
-      multiple: true,
-      filters: [{
-        name: 'Image',
-        extensions: ['png', 'jpg', 'jpeg', 'txt', 'doc', 'docx']
-      }]
-    });
-    // console.log('111 attachMents: ', todoInfo.attachMents)
-    if (Array.isArray(selected)) {
-      selected.forEach(async selectedFilePath => {
-        isUploading.value = true
-        const url = convertFileSrc(selectedFilePath)
-        const name = selectedFilePath.split('/').pop()
-        const newTodoItem = {
-          id: `${Date.now() + Math.ceil(Math.random() * 1000000)}`,
-          name: name as string,
-          status: 'finished',
-          url: url
-        } as attachMentsType
-        todoInfo.attachMents.push(newTodoItem)
-        isUploading.value = false
-        window.$message.success('上传成功')
-      })
-    } else if (selected === null) {
-      // user cancelled the selection
-    } else {
-      // user selected a single file
-    }
+    // const selected = await open({
+    //   multiple: true,
+    //   filters: [{
+    //     name: 'Image',
+    //     extensions: ['png', 'jpg', 'jpeg', 'txt', 'doc', 'docx']
+    //   }]
+    // });
+    // // console.log('111 attachMents: ', todoInfo.attachMents)
+    // if (Array.isArray(selected)) {
+    //   selected.forEach(async selectedFilePath => {
+    //     isUploading.value = true
+    //     const url = convertFileSrc(selectedFilePath)
+    //     const name = selectedFilePath.split('/').pop()
+    //     const newTodoItem = {
+    //       id: `${Date.now() + Math.ceil(Math.random() * 1000000)}`,
+    //       name: name as string,
+    //       status: 'finished',
+    //       url: url
+    //     } as attachMentsType
+    //     todoInfo.attachMents.push(newTodoItem)
+    //     isUploading.value = false
+    //     window.$message.success('上传成功')
+    //   })
+    // } else if (selected === null) {
+    //   // user cancelled the selection
+    // } else {
+    //   // user selected a single file
+    // }
   }
 
   const customRequest = (options: UploadCustomRequestOptions) => {
@@ -403,18 +402,18 @@
   }
 
   const handlePreview = (file: UploadFileInfo) => {
-    console.log('file: ', file, 'os: ', os)
-    if (os === 'Windows_NT') {
-      // windows打开
-      const command = new Command('cmd', ['/C', 'start', file.name])
-      command.on('close', (data) => {
-        if (data.code) {
-          window.$message.success('打开成功')
-        }
-      })
-      command.on('error', (error) => window.$message.error(error.toString()))
-      command.execute()
-    }
+    // console.log('file: ', file, 'os: ', os)
+    // if (os === 'Windows_NT') {
+    //   // windows打开
+    //   const command = new Command('cmd', ['/C', 'start', file.name])
+    //   command.on('close', (data) => {
+    //     if (data.code) {
+    //       window.$message.success('打开成功')
+    //     }
+    //   })
+    //   command.on('error', (error) => window.$message.error(error.toString()))
+    //   command.execute()
+    // }
   }
 
   const handleRemove = (options: any) => {

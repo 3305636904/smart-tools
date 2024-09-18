@@ -119,9 +119,9 @@
 </template>
   
 <script lang="ts" setup>
-  import { open, save } from '@tauri-apps/api/dialog'
-  import { writeTextFile, readTextFile } from '@tauri-apps/api/fs'
-  import { convertFileSrc } from '@tauri-apps/api/tauri'
+  // import { open, save } from '@tauri-apps/api/dialog'
+  // import { writeTextFile, readTextFile } from '@tauri-apps/api/fs'
+  // import { convertFileSrc } from '@tauri-apps/api/tauri'
 
   import dayjs from 'dayjs'
   import TodoItem from './Item.vue'
@@ -130,13 +130,14 @@
   import { useStore } from '../../store'
   import { formatTimeNormal, formatTimeDifference, toRFC3339 } from '../../hooks/useTime'
 
-  import { Command } from '@tauri-apps/api/shell'
-  import { os } from '../../common/global'
+  // import { Command } from '@tauri-apps/api/shell'
+  // import { os } from '../../common/global'
 
   import { useTodoAddForm } from './useTodo'
   const { todoInfo, rules, formItems, getToken } = useTodoAddForm()
 
-  import { fetchPostPromise, generateFileInfo, Body, fetch } from '../../hooks/useRequest'
+  // import { fetchPostPromise, generateFileInfo, Body, fetch } from '../../hooks/useRequest'
+  import { service } from './useTodo'
   const fileUploadUrl = `/bizTask/upload`
 
   const store = useStore()
@@ -160,7 +161,11 @@
   }
 
   const showTodoList = computed(() => {
+    console.log('store.todoData： ', store.todoData)
     let retArr: todoInfoType[] = store.todoData
+    if (!retArr || retArr.length === 0) {
+      return []
+    }
 
     if (!searchTodoKey.value.trim()) {
       retArr = retArr.sort((v2, v1) => dayjs(v1.updatedAt).valueOf() - dayjs(v2.updatedAt).valueOf());
@@ -235,37 +240,37 @@
 
   const dialog = useDialog()
   async function exportShowTodoList() {
-    const exportInfo2Txt = async (needMemo: boolean = false) => {
-      const filePath = await save({
-        filters: [{
-          name: 'showTodoList',
-          extensions: ['txt']
-        }]
-      });
+    // const exportInfo2Txt = async (needMemo: boolean = false) => {
+    //   const filePath = await save({
+    //     filters: [{
+    //       name: 'showTodoList',
+    //       extensions: ['txt']
+    //     }]
+    //   });
 
-      if (filePath) {
-        let exportData = showTodoList.value.map(v => `${v.isCompleted ? '已完成': '进行中'}-${v.content} ${v.isCompleted ? '耗时：' + timeDuration(v) : ''}\n`).join('')
-        if (checkedTodos.value.length > 0) { 
-          exportData = checkedTodos.value.map(v => `${v.isCompleted? '已完成': '进行中'}-${v.content}${needMemo ? '-' + v.memo : ''}\n`).join('')
-        }
-        writeTextFile(filePath, exportData)
-        window.$notification.success({
-          title: checkedTodos.value.length ? '勾选待办导出成功': '导出成功',
-          duration: 3000,
-        })
-      } else {
-        window.$notification.info({
-          title: '取消导出',
-          duration: 3000,
-        })
-      }
-    }
-    console.log('dialog: ', dialog)
-    dialog.info({
-      title: `提示`, content: `是否导出备注？`, positiveText: `是`, negativeText: `否`, 
-      onPositiveClick: async () => exportInfo2Txt(true),
-      onNegativeClick: () => exportInfo2Txt()
-    })
+    //   if (filePath) {
+    //     let exportData = showTodoList.value.map(v => `${v.isCompleted ? '已完成': '进行中'}-${v.content} ${v.isCompleted ? '耗时：' + timeDuration(v) : ''}\n`).join('')
+    //     if (checkedTodos.value.length > 0) { 
+    //       exportData = checkedTodos.value.map(v => `${v.isCompleted? '已完成': '进行中'}-${v.content}${needMemo ? '-' + v.memo : ''}\n`).join('')
+    //     }
+    //     writeTextFile(filePath, exportData)
+    //     window.$notification.success({
+    //       title: checkedTodos.value.length ? '勾选待办导出成功': '导出成功',
+    //       duration: 3000,
+    //     })
+    //   } else {
+    //     window.$notification.info({
+    //       title: '取消导出',
+    //       duration: 3000,
+    //     })
+    //   }
+    // }
+    // console.log('dialog: ', dialog)
+    // dialog.info({
+    //   title: `提示`, content: `是否导出备注？`, positiveText: `是`, negativeText: `否`, 
+    //   onPositiveClick: async () => exportInfo2Txt(true),
+    //   onNegativeClick: () => exportInfo2Txt()
+    // })
   }
 
   const handleAddTodoConfirm = (e: MouseEvent) => {
@@ -364,36 +369,36 @@
     if (file && file.file && file.type) {
       let formData = new FormData()
       formData.append('file', file.file, file.name)
-      window.$notification.info({
-        title: '开发调整中'
-      })
-      return false
-      // const fileUploadUrlFn = (): Promise<resType> => {
-      //   return service({ url: fileUploadUrl, method: 'post', data: formData })
-      // }
-      // fileUploadUrlFn().then(res => {
-      //   if (res.code !== 0) {
-      //     window.$message.error(res.msg)
-      //     return
-      //   }
-      //   const retFileInfo = res.data
-      //   uploadedFileList.value.push(retFileInfo)
+      // window.$notification.info({
+      //   title: '开发调整中'
       // })
+      // return false
+      const fileUploadUrlFn = (): Promise<resType> => {
+        return service({ url: fileUploadUrl, method: 'post', data: formData })
+      }
+      fileUploadUrlFn().then(res => {
+        if (res.code !== 0) {
+          window.$message.error(res.msg)
+          return
+        }
+        const retFileInfo = res.data
+        uploadedFileList.value.push(retFileInfo)
+      })
     }
   }
 
   const handlePreview = (file: UploadFileInfo) => {
-    if (os === 'Windows_NT') {
-      // windows打开
-      const command = new Command('cmd', ['/C', 'start', file.name])
-      command.on('close', (data) => {
-        if (data.code) {
-          window.$message.success('打开成功')
-        }
-      })
-      command.on('error', (error) => window.$message.error(error.toString()))
-      command.execute()
-    }
+    // if (os === 'Windows_NT') {
+    //   // windows打开
+    //   const command = new Command('cmd', ['/C', 'start', file.name])
+    //   command.on('close', (data) => {
+    //     if (data.code) {
+    //       window.$message.success('打开成功')
+    //     }
+    //   })
+    //   command.on('error', (error) => window.$message.error(error.toString()))
+    //   command.execute()
+    // }
   }
 
   const handleRemove = (options: any) => {
@@ -407,33 +412,33 @@
   }
   
   async function overHandleClick() {
-    const selected = await open({
-      multiple: true,
-      filters: [{
-        name: 'Image',
-        extensions: ['png', 'jpg', 'jpeg', 'txt', 'doc', 'docx']
-      }]
-    });
-    if (Array.isArray(selected)) {
-      selected.forEach(async selectedFilePath => {
-        isUploading.value = true
-        const url = convertFileSrc(selectedFilePath)
-        const name = selectedFilePath.split('/').pop()
-        todoInfo.attachMents.push({
-          id: `${Date.now() + Math.ceil(Math.random() * 1000000)}`,
-          name: name,
-          status: 'finished',
-          url,
-          sourcePath: selectedFilePath
-        })
-        isUploading.value = false
-      })
-      console.log(1, todoInfo.attachMents)
-    } else if (selected === null) {
-      // user cancelled the selection
-    } else {
-      // user selected a single file
-    }
+    // const selected = await open({
+    //   multiple: true,
+    //   filters: [{
+    //     name: 'Image',
+    //     extensions: ['png', 'jpg', 'jpeg', 'txt', 'doc', 'docx']
+    //   }]
+    // });
+    // if (Array.isArray(selected)) {
+    //   selected.forEach(async selectedFilePath => {
+    //     isUploading.value = true
+    //     const url = convertFileSrc(selectedFilePath)
+    //     const name = selectedFilePath.split('/').pop()
+    //     todoInfo.attachMents.push({
+    //       id: `${Date.now() + Math.ceil(Math.random() * 1000000)}`,
+    //       name: name,
+    //       status: 'finished',
+    //       url,
+    //       sourcePath: selectedFilePath
+    //     })
+    //     isUploading.value = false
+    //   })
+    //   console.log(1, todoInfo.attachMents)
+    // } else if (selected === null) {
+    //   // user cancelled the selection
+    // } else {
+    //   // user selected a single file
+    // }
   }
 
   function expotExcelCallback(cb = (params: Record<string, any>) => {}) {

@@ -7,8 +7,14 @@ import { NaiveUiResolver } from 'unplugin-vue-components/resolvers'
 import icons from 'unplugin-icons/vite'
 import IconsResolver from 'unplugin-icons/resolver'
 import { FileSystemIconLoader } from 'unplugin-icons/loaders'
-import { fileURLToPath } from 'url'
+// utools打包plugin
+// https://www.npmjs.com/package/vite-plugin-utools-helper
+import {
+  createPreloadPlugin,
+  createUpxPlugin
+} from "vite-plugin-utools-helper";
 
+import { fileURLToPath } from 'url'
 import { dirname, resolve } from "node:path";
 
 /**
@@ -35,11 +41,26 @@ const pathResolve = (dir = ".", metaUrl = import.meta.url) => {
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
 
-  const { VITE_APP_API_URL } = loadEnv(mode, process.cwd())
+  const { VITE_APP_API_URL, VITE_PUBLIC_PATH, VITE_PORT } = loadEnv(mode, process.cwd())
   return {
+    base: VITE_PUBLIC_PATH,
     plugins: [
       vue(),
       unocss(),
+      createPreloadPlugin({
+        // preload挂载方式
+        // https://www.u.tools/docs/developer/preload.html
+        name: "window.preload",
+        // preload打包内容
+        path: "src/preload/index.ts"
+      }),
+      createUpxPlugin({
+        // 打包输出目录
+        outDir: "upx",
+        // 打包名称格式，取决自plugin.json
+        // https://www.u.tools/docs/developer/config.html
+        outFileName: "[pluginName]-[version].upx"
+      }),
       icons({
         compiler: 'vue3',
         customCollections: {
@@ -72,9 +93,10 @@ export default defineConfig(({ mode }) => {
     // tauri expects a fixed port, fail if that port is not available
     server: {
       port: 1420,
+      host: "0.0.0.0",
       proxy: {
         '/api': {
-          target: VITE_APP_API_URL,
+          target: 'http://127.0.0.1:8888',
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, ''),
         }

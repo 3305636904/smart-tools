@@ -1,4 +1,4 @@
-import type { WindowOptions } from "@tauri-apps/api/window";
+// import type { WindowOptions } from "@tauri-apps/api/window";
 import { RouteRecordRaw } from "vue-router";
 
 export type RoutePath =
@@ -13,6 +13,6 @@ export interface Route extends RouteRecordRaw {
 	meta?: {
 		icon?: string;
 		title?: string;
-		windowOptions?: WindowOptions;
+		// windowOptions?: WindowOptions;
 	};
 }
