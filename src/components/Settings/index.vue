@@ -80,6 +80,8 @@ import { getToken } from '../../utils/auth'
 import { useStore } from '../../store'
 import { useSettings } from './useSettings'
 
+import { getUtoolToken } from '../../utils/u.js'
+
 import { axiosServie } from '../../hooks/useRequest'
 const { service } = axiosServie()
 
@@ -104,7 +106,7 @@ const isLogin = computed(() => {
 
 const showSetting = () => {
   model.isShow = !model.isShow
-
+  getUtoolToken()
   if (model.isShow ) {
     changeThemeAuto()
   }

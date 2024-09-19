@@ -175,9 +175,7 @@ import { fetchPostPromise, getToken } from '../hooks/useRequest'
 // import { Body, fetch } from '@tauri-apps/api/http'
 // const { service } = axiosServie()
 
-const { VITE_APP_BASE_API } = import.meta.env
-
-// import axios from 'axios';
+import axios from 'axios';
 
 const { hour, minute, second } = formatTimeTodayLast()
 
@@ -363,7 +361,7 @@ const handleImport = async () => {
   // }
 }
 
-const {  VITE_APP_API_URL } = import.meta.env
+const { VITE_APP_API_URL } = import.meta.env
 
 const handleExportExcel = () => {
   const exportExcelUrl = `/bizTask/exportBizTaskExcel`
@@ -373,56 +371,34 @@ const handleExportExcel = () => {
   // })
   // TODO: 附件下载
   todoRef.value?.expotExcelCallback((params: Record<string, any>) => {
-    // fetchPostPromise(exportExcelUrl, params, { 'biz-user': store.loginBizUser || '', responseType: 'blob' }).then(res => {
+    const getBlobData = async () => {
+      const response = await axios.post<Blob>(`${VITE_APP_API_URL}${exportExcelUrl}`, params, {
+        headers: { 'biz-user': getToken() },
+        responseType: 'blob', // 设置响应类型为 blob
+      });
+      return {
+        data: response.data,
+        status: response.status,
+        statusText: response.statusText,
+        headers: response.headers,
+        config: response.config
+      };
+    }
+    console.log('getUser: ', utools.getUser())
+    getBlobData().then(result => {
       // const result = (res as any) as Blob
-      // console.log(result)
-      // console.log(result.data instanceof Blob)
-      // let blob = new Blob([result.data])
-      // let link = window.URL.createObjectURL(blob)
-      // let a = document.createElement('a')
-      // a.download = '待办报表.xlsx'
-    // })
-  // })
-    // 发起 POST 请求，期望返回 Blob 类型
-    // const getBlobData = async (): Promise<Blob> => {
-    //   try {
-    //     const response = await fetch(`${VITE_APP_API_URL}${exportExcelUrl}`, {
-    //       method: 'POST',
-    //       headers: { 'biz-user': store.loginBizUser || '' },
-    //       data: Body.json(params),
-    //       responseType: 'blob'
-    //     })
-    //   }
-    // }
+      console.log(result)
+      console.log(result.data instanceof Blob)
+      let blob = new Blob([result.data])
+      let link = window.URL.createObjectURL(blob)
+      let a = document.createElement('a')
+      a.download = '待办报表.xlsx'
+      a.href = link
+      a.click()
+  })
   })
 }
-      //   const response = await axios.post<Blob>(`${VITE_APP_BASE_API}${exportExcelUrl}`, params, {
-      //     headers: { 'biz-user': getToken() },
-      //     responseType: 'blob', // 设置响应类型为 blob
-      //   });
-        // return {
-        //   data: response.data,
-        //   status: response.status,
-        //   statusText: response.statusText,
-        //   headers: response.headers,
-        //   config: response.config
-        // };
-      // } catch (error) {
-      //   // 错误处理
-      //   console.error(error);
-      //   throw error;
-      // }
-    // } 
-    // getBlobData().then(result => {
-    //   // const result = (res as any) as Blob
-    //   console.log(result)
-    //   console.log(result.data instanceof Blob)
-    //   let blob = new Blob([result.data])
-    //   let link = window.URL.createObjectURL(blob)
-    //   let a = document.createElement('a')
-    //   a.download = '待办报表.xlsx'
-    //   a.href = link
-    //   a.click()
+      
 
 const handleAddCate = () => {
   store.cateModal.title = '添加分类'
