@@ -33,7 +33,7 @@
       <SearchForm v-else-if="activeTab === 'todoSetting'" ref="formRef" :model="model" :formItems="formItems" :rules="rules" />
       <div v-else-if="activeTab === 'saveDate'" class="w-full">
         <n-button type="primary" v-if="store.loginBizUser" size="small" :loading="loading" @click="saveToServer">确定同步</n-button>
-        <n-button class="ml-3" type="warning" v-if="store.loginBizUser" size="small" :loading="loading" @click="logout">退出用户</n-button>
+        <n-button class="ml-3" type="warning" v-if="store.loginBizUser" size="small" :loading="loading" @click="logoutFn">退出用户</n-button>
         <div class="w-60%" v-else>
           <n-tabs type="segment" v-model:value="activeSync" @update:value="handleUpdateActiveSync" animated>
             <n-tab-pane name="login" tab="登录">
@@ -90,14 +90,11 @@ const {
   activeTab, activeSync,
   selectedTheme, themeOptions, modalTitle,
   model, formItems, rules, loading,
-  userFormItems, userForm, userRules,
+  userFormItems, userForm, userRules, toRFC3339,
   handleSettingConfirm, changeThemeAuto, handleUpdateActiveSync, logout,
   fetchPostPromise, userLogin, createNewUser, getSysBizTaskListFn
 } = useSettings()
 
-const isLogin = computed(() => {
-  return getToken()
-})
 
 const showSetting = () => {
   model.isShow = !model.isShow
@@ -107,11 +104,11 @@ const showSetting = () => {
   }
 }
 
-const enSureSave2Server = () => {
+const enSureSave2Server = (cb = ()=>{}) => {
   /**
    * 1、只同步已完成的数据，没有id的时候会重新生成id
    */
-   const completedData: paramsTodoType[] = store.todoData.filter(v => v.isCompleted)
+   const completedData: paramsTodoType[] = store.todoData
   .map((todo, i) => {
     let returnTodo: any = todo
     if (!todo.id) {
@@ -136,7 +133,8 @@ const enSureSave2Server = () => {
   let toUpdateData: paramsTodoType[] = completedData.filter(v => v.isRomote && v.isEdited).map(returnTodo => {
     if (returnTodo.updatedAt) {
       // 兼容时间格式 需要是 ISO 8601 格式
-      returnTodo.updatedAt = dayjs(returnTodo.updatedAt).format('YYYY-MM-DDTHH:mm:ssZ')
+      // returnTodo.updatedAt = dayjs(returnTodo.updatedAt).format('YYYY-MM-DDTHH:mm:ssZ')
+      returnTodo.updatedAt = toRFC3339(new Date(returnTodo.updatedAt))
     }
     return returnTodo
   })
@@ -151,6 +149,7 @@ const enSureSave2Server = () => {
   if (toSaveData.length === 0 && toUpdateData.length === 0 && toDelDataIds.length === 0) {
     getSysBizTaskListFn()
     window.$message.info(`当前数据已经是最新状态。`)
+    cb()
     return
   }
   if (toSaveData.length > 0) {
@@ -177,6 +176,7 @@ const enSureSave2Server = () => {
         onClose: () => nRef = null
       })
       store.delRemoteTodoData = []
+      cb()
       getSysBizTaskListFn()
     }
   }).catch(err => {
@@ -187,6 +187,7 @@ const enSureSave2Server = () => {
       content: errorMsg,
       onClose: () => nRef = null
     })
+    cb()
   })
 }
 
@@ -205,7 +206,9 @@ const saveToServer = () => {
   
 }
 
-
+function logoutFn() {
+  
+}
 
 defineExpose({ showSetting })
 </script>

@@ -1,6 +1,7 @@
 import { useStore } from '../../store'
 import { fetchPostPromise, Body } from '../../hooks/useRequest'
 import { setToken, removeToken, getToken } from '../../utils/auth'
+import { toRFC3339 } from '../../hooks/useTime'
 
 // import {  VITE_APP_API_URL} from '../../hooks/useRequest'
 // const { service } = axiosServie()
@@ -116,14 +117,14 @@ export const useSettings = () => {
     // const getBizTaskFn = (): Promise<resType> => service({ url: getSysBizTaskList, method: 'post', data: { 'biz-user': store.loginBizUser } })
     // getBizTaskFn().then(result => {
     fetchPostPromise(getSysBizTaskList, null, { 'biz-user': store.loginBizUser }).then(result => {
-      store.todoData = store.todoData.filter(v => !v.isCompleted).concat(result.data.list.map((v: paramsTodoType) => {
+      store.todoData = result.data.list.map((v: paramsTodoType) => {
         v.isRomote = true
         if (v.ID) v.id = v.ID
         if (v.Content) v.content = v.Content
         if (v.CreatedAt) v.createdAt = v.CreatedAt
         if (v.UpdatedAt) v.updatedAt = v.UpdatedAt
         return v
-      }))
+      })
       cb(result)
       loading.value = false
     }).catch((err: any) => {
@@ -209,6 +210,7 @@ export const useSettings = () => {
     store.loginBizUser = ''
     removeToken()
     localStorage.removeItem('biz-user')
+    store.todoData = []
   }
 
   const handleUpdateActiveSync = (val: string) => {
@@ -221,6 +223,8 @@ export const useSettings = () => {
 
   return {
     fetchPostPromise,
+    
+    toRFC3339,
     
     loading,
     activeTab,
