@@ -197,10 +197,15 @@
 
   watchEffect(() => {
     if (store.loginBizUser) {
-      formItems.splice(6, 0, { span: 9, label: `相关附件`, path: `attachMents`, type: 'custom' })
+      const index = formItems.findIndex(v => v.path === 'attachMents')
+      if (index === -1) {
+        formItems.splice(6, 0, { span: 9, label: `相关附件`, path: `attachMents`, type: 'custom' })
+      }
     } else {
       const index = formItems.findIndex(v => v.path === 'attachMents')
-      formItems.splice(index, 1)
+      if (index > -1) {
+        formItems.splice(index, 1)
+      }
     }
   })
 
