@@ -3,7 +3,7 @@
     <div class="w-100vw h-100vh relative">
       <div class="bg absolute w-100vw h-100vh"></div>
       <div
-        class="absolute flex justify-between h-40px w-90px top-10vh left-[50%] translate-x-[-50%] cursor-pointer"
+        class="absolute flex justify-center h-40px w-90px top-10vh left-[50%] translate-x-[-50%] cursor-pointer"
       >
         <n-tooltip placement="bottom" trigger="hover">
           <template #trigger>
@@ -17,7 +17,7 @@
           </template>
           解锁
         </n-tooltip>
-        <n-tooltip placement="bottom" trigger="hover">
+        <!-- <n-tooltip placement="bottom" trigger="hover">
           <template #trigger>
             <div
               class="w-40px h-40px"
@@ -36,7 +36,7 @@
             </div>
           </template>
           {{ store.fullscreen ? '取消全屏' : '全屏' }}
-        </n-tooltip>
+        </n-tooltip> -->
       </div>
 
       <div

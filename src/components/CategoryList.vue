@@ -95,7 +95,7 @@
                   </template>
                   清除所有待办事项
                 </n-tooltip>
-                <n-tooltip placement="left" trigger="hover">
+                <!-- <n-tooltip placement="left" trigger="hover">
                   <template #trigger>
                     <n-icon class="mr-5">
                       <ICarbonExport class="text-18px" @click.stop="handleExport" />
@@ -110,7 +110,7 @@
                     </n-icon>
                   </template>
                   导入待办事项
-                </n-tooltip>
+                </n-tooltip> -->
                 <n-tooltip v-if="store.loginBizUser" placement="left" trigger="hover">
                   <template #trigger>
                     <n-icon class="mr-5">

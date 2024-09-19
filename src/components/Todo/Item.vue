@@ -238,17 +238,18 @@
       && Array.isArray(props.item.attachMents) && props.item.attachMents.length > 0
     ) {
       todoInfo.attachMents = props.item.attachMents.map((v, i) => {
-        const isReshowIndex = `${v}`.indexOf(VITE_APP_API_URL) as number
-        let path = `${VITE_APP_API_URL}/${v}`
+        const isReshowIndex = `${v.url}`.indexOf(VITE_APP_API_URL) as number
+        let path = `${VITE_APP_API_URL}/${v.url}`
         if (isReshowIndex != -1) {
           uploadedFileList.value.push(v)
-          path = `${v}`
+          path = `${v.url}`
         }
-
+        let fileName = path.split('/').pop()
         return {
-          status: 'finished', id: `${i}`, name: v, url: path, sourcePath: path
+          status: 'finished', id: `${i}`, name: fileName, url: path, sourcePath: path
         }
       })
+      console.log('1 -- todoInfo.attachMents: ', todoInfo.attachMents)
       uploadedFileList.value = todoInfo.attachMents.map(v => {
         const isReshowIndex = v.url?.indexOf(VITE_APP_API_URL) as number
         if (isReshowIndex != -1) {
@@ -256,7 +257,7 @@
         }
         return v
       })
-      console.log('todoInfo.attachMents: ', todoInfo.attachMents)
+      console.log('2 -- todoInfo.attachMents: ', todoInfo.attachMents)
     }
   }
 

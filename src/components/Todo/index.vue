@@ -240,37 +240,36 @@
 
   const dialog = useDialog()
   async function exportShowTodoList() {
-    // const exportInfo2Txt = async (needMemo: boolean = false) => {
-    //   const filePath = await save({
-    //     filters: [{
-    //       name: 'showTodoList',
-    //       extensions: ['txt']
-    //     }]
-    //   });
+    const exportInfo2Txt = async (needMemo: boolean = false) => {
+      let exportData = showTodoList.value.map(v => `${v.isCompleted ? '已完成': '进行中'}-${v.content} ${v.isCompleted ? '耗时：' + timeDuration(v) : ''}`)
+      if (checkedTodos.value.length > 0) { 
+        exportData = checkedTodos.value.map(v => `${v.isCompleted? '已完成': '进行中'}-${v.content}${needMemo ? '-' + v.memo : ''}`)
+      }
+      
+      window.$notification.success({
+        title: checkedTodos.value.length ? '勾选待办导出成功': '导出成功',
+        duration: 3000,
+      })
+      // 获取文本内容
+      const content = JSON.stringify(exportData, null, 2)
+      // 创建 Blob 对象
+      const txtType = 'text/plain'
+      const blob = new Blob([content], { type: txtType });
+      // 创建下载链接
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `showTodoList_${Date.now()}.txt`
+      // 触发点击事件
+      link.click();
 
-    //   if (filePath) {
-    //     let exportData = showTodoList.value.map(v => `${v.isCompleted ? '已完成': '进行中'}-${v.content} ${v.isCompleted ? '耗时：' + timeDuration(v) : ''}\n`).join('')
-    //     if (checkedTodos.value.length > 0) { 
-    //       exportData = checkedTodos.value.map(v => `${v.isCompleted? '已完成': '进行中'}-${v.content}${needMemo ? '-' + v.memo : ''}\n`).join('')
-    //     }
-    //     writeTextFile(filePath, exportData)
-    //     window.$notification.success({
-    //       title: checkedTodos.value.length ? '勾选待办导出成功': '导出成功',
-    //       duration: 3000,
-    //     })
-    //   } else {
-    //     window.$notification.info({
-    //       title: '取消导出',
-    //       duration: 3000,
-    //     })
-    //   }
-    // }
-    // console.log('dialog: ', dialog)
-    // dialog.info({
-    //   title: `提示`, content: `是否导出备注？`, positiveText: `是`, negativeText: `否`, 
-    //   onPositiveClick: async () => exportInfo2Txt(true),
-    //   onNegativeClick: () => exportInfo2Txt()
-    // })
+      // 清除 URL 对象
+      URL.revokeObjectURL(link.href);
+    }
+    dialog.info({
+      title: `提示`, content: `是否导出备注？`, positiveText: `是`, negativeText: `否`, 
+      onPositiveClick: async () => exportInfo2Txt(true),
+      onNegativeClick: () => exportInfo2Txt()
+    })
   }
 
   const handleAddTodoConfirm = (e: MouseEvent) => {

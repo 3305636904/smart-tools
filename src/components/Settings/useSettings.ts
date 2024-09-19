@@ -118,7 +118,12 @@ export const useSettings = () => {
     getBizTaskFn().then(result => {
     // fetchPostPromise(getSysBizTaskList, null, { 'biz-user': store.loginBizUser }).then(result => {
       console.log('todoData: ', store.todoData)
-      store.todoData = store.todoData.filter(v => !v.isCompleted).concat(result.data.list.map((v: paramsTodoType) => {
+      if (!store.todoData || store.todoData.length === 0) {
+        store.todoData = []
+      } else {
+        store.todoData = store.todoData.filter(v => !v.isCompleted)
+      }
+      store.todoData = store.todoData.concat(result.data.list.map((v: paramsTodoType) => {
         v.isRomote = true
         if (v.ID) v.id = v.ID
         if (v.Content) v.content = v.Content

@@ -30,7 +30,7 @@
       </template>
       锁屏
     </n-tooltip>
-    <n-tooltip placement="top-end" trigger="hover">
+    <!-- <n-tooltip placement="top-end" trigger="hover">
       <template #trigger>
         <n-button
           class="mb-2"
@@ -47,7 +47,7 @@
         </n-button>
       </template>
       {{ store.fullscreen ? '退出全屏' : '全屏' }}
-    </n-tooltip>
+    </n-tooltip> -->
     <n-tooltip placement="top-end" trigger="hover">
       <template #trigger>
         <n-button
