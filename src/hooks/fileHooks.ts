@@ -28,3 +28,17 @@ export function handleFile(disposition: string) {
   }
   return { fileName, fileType }
 }
+
+export function blobToArrayBuffer(blob: Blob): Promise<ArrayBuffer> {
+  return new Promise((resolve, reject) => {
+    const fileReader = new FileReader()
+    fileReader.onload = (e) => {
+      resolve(e.target?.result as ArrayBuffer)
+    }
+    // 将文件读取为ArrayBuffer
+    fileReader.readAsArrayBuffer(blob);
+    fileReader.onerror = () => {
+      reject(new Error('blobToBase64 error'))
+    }
+  })
+}

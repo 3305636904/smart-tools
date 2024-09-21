@@ -99,9 +99,9 @@ const {
 const showSetting = () => {
   model.isShow = !model.isShow
 
-  if (model.isShow ) {
-    changeThemeAuto()
-  }
+  // if (model.isShow ) {
+  //   changeThemeAuto()
+  // }
 }
 
 const enSureSave2Server = (cb = ()=>{}) => {
@@ -207,7 +207,7 @@ const saveToServer = () => {
 }
 
 function logoutFn() {
-  
+  logout()
 }
 
 defineExpose({ showSetting })

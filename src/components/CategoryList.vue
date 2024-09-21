@@ -373,17 +373,7 @@ const handleExportExcel = () => {
   //   title: '开发调整中'
   // })
   // TODO: 附件下载
-  todoRef.value?.expotExcelCallback((params: Record<string, any>) => {
-    // fetchPostPromise(exportExcelUrl, params, { 'biz-user': store.loginBizUser || '', responseType: 'blob' }).then(res => {
-    //   const result = (res as any) as Blob
-    //   console.log(result)
-    //   console.log(result.data instanceof Blob)
-    //   let blob = new Blob([result.data])
-    //   let link = window.URL.createObjectURL(blob)
-    //   let a = document.createElement('a')
-    //   a.download = '待办报表.xlsx'
-    // })
-    
+  todoRef.value?.expotExcelCallback((params: Record<string, any>) => {    
     // 发起 POST 请求，期望返回 Blob 类型
     const getBlobData = async () => {
       try {
