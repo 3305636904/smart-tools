@@ -52,7 +52,9 @@ export default defineConfig(({ mode }) => {
         // https://www.u.tools/docs/developer/preload.html
         name: "window.preload",
         // preload打包内容
-        path: "src/preload/index.ts"
+        path: resolve(__dirname, "./src/preload/index.ts"),
+        // path: "./src/preload/index.ts"
+        // path: fileURLToPath(new URL('../preload/index.ts', import.meta.url))
       }),
       createUpxPlugin({
         // 打包输出目录

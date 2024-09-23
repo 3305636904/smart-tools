@@ -4,3 +4,5 @@ utools.onPluginEnter(async enter => {
 
 utools.onPluginOut(async exit => {
 });
+
+export default utools;

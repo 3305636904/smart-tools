@@ -1,6 +1,7 @@
 
 import CryptoJS from "crypto-js";
 import axios from "axios";
+import utools from 'utools-api-types'
 
 import { axiosServie } from '../hooks/useRequest'
 import { setToken, getToken, removeToken } from './auth'
@@ -11,11 +12,11 @@ export const getUser = () => {
   return utools.getUser()
 }
 
-function handleParams(params) {
+function handleParams(params: Record<string, any>) {
   var secretKey = "";
   const sortedParams = Object.keys(params)
     .sort()
-    .reduce((obj, key) => {
+    .reduce((obj: Record<string, any>, key) => {
       obj[key] = params[key];
       return obj;
     }, {});
@@ -28,7 +29,7 @@ function handleParams(params) {
   return hmacHash.toString(CryptoJS.enc.Hex);
 }
 
-const setItem = (key, value, expires = 2592000000) => {
+const setItem = (key: string, value: any, expires = 2592000000) => {
   let count = new Date().getTime() + expires;
   const obj = {
     value, // 需要缓存的数据
@@ -39,11 +40,12 @@ const setItem = (key, value, expires = 2592000000) => {
 
 
 export function getUtoolToken() {
-  utools.fetchUserServerTemporaryToken().then((res) => {
+  utools.fetchUserServerTemporaryToken().then((res: any) => {
     const params = {
       plugin_id: "zgvcgslm",
       access_token: res.token,
       timestamp: Math.floor(new Date().getTime() / 1000),
+      sign: ''
     };
     params.sign = handleParams(params);
     axios
@@ -71,17 +73,12 @@ export function getUtoolToken() {
       
         const registerFn = (cb = () => {}) => {
           service({ url: createBizUser, method: 'post', data: params }).then(res => {
-            console.log('创建bizUser成功', res);
-            service({ url: getBizUser, method: 'post', data: params }).then(res => {
-              if (res.code === 0) {
-                utools.db.put(params)
-                cb()
-              }
-            })
+            cb()
           })
         }
         const loginFn = (cb = () => {}) => {
-          service({ url: getBizUser, method: 'post', data: params }).then(res => {
+          const getBizUserFn = (): Promise<resType> => service({ url: getBizUser, method: 'post', data: params })
+          getBizUserFn().then(res => {
             if (res.code === 0) {
               // localStorage.setItem('biz-user', JSON.stringify(store.loginBizUser))
               setToken(token)
