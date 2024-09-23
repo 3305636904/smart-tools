@@ -270,7 +270,7 @@
     const editDataIndex = store.todoData.findIndex(v => v.id === props.item.id)
       if (editDataIndex!== -1) {
         props.item.updatedAt = new Date()
-        if (props.item.isRomote) props.item.isEdited = true
+        props.item.isEdited = true
         store.todoData[editDataIndex] = { ...store.todoData[editDataIndex], ...props.item }
         store.lastOperatedItemId = (props.item.id as string)
       }
@@ -288,9 +288,7 @@
         if (!todoInfo.isCompleted) {
           todoInfo.updatedAt = new Date()
         }
-        if (todoInfo.isRomote) {
-          todoInfo.isEdited = true
-        }
+        todoInfo.isEdited = true
         if (uploadedFileList.value && uploadedFileList.value.length > 0) {
           todoInfo.attachMents = uploadedFileList.value.map(v => v.url)
         }
