@@ -1,5 +1,5 @@
 <template>
-  <n-card v-if="!props.isList" content-class="content-clz" :class="['w-20vw', 'text-left', 'p-0', 'relative', 'overflow-hidden', 
+  <n-card v-if="!props.isList" content-class="content-clz" :class="['w-20vw', 'text-left', 'relative', 'overflow-hidden', 
   {
     'color-gray-500': props.item.isCompleted, 
     'bg-green-100': !store.darkTheme && store.lastOperatedItemId === props.item.id,
@@ -38,14 +38,14 @@
   </n-card>
   <!-- 'border-b-emerald',  -->
   <n-p v-else 
-    :class="['text-left', 'p-1', 'pt-2', 'pos-relative', 'overflow-hidden', 'b-rounded-1.5', 
+    :class="['text-left', 'p-1', 'mt-2', 'mb-2', 'pos-relative', 'overflow-hidden', 'b-rounded-1.5', 'bg-gray-100',
     {
       'hover:bg-dark': store.darkTheme, 
       'hover:bg-gray-200': !store.darkTheme,  
       'bg-green-100': !store.darkTheme && store.lastOperatedItemId === props.item.id,
       'bg-green-900': store.darkTheme && store.lastOperatedItemId === props.item.id
     }]"
-    style="width: calc(100% - 15px);"
+    style="width: 100%;"
     @mouseenter="() => (isEnter = true)" @mouseleave="() => (isEnter = false)">
     <!--  -->
     <span v-show="!props.item.isCompleted && !isEdit">
@@ -159,7 +159,7 @@
 
   const isUploading = ref(false)
 
-  import { useTodoEditForm } from './useTodo'
+  import { useTodoEditForm, service } from './useTodo'
   const { todoInfo, rules, formItems, getToken } = useTodoEditForm()
 
   const formRef = ref<FormInst>()
@@ -238,11 +238,11 @@
       && Array.isArray(props.item.attachMents) && props.item.attachMents.length > 0
     ) {
       todoInfo.attachMents = props.item.attachMents.map((v, i) => {
-        const isReshowIndex = `${v.url}`.indexOf(VITE_APP_API_URL) as number
-        let path = `${VITE_APP_API_URL}/${v.url}`
+        const isReshowIndex = `${v}`.indexOf(VITE_APP_API_URL) as number
+        let path = `${VITE_APP_API_URL}/${v}`
         if (isReshowIndex != -1) {
           uploadedFileList.value.push(v)
-          path = `${v.url}`
+          path = `${v}`
         }
         let fileName = path.split('/').pop()
         return {
@@ -347,58 +347,28 @@
     }
   }
 
-  async function overHandleClick() {
-    // const selected = await open({
-    //   multiple: true,
-    //   filters: [{
-    //     name: 'Image',
-    //     extensions: ['png', 'jpg', 'jpeg', 'txt', 'doc', 'docx']
-    //   }]
-    // });
-    // // console.log('111 attachMents: ', todoInfo.attachMents)
-    // if (Array.isArray(selected)) {
-    //   selected.forEach(async selectedFilePath => {
-    //     isUploading.value = true
-    //     const url = convertFileSrc(selectedFilePath)
-    //     const name = selectedFilePath.split('/').pop()
-    //     const newTodoItem = {
-    //       id: `${Date.now() + Math.ceil(Math.random() * 1000000)}`,
-    //       name: name as string,
-    //       status: 'finished',
-    //       url: url
-    //     } as attachMentsType
-    //     todoInfo.attachMents.push(newTodoItem)
-    //     isUploading.value = false
-    //     window.$message.success('上传成功')
-    //   })
-    // } else if (selected === null) {
-    //   // user cancelled the selection
-    // } else {
-    //   // user selected a single file
-    // }
-  }
 
   const customRequest = (options: UploadCustomRequestOptions) => {
     if (options.file.file) {
       const file = (options.file.file as File)
       const formData = new FormData()
       formData.append('file', file, options.file.name)
-      window.$notification.info({
-        title: '开发调整中'
-      })
-      return false
-      // TODO: 使用 fetch重写
-      // const fileUploadUrlFn = (): Promise<resType> => {
-      //   return service({ url: fileUploadUrl, method: 'post', data: formData})
-      // }
-      // fileUploadUrlFn().then(res => {
-      //   if (res.code === 0) {
-      //     const retFileInfo = res.data.file
-      //     if (retFileInfo) {
-      //       uploadedFileList.value.push(retFileInfo)
-      //     }
-      //   }
+      // window.$notification.info({
+      //   title: '开发调整中'
       // })
+      // return false
+      // TODO: 使用 fetch重写
+      const fileUploadUrlFn = (): Promise<resType> => {
+        return service({ url: fileUploadUrl, method: 'post', data: formData})
+      }
+      fileUploadUrlFn().then(res => {
+        if (res.code === 0) {
+          const retFileInfo = res.data.file
+          if (retFileInfo) {
+            uploadedFileList.value.push(retFileInfo)
+          }
+        }
+      })
     }
   }
 
@@ -445,6 +415,6 @@
   
 <style scoped>
 :deep(.content-clz) {
-  padding: 1em;
+  /* padding: 1em; */
 }
 </style>

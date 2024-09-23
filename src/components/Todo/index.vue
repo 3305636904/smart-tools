@@ -1,41 +1,5 @@
 <template>
-  <n-layout class="w-92%">
-    <div :class="['w-20px', 'flex', 'flex-col', 'rounded-4', 'pos-fixed', 'right-20px', 'p-8px', 'pb-15px', 'z-50', {'hover:bg-gray-700': store.darkTheme, 'hover:bg-gray-200': !store.darkTheme }]">
-      <n-tooltip placement="left" trigger="hover" >
-        <template #trigger>
-          <n-icon class="cursor-pointer" @click.stop="switchCondition">
-            <IMaterialSymbolsTopPanelCloseOutline v-if="!hiddenCondition" class="text-18px" />
-            <IMaterialSymbolsBottomPanelCloseOutlineSharp v-else class="text-18px" />
-          </n-icon>
-        </template>
-        {{ hiddenCondition ? '展开工具栏' : '收起工具栏' }}
-      </n-tooltip>
-      <n-tooltip v-if="showTodoList.length" placement="left" trigger="hover">
-        <template #trigger>
-          <n-icon class="mt-18px cursor-pointer" @click.stop="batchClick">
-            <ICarbonBatchJob class="text-19px" v-if="!isBatch" />
-            <IMdiCancelBoxMultiple class="text-19px" v-else />
-          </n-icon>
-        </template>
-        {{ isBatch ? '取消批量操作' : '批量操作' }}
-      </n-tooltip>
-      <n-tooltip v-if="checkedTodos.length" placement="left" trigger="hover">
-        <template #trigger>
-          <n-icon class="mt-18px cursor-pointer" @click.stop="handleDeleteTodo">
-            <IMaterialSymbolsDeleteOutline class="text-19px" />
-          </n-icon>
-        </template>
-        批量删除
-      </n-tooltip>
-      <n-tooltip placement="left" trigger="hover">
-        <template #trigger>
-          <n-icon class="mt-18px" @click.stop="exportShowTodoList">
-            <IClarityExportLine class="text-19px" />
-          </n-icon>
-        </template>
-        {{ checkedTodos.length ? '导出勾选展示数据' : '导出展示数据' }}
-      </n-tooltip>
-    </div>
+  <n-layout class="w-99%">
     <n-form
       :label-width="80"
       :rules="rules"
@@ -69,7 +33,8 @@
       <n-checkbox v-if="isBatch" :label="checkedTodos.length ? `选中${checkedTodos.length}` : '全选'" size="small" v-model:checked="isCheckAll" />
     </p>
     <n-checkbox-group v-model:value="checkedTodos">
-      <n-space :vertical="store.isTodoList">
+      <n-space :vertical="store.isTodoList" :justify="store.isTodoList ? 'start': 'space-around'">
+      <!-- <n-space :vertical="store.isTodoList" > -->
         <TodoItem v-for="(v, i) of showTodoList" :key="i" :item="v" :index="i + 1" :is-list="store.isTodoList" :isBatch="isBatch" />
       </n-space>
     </n-checkbox-group>
@@ -154,11 +119,11 @@
   const isUploading = ref(false)
 
   const dayofWeek = new Date().getDay()
-  if ([6, 0].includes(dayofWeek)) {
-    searchTodoTypes.value = ['3']
-  } else {
-    searchTodoTypes.value = ['1']
-  }
+  // if ([6, 0].includes(dayofWeek)) {
+  //   searchTodoTypes.value = ['3']
+  // } else {
+  //   searchTodoTypes.value = ['1']
+  // }
 
   const showTodoList = computed(() => {
     console.log('store.todoData： ', store.todoData)
@@ -219,6 +184,7 @@
 
   function switchCondition() {
     hiddenCondition.value = !hiddenCondition.value
+    emits('update:hiddenCondition', hiddenCondition.value)
   }
 
   function batchClick() {
@@ -227,6 +193,7 @@
       checkedTodos.value = []
       isCheckAll.value = false
     }
+    emits('update:isBatch', isBatch.value)
   }
 
   function timeDuration(item: Record<string, any>) {
@@ -410,35 +377,6 @@
     return true
   }
   
-  async function overHandleClick() {
-    // const selected = await open({
-    //   multiple: true,
-    //   filters: [{
-    //     name: 'Image',
-    //     extensions: ['png', 'jpg', 'jpeg', 'txt', 'doc', 'docx']
-    //   }]
-    // });
-    // if (Array.isArray(selected)) {
-    //   selected.forEach(async selectedFilePath => {
-    //     isUploading.value = true
-    //     const url = convertFileSrc(selectedFilePath)
-    //     const name = selectedFilePath.split('/').pop()
-    //     todoInfo.attachMents.push({
-    //       id: `${Date.now() + Math.ceil(Math.random() * 1000000)}`,
-    //       name: name,
-    //       status: 'finished',
-    //       url,
-    //       sourcePath: selectedFilePath
-    //     })
-    //     isUploading.value = false
-    //   })
-    //   console.log(1, todoInfo.attachMents)
-    // } else if (selected === null) {
-    //   // user cancelled the selection
-    // } else {
-    //   // user selected a single file
-    // }
-  }
 
   function expotExcelCallback(cb = (params: Record<string, any>) => {}) {
     let params: Record<string, any> = {
@@ -458,13 +396,20 @@
     cb(params)
   }
 
-  const emits = defineEmits(['update:checkedOptions'])
+  const emits = defineEmits([
+    'update:checkedOptions', 
+    'update:hiddenCondition',
+    'update:isBatch'
+  ])
 
   defineExpose({
     handleShowModal,
     handleDeleteTodo,
 
-    expotExcelCallback
+    expotExcelCallback,
+
+    isBatch, checkedTodos,
+    switchCondition, batchClick, showTodoList, exportShowTodoList
   })
 
 </script>

@@ -33,7 +33,7 @@
       <SearchForm v-else-if="activeTab === 'todoSetting'" ref="formRef" :model="model" :formItems="formItems" :rules="rules" />
       <div v-else-if="activeTab === 'saveDate'" class="w-full">
         <n-button type="primary" v-if="store.loginBizUser" size="small" :loading="loading" @click="saveToServer">确定同步</n-button>
-        <n-button class="ml-3" type="warning" v-if="store.loginBizUser" size="small" :loading="loading" @click="logout">退出用户</n-button>
+        <n-button class="ml-3" type="warning" v-if="store.loginBizUser" size="small" :loading="loading" @click="logoutFn">退出用户</n-button>
         <div class="w-60%" v-else>
           <n-tabs type="segment" v-model:value="activeSync" @update:value="handleUpdateActiveSync" animated>
             <n-tab-pane name="login" tab="登录">
@@ -80,7 +80,7 @@ import { getToken } from '../../utils/auth'
 import { useStore } from '../../store'
 import { useSettings } from './useSettings'
 
-import { getUtoolToken } from '../../utils/u.js'
+import { getUtoolToken } from '../../utils/u'
 
 import { axiosServie } from '../../hooks/useRequest'
 const { service } = axiosServie()
@@ -104,6 +104,11 @@ const isLogin = computed(() => {
   return getToken()
 })
 
+function logoutFn() {
+  logout()
+  store.todoData = []
+}
+
 const showSetting = () => {
   model.isShow = !model.isShow
   getUtoolToken()
@@ -117,7 +122,8 @@ const enSureSave2Server = () => {
   /**
    * 1、只同步已完成的数据，没有id的时候会重新生成id
    */
-  let completedData: paramsTodoType[] = store.todoData.filter(v => v.isCompleted).
+  // let completedData: paramsTodoType[] = store.todoData.filter(v => v.isCompleted).
+  let completedData: paramsTodoType[] = store.todoData.
   map((todo, i) => {
     let returnTodo: any = todo
     if (!todo.id) {
