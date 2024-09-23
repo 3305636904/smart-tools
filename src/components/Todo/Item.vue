@@ -16,7 +16,7 @@
         <span :class="['text-size-12px', 'color-red', 'p-1', {'bg-gray-700': store.darkTheme, 'bg-gray-400': !store.darkTheme}]">{{ spendDuration }}</span>
       </n-popover>
     </span>
-    <n-switch :round="false" :railStyle="switchStatusColor" class="v-base mr-1.5" size="small" v-model:value="props.item.isCompleted" @on-update:value="updateEditItemByTime">
+    <n-switch :round="false" :railStyle="switchStatusColor" class="v-base mr-1.5" size="small" v-model:value="props.item.isCompleted" @update:value="updateEditItemByTime">
       <template #unchecked>待关闭</template>
       <template #checked>已关闭</template>
     </n-switch>
@@ -64,7 +64,7 @@
           <span>{{ props.index }}. </span>
           <span :class="['mr-1.5', { 'color-gray-700': !store.darkTheme, 'color-gray-400': store.darkTheme, 'line-through': props.item.isCompleted }]">{{props.item.content}}</span>
         </n-ellipsis>
-        <n-switch :round="false" :railStyle="switchStatusColor" class="v-text-top" size="small" v-model:value="props.item.isCompleted" @on-update:value="updateEditItemByTime">
+        <n-switch :round="false" :railStyle="switchStatusColor" class="v-text-top" size="small" v-model:value="props.item.isCompleted" @update:value="updateEditItemByTime">
           <template #unchecked>待关闭</template>
           <template #checked>已关闭</template>
         </n-switch>
@@ -266,14 +266,15 @@
     }
   }
 
-  function updateEditItemByTime () {
+  function updateEditItemByTime (val: boolean) {
     const editDataIndex = store.todoData.findIndex(v => v.id === props.item.id)
-      if (editDataIndex!== -1) {
-        props.item.updatedAt = new Date()
-        props.item.isEdited = true
-        store.todoData[editDataIndex] = { ...store.todoData[editDataIndex], ...props.item }
-        store.lastOperatedItemId = (props.item.id as string)
-      }
+    console.log('editDataIndex: ', editDataIndex)
+    if (editDataIndex!== -1) {
+      props.item.updatedAt = new Date()
+      props.item.isEdited = true
+      store.todoData[editDataIndex] = { ...store.todoData[editDataIndex], ...props.item }
+      store.lastOperatedItemId = (props.item.id as string)
+    }
   }
 
   function handleEditTodoConfirm(e: MouseEvent | KeyboardEvent) {
@@ -285,9 +286,7 @@
       const editDataIndex = store.todoData.findIndex(v => v.id === todoInfo.id)
       store.lastOperatedItemId = (todoInfo.id as string)
       if (editDataIndex!== -1) {
-        if (!todoInfo.isCompleted) {
-          todoInfo.updatedAt = new Date()
-        }
+        todoInfo.updatedAt = new Date()
         todoInfo.isEdited = true
         if (uploadedFileList.value && uploadedFileList.value.length > 0) {
           todoInfo.attachMents = uploadedFileList.value.map(v => v.url)

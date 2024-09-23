@@ -108,7 +108,7 @@ const enSureSave2Server = (cb = ()=>{}) => {
   /**
    * 1、只同步已完成的数据，没有id的时候会重新生成id
    */
-   const completedData: paramsTodoType[] = store.todoData
+  const completedData: paramsTodoType[] = store.todoData
   .map((todo, i) => {
     let returnTodo: any = todo
     if (!todo.id) {
