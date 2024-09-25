@@ -73,12 +73,14 @@ export const axiosServie = () => {
   // request拦截器
   service.interceptors.request.use(config => {
     // 是否需要设置 token
-    const isToken = (config.headers || {}).isToken === false
+    // const isToken = (config.headers || {}).isToken === false
     // 是否需要防止数据重复提交
     const isRepeatSubmit = (config.headers || {}).repeatSubmit === false
-    if (getToken() && !isToken) {
-      config.headers['biz-user'] = getToken() // 让每个请求携带自定义token 请根据实际情况自行修改
+    const loginUid = window.utools.dbStorage.getItem('loginUid')
+    if (getToken()) {
+      // config.headers['biz-user'] = getToken() // 让每个请求携带自定义token 请根据实际情况自行修改
     }
+    config.headers['biz-user'] = loginUid // 让每个请求携带自定义token 请根据实际情况自行修改
     // get请求映射params参数
     if (config.method === 'get' && config.params) {
       let url = config.url + '?' + tansParams(config.params);

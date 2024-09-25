@@ -17,6 +17,8 @@
 
 import NaiveProvider from './components/NaiveProvider.vue'
 import { useStore } from './store'
+import { formatTimeDifference } from './hooks/useTime'
+
 import LockScreen from './components/LockScreen.vue'
 
 import { useSettings } from './components/Settings/useSettings'
@@ -25,6 +27,23 @@ const { changeThemeAuto } = useSettings()
 const store = useStore()
 
 changeThemeAuto()
+
+onMounted(() => {
+  const loginUid = utools.dbStorage.getItem('loginUid')
+  if (loginUid) {
+    const lastLoginTime = utools.dbStorage.getItem('loginTime')
+    const { days, hours } = formatTimeDifference(new Date().getTime() - lastLoginTime)
+    if (days > 0 || hours > 5) {
+      utools.dbStorage.removeItem('loginUid')
+      store.todoData = []
+      store.loginBizUser = ''
+      localStorage.removeItem('biz-user')
+    } else {
+      utools.dbStorage.setItem('loginTime', new Date().getTime())
+      store.loginBizUser = loginUid
+    }
+  }
+})
 
 </script>
 

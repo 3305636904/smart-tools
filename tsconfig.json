@@ -14,7 +14,8 @@
     "skipLibCheck": true,
     "typeRoots": ["src/typings"],
     "types": [
-      "unplugin-icons/types/vue"
+      "unplugin-icons/types/vue",
+      "utools-api-types"
     ]
   },
   "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"],

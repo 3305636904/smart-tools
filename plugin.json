@@ -14,5 +14,8 @@
 			"cmds": ["tool", "助手"],
 			"icon": "appicon.png"
 		}
-	]
+	],
+	"development": {
+		"main": "http://127.0.0.1:1420/index.html"
+	}
 }

@@ -250,7 +250,6 @@
         uploadedFileList.value.forEach((v: any, i) => {
           let name = ``
           const fileInfo = v.file
-          // if (fileInfo.name) name = fileInfo.name
           attachMents.push({ id: `${i}`, name, status: 'finished', url: fileInfo.url })
         })
       }
@@ -273,15 +272,18 @@
   }
 
   const handleShowModal = () => {
+    const index = formItems.findIndex(v => v.path === 'attachMents')
     if (store.loginBizUser) {
-      formItems.splice(3, 0, { span: 9, label: `相关附件`, path: `attachMents`, type: 'custom' })
+      if (index === -1) {
+        formItems.splice(3, 0, { span: 9, label: `相关附件`, path: `attachMents`, type: 'custom' })
+      }
     } else {
-      const index = formItems.findIndex(v => v.path === 'attachMents')
       if (index > -1) {
         formItems.splice(index, 1)
       }
     }
     todoInfo.isShow = true
+    console.log('store: ', store)
     todoInfo.content = ''
     todoInfo.level = '4'
     todoInfo.type = searchTodoTypes.value
@@ -373,7 +375,6 @@
     const targetIndex = todoInfo.attachMents.findIndex(v => v.id = file.id)
     todoInfo.attachMents.splice(targetIndex, 1)
     options.fileList = todoInfo.attachMents
-    console.log(2, todoInfo.attachMents)
     return true
   }
   

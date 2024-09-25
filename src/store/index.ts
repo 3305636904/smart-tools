@@ -82,7 +82,7 @@ export const useStore = defineStore('global', () => {
         // data.value = jsonParse
       } else {
         data.value = JSON.parse(window.localStorage.getItem('data') as string)
-        todoData.value = JSON.parse(window.localStorage.getItem('todoData') as string)
+          todoData.value = JSON.parse(window.localStorage.getItem('todoData') || '[]' as string)
         todoData.value.forEach((item, i) => {
           if (!item.id) {
             item.id = Date.now() + Math.floor((Math.random() * 10000)) + i
@@ -91,10 +91,10 @@ export const useStore = defineStore('global', () => {
             item.updatedAt = new Date(item.updatedAt)
           }
         })
-        showCateToolList.value = JSON.parse(window.localStorage.getItem('showCateToolList') as string)
-        activeVal.value = JSON.parse(window.localStorage.getItem('activeVal') as string)
-        isTodoList.value = JSON.parse(window.localStorage.getItem('isTodoList') as string)
-        loginBizUser.value = JSON.parse(window.localStorage.getItem('biz-user') as string)
+        showCateToolList.value = JSON.parse(window.localStorage.getItem('showCateToolList') || '[2]' as string)
+        activeVal.value = JSON.parse(window.localStorage.getItem('activeVal') || '2' as string)
+        isTodoList.value = JSON.parse(window.localStorage.getItem('isTodoList') || 'true' as string)
+        loginBizUser.value = JSON.parse(window.localStorage.getItem('biz-user') || '""' as string)
       }
     } catch (e) {}
 

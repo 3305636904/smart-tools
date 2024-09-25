@@ -38,7 +38,7 @@
   </n-card>
   <!-- 'border-b-emerald',  -->
   <n-p v-else 
-    :class="['text-left', 'p-1', 'mt-2', 'mb-2', 'pos-relative', 'overflow-hidden', 'b-rounded-1.5', 'bg-gray-100',
+    :class="['text-left', 'p-1', 'mt-2', 'mb-2', 'pos-relative', 'overflow-hidden', 'b-rounded-1.5',
     {
       'hover:bg-dark': store.darkTheme, 
       'hover:bg-gray-200': !store.darkTheme,  
@@ -214,7 +214,6 @@
   
 
   function editItem() {
-    console.log('edit item: ', props.item)
     todoInfo.isShow = true
     todoInfo.content = props.item.content
     todoInfo.level = props.item.level
@@ -249,7 +248,7 @@
           status: 'finished', id: `${i}`, name: fileName, url: path, sourcePath: path
         }
       })
-      console.log('1 -- todoInfo.attachMents: ', todoInfo.attachMents)
+      console.log('todoInfo.attachMents: ', todoInfo.attachMents)
       uploadedFileList.value = todoInfo.attachMents.map(v => {
         const isReshowIndex = v.url?.indexOf(VITE_APP_API_URL) as number
         if (isReshowIndex != -1) {
@@ -257,7 +256,6 @@
         }
         return v
       })
-      console.log('2 -- todoInfo.attachMents: ', todoInfo.attachMents)
     }
   }
 
@@ -265,7 +263,7 @@
     const editDataIndex = store.todoData.findIndex(v => v.id === props.item.id)
       if (editDataIndex!== -1) {
         props.item.updatedAt = new Date()
-        if (props.item.isRomote) props.item.isEdited = true
+        props.item.isEdited = true
         store.todoData[editDataIndex] = { ...store.todoData[editDataIndex], ...props.item }
         store.lastOperatedItemId = (props.item.id as string)
       }
@@ -280,16 +278,13 @@
       const editDataIndex = store.todoData.findIndex(v => v.id === todoInfo.id)
       store.lastOperatedItemId = (todoInfo.id as string)
       if (editDataIndex!== -1) {
-        if (!todoInfo.isCompleted) {
-          todoInfo.updatedAt = new Date()
-        }
-        if (todoInfo.isRomote) {
-          todoInfo.isEdited = true
-        }
+        todoInfo.updatedAt = new Date()
+        todoInfo.isEdited = true
         if (uploadedFileList.value && uploadedFileList.value.length > 0) {
           todoInfo.attachMents = uploadedFileList.value.map(v => v.url)
         }
         store.todoData[editDataIndex] = { ...store.todoData[editDataIndex], ...todoInfo }
+        console.log('todoData: ', store.todoData[editDataIndex])
       }
       
       todoInfo.isShow = false
@@ -388,6 +383,8 @@
   }
 
   const handleRemove = (options: any) => {
+    console.log('remove: ', options)
+    console.log('uploadedFileList: ', uploadedFileList.value)
     return new Promise((resolve, reject) => {
       window.$dialog.warning({
         title: '警告',
@@ -396,7 +393,10 @@
         negativeText: '取消',
         onPositiveClick: () => {
           const file = options.file as UploadFileInfo
-          
+          const targetIndex =  todoInfo.attachMents.findIndex(v => v.name == file.name)
+          if (targetIndex > -1) {
+            todoInfo.attachMents.splice(targetIndex, 1)
+          }
           uploadedFileList.value.splice(options.index, 1)
           return true
         }

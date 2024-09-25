@@ -80,8 +80,6 @@ import { getToken } from '../../utils/auth'
 import { useStore } from '../../store'
 import { useSettings } from './useSettings'
 
-import { getUtoolToken } from '../../utils/u'
-
 import { axiosServie } from '../../hooks/useRequest'
 const { service } = axiosServie()
 
@@ -97,7 +95,7 @@ const {
   model, formItems, rules, loading,
   userFormItems, userForm, userRules,
   handleSettingConfirm, changeThemeAuto, handleUpdateActiveSync, logout,
-  userLogin, createNewUser, getSysBizTaskListFn
+  userLogin, createNewUser, getSysBizTaskListFn, enSureSave2Server
 } = useSettings()
 
 const isLogin = computed(() => {
@@ -111,111 +109,15 @@ function logoutFn() {
 
 const showSetting = () => {
   model.isShow = !model.isShow
-  getUtoolToken()
-  if (model.isShow ) {
-    changeThemeAuto()
-  }
+  // getUtoolToken()
+  // if (model.isShow ) {
+  //   changeThemeAuto()
+  // }
 }
 
-const enSureSave2Server = () => {
-  console.log('store: ', store)
-  /**
-   * 1、只同步已完成的数据，没有id的时候会重新生成id
-   */
-  // let completedData: paramsTodoType[] = store.todoData.filter(v => v.isCompleted).
-  let completedData: paramsTodoType[] = store.todoData.
-  map((todo, i) => {
-    let returnTodo: any = todo
-    if (!todo.id) {
-      const newId = Date.now() + (Math.floor(Math.random() * 10000) + i)
-      returnTodo.ID = newId
-      returnTodo.id = newId
-    }
-    if (todo.attachMents && Array.isArray(todo.attachMents) && todo.attachMents.length > 0) returnTodo.attachMents = todo.attachMents.map(v => {
-      if (typeof v == 'object' && Object.hasOwn(v, 'url')) return v.url
-      return v
-    })
-    if (todo.type && !Array.isArray(todo.type)) {
-      returnTodo.type = [todo.type]
-    }
-    delete returnTodo.UpdatedAt
-    return returnTodo
-  })
-  /**
-   * 2、根据isRomote标识区分数据是否已经在服务器，isEdited标识是否修改过
-   */
-  let toSaveData: paramsTodoType[] = completedData.filter(v => !v.isRomote)
-  let toUpdateData: paramsTodoType[] = completedData.filter(v => v.isRomote && v.isEdited).map(returnTodo => {
-    if (returnTodo.updatedAt) {
-      // 兼容时间格式 需要是 ISO 8601 格式
-      returnTodo.updatedAt = dayjs(returnTodo.updatedAt).format('YYYY-MM-DDTHH:mm:ssZ')
-    }
-    return returnTodo
-  })
-  let toDelDataIds  = store.delRemoteTodoData
-  const saveUrl = `/bizTask/createBatchBizTask`
-  const updateUrl = `/bizTask/updateBatchBizTask`
-  const deleteUrl = `/bizTask/delBatchBizTask`
-
-  console.log(toSaveData.length, toUpdateData.length, toDelDataIds.length)
-  console.log(toSaveData, toUpdateData, toDelDataIds)
-  const promiseList = []
-  if (toSaveData.length === 0 && toUpdateData.length === 0 && toDelDataIds.length === 0) {
-    getSysBizTaskListFn()
-    window.$message.info(`当前数据已经是最新状态。`)
-    return
-  }
-  if (toSaveData.length > 0) {
-    const params = { requestBizTaskList: toSaveData}
-    // promiseList.push(fetchPostPromise(saveUrl, params, { 'biz-user': store.loginBizUser || '' }))
-    promiseList.push(service({ url: saveUrl, method: 'POST', data: params }) as Promise<resType>)
-  }
-  if (toUpdateData.length > 0) {
-    const params = {requestBizTaskList: toUpdateData}
-    // promiseList.push(fetchPostPromise(updateUrl, params, { 'biz-user': store.loginBizUser || '' }))
-    promiseList.push(service({ url: updateUrl, method: 'POST', data: params }) as Promise<resType>)
-  }
-  if (toDelDataIds.length > 0) {
-    const params = { ids: toDelDataIds }
-    // promiseList.push(fetchPostPromise(deleteUrl, params, { 'biz-user': store.loginBizUser || '' }))
-    promiseList.push(service({ url: updateUrl, method: 'POST', data: params }) as Promise<resType>)
-  }
-  let nRef
-  Promise.all(promiseList).then(resArr => {
-    if (resArr && Array.isArray(resArr) && resArr.length > 0) {
-      nRef = window.$notification.success({
-        title: '操作成功。',
-        content: resArr.map(v => v?.msg).join(', '),
-        onClose: () => nRef = null
-      })
-      store.delRemoteTodoData = []
-      getSysBizTaskListFn()
-    }
-  }).catch(err => {
-    console.error(err)
-    const errorMsg = err && Array.isArray(err) ? err.map(v => v.msg) : err.msg;
-    nRef = window.$notification.error({
-      title: '操作失败。',
-      content: errorMsg,
-      onClose: () => nRef = null
-    })
-  })
-}
 
 const saveToServer = () => {
-  // window.$dialog.warning({
-  //   title: `温馨提示`,
-  //   content: `为防止因为网络等原因导致数据丢失，请先备份数据，再进行同步操作。`,
-  //   positiveText: '去备份',
-  //   negativeText: '直接同步',
-  //   onPositiveClick: () => {
-  //   },
-  //   onNegativeClick: () => {
-  //     enSureSave2Server()
-  //   }
-  // })
   enSureSave2Server()
-  
 }
 
 

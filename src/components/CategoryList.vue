@@ -46,7 +46,6 @@
 						title="待办纪要"
 						:name="2"
 						display-directive="show"
-						v-if="store.showCateToolList.includes(2)"
 						disabled
 					>
 						<template #header-extra>
@@ -64,7 +63,6 @@
 									},
 								]"
 								@click.stop="() => {}"
-								v-if="store.activeVal === 2"
 							>
 								<n-tooltip placement="top" trigger="hover">
 									<template #trigger>
@@ -77,6 +75,15 @@
 										</n-icon>
 									</template>
 									切换为{{ store.isTodoList ? "方块" : "列表" }}
+								</n-tooltip>
+								<n-tooltip placement="top" trigger="hover" >
+									<template #trigger>
+										<n-icon class="mr-5" @click.stop="switchCondition">
+											<IMaterialSymbolsTopPanelCloseOutline v-if="!hiddenCondition" class="text-18px" />
+											<IMaterialSymbolsBottomPanelCloseOutlineSharp v-else class="text-18px" />
+										</n-icon>
+									</template>
+									{{ hiddenCondition ? '展开工具栏' : '收起工具栏' }}
 								</n-tooltip>
 								<n-tooltip placement="top" trigger="hover">
 									<template #trigger>
@@ -221,12 +228,11 @@ const isBatch = ref<Boolean>(false)
 
 const isYearTimeShow = ref<Boolean>(false);
 
-const expandedNames = ref<number | null>();
+const expandedNames = ref([2]);
 
 onMounted(() => {
 	getLeftDays();
 	// expandedNames.value = store.activeVal
-	expandedNames.value = 2;
 });
 
 const showTopButton = ref(false);
@@ -261,9 +267,9 @@ const handleItemHeaderClick: CollapseProps["onItemHeaderClick"] = ({
 };
 
 watchEffect(() => {
-	if (store.showCateToolList.length > 0) {
-		expandedNames.value = store.activeVal;
-	}
+	// if (store.showCateToolList.length > 0) {
+	// 	expandedNames.value = store.activeVal;
+	// }
 });
 
 function switchCondition() {
@@ -432,7 +438,7 @@ const handleExportExcel = () => {
 				`${VITE_APP_API_URL}${exportExcelUrl}`,
 				params,
 				{
-					headers: { "biz-user": getToken() },
+					headers: { "biz-user": window.utools.dbStorage.getItem('loginUid') },
 					responseType: "blob", // 设置响应类型为 blob
 				}
 			);

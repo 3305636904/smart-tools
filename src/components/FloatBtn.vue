@@ -1,8 +1,8 @@
 <template>
   <n-button circle class="fixed bottom-1 right-1 z-9999 cursor-pointer" @click.stop="switchBtnHandle">
-    <i-MaterialSymbolsArrowLeftRounded :class="['text-24px transition-all-300',showBtn ? 'transform-rotate-180' : '']"/>
+    <i-MaterialSymbolsArrowLeftRounded :class="['text-22px transition-all-300',showBtn ? 'transform-rotate-180' : '']"/>
   </n-button>
-  <div class="fixed flex flex-col bottom-8 right-4 z-9999" v-if="showBtn">
+  <div class="fixed flex flex-col bottom-10 right-1 z-9999" v-if="showBtn">
     <n-tooltip placement="top-end" trigger="hover">
       <template #trigger>
         <n-button class="mb-2" circle size="large" @click="themeSwitch">
