@@ -115,6 +115,7 @@
           list-type="image-card"
           @preview="handlePreview"
           :on-remove="handleRemove"
+          :max="5"
         />
       </template>
     </search-form>
@@ -237,25 +238,20 @@
       && Array.isArray(props.item.attachMents) && props.item.attachMents.length > 0
     ) {
       todoInfo.attachMents = props.item.attachMents.map((v, i) => {
-        const isReshowIndex = `${v}`.indexOf(VITE_APP_API_URL) as number
-        let path = `${VITE_APP_API_URL}/${v}`
-        if (isReshowIndex != -1) {
-          uploadedFileList.value.push(v)
-          path = `${v}`
-        }
+        let path = `${import.meta.env.MODE === 'development' ? 'http://127.0.0.1:8888': VITE_APP_API_URL}/${v}`
+        uploadedFileList.value.push(v)
         let fileName = path.split('/').pop()
         return {
-          status: 'finished', id: `${i}`, name: fileName, url: path, sourcePath: path
+          status: 'finished', id: `${i}`, name: fileName, url: path, sourcePath: `${v}`,
         }
       })
-      console.log('todoInfo.attachMents: ', todoInfo.attachMents)
-      uploadedFileList.value = todoInfo.attachMents.map(v => {
-        const isReshowIndex = v.url?.indexOf(VITE_APP_API_URL) as number
-        if (isReshowIndex != -1) {
-          v.url = v.url?.substring(isReshowIndex, v.url.length)
-        }
-        return v
-      })
+      // uploadedFileList.value = todoInfo.attachMents.map(v => {
+      //   const isReshowIndex = v.url?.indexOf(VITE_APP_API_URL) as number
+      //   if (isReshowIndex != -1) {
+      //     v.url = v.url?.substring(isReshowIndex, v.url.length)
+      //   }
+      //   return v
+      // })
     }
   }
 
@@ -281,7 +277,8 @@
         todoInfo.updatedAt = new Date()
         todoInfo.isEdited = true
         if (uploadedFileList.value && uploadedFileList.value.length > 0) {
-          todoInfo.attachMents = uploadedFileList.value.map(v => v.url)
+          console.log('uploadedFileList.value: ', uploadedFileList.value)
+          todoInfo.attachMents = uploadedFileList.value
         }
         store.todoData[editDataIndex] = { ...store.todoData[editDataIndex], ...todoInfo }
         console.log('todoData: ', store.todoData[editDataIndex])
@@ -348,20 +345,17 @@
       const file = (options.file.file as File)
       const formData = new FormData()
       formData.append('file', file, options.file.name)
-      // window.$notification.info({
-      //   title: '开发调整中'
-      // })
-      // return false
-      // TODO: 使用 fetch重写
       const fileUploadUrlFn = (): Promise<resType> => {
         return service({ url: fileUploadUrl, method: 'post', data: formData})
       }
       fileUploadUrlFn().then(res => {
         if (res.code === 0) {
           const retFileInfo = res.data.file
+          console.log('retFileInfo: ', retFileInfo)
           if (retFileInfo) {
-            uploadedFileList.value.push(retFileInfo)
+            uploadedFileList.value.push(retFileInfo.url)
           }
+          options.onFinish()
         }
       })
     }
@@ -383,8 +377,6 @@
   }
 
   const handleRemove = (options: any) => {
-    console.log('remove: ', options)
-    console.log('uploadedFileList: ', uploadedFileList.value)
     return new Promise((resolve, reject) => {
       window.$dialog.warning({
         title: '警告',

@@ -177,7 +177,7 @@
 					<n-button
 						circle
 						size="small"
-						class="fixed right-5 bottom-1"
+						class="fixed right-8 bottom-1"
 						@click="scrollToTop"
 					>
 						<ISystemUiconsPushUp />

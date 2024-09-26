@@ -127,9 +127,9 @@ export const useSettings = () => {
         if (v.Content) v.content = v.Content
         if (v.CreatedAt) v.createdAt = v.CreatedAt
         if (v.UpdatedAt) v.updatedAt = v.UpdatedAt
-        if (v.attachMents && typeof v.attachMents === 'string') {
-          if ((v.attachMents as string).indexOf(';') !== -1) {
-            v.attachMents = (v.attachMents as string).split(';')
+        if (v.attachMents && typeof v.attachMents === 'string' && v.attachMents !== '') {
+          if ((v.attachMents as string).indexOf(',') !== -1) {
+            v.attachMents = (v.attachMents as string).split(',')
           } else {
             v.attachMents = [(v.attachMents as string)]
           }
@@ -256,7 +256,7 @@ export const useSettings = () => {
      * 2、根据isRomote标识区分数据是否已经在服务器，isEdited标识是否修改过
      */
     let toSaveData: paramsTodoType[] = completedData.filter(v => !v.isRomote)
-    let toUpdateData: paramsTodoType[] = completedData.filter(v => v.isRomote && v.isEdited).map(returnTodo => {
+    let toUpdateData: paramsTodoType[] = completedData.filter(v => v.isEdited).map(returnTodo => {
       if (returnTodo.updatedAt) {
         // 兼容时间格式 需要是 ISO 8601 格式
         returnTodo.updatedAt = dayjs(returnTodo.updatedAt).format('YYYY-MM-DDTHH:mm:ssZ')
