@@ -5,8 +5,9 @@
   "author": "zhiPeng",
 	"homepage": "http://111.229.144.150/web/download/",
   "version": "0.0.1",
-	"main": "index.html",
 	"logo": "appicon.png",
+	"main": "index.html",
+	"platform": ["win32"],
 	"features": [
 		{
 			"code": "tools",

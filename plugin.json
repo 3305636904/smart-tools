@@ -7,6 +7,7 @@
   "version": "0.0.1",
 	"main": "index.html",
 	"logo": "appicon.png",
+	"platform": ["win32"],
 	"features": [
 		{
 			"code": "tools",
