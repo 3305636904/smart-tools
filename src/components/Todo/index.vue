@@ -338,11 +338,6 @@
       negativeText: '取消',
       onPositiveClick: () => {
         store.todoData = store.todoData.filter(v =>!checkedTodos.value?.includes(v))
-        let toDelRemoteIdList = []
-        if (store.delRemoteTodoData.length > 0) {
-          toDelRemoteIdList = checkedTodos.value.filter(v => v.isRomote && v.isCompleted).map(v => v.id)
-        }
-        store.delRemoteTodoData = store.delRemoteTodoData.concat(toDelRemoteIdList)
         checkedTodos.value = []
         window.$notification.success({
           title: '删除成功',

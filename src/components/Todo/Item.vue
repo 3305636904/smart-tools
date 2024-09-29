@@ -305,7 +305,7 @@
       positiveText: '确定',
       negativeText: '不确定',
       onPositiveClick: () => {
-        if (props.item.isRomote && props.item.isCompleted && props.item.id) {
+        if (props.item.id && !store.delRemoteTodoData.some(v => v === props.item.id)) {
           store.delRemoteTodoData.push(props.item.id as string)
         }
         if (props.item.id) {
